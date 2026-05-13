@@ -23,6 +23,7 @@ async function bootstrap() {
         'http://localhost:3000',
         'https://riri.rw',
         'https://www.riri.rw',
+        'https://api.riri.rw',
       ],
       methods: 'GET,POST,PATCH,DELETE,PUT',
       allowedHeaders: ['Content-Type', 'Authorization'],
@@ -45,5 +46,4 @@ async function bootstrap() {
     process.exit(1);
   }
 }
-
 void bootstrap();
