@@ -1,6 +1,6 @@
 # Ignore dependency and build folders everywhere
 node_modules/
 .next/
-dist/
+#dist/
 .env
 *.log
