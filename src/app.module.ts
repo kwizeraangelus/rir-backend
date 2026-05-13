@@ -30,7 +30,7 @@ import { InnovationModule } from './innovation/innovation.module';
       database: process.env.DB_NAME,
       entities: [__dirname + '/**/*.entity.js'],
 
-      synchronize: true,
+      synchronize: false,
 
       // development settings
       dropSchema: false,
