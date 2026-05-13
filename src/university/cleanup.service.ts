@@ -31,7 +31,9 @@ export class CleanupService {
 
     if (expiredUploads.length === 0) return;
 
-    this.logger.log(`Found ${expiredUploads.length} rejected uploads to delete`);
+    this.logger.log(
+      `Found ${expiredUploads.length} rejected uploads to delete`,
+    );
 
     for (const upload of expiredUploads) {
       // Delete file from disk

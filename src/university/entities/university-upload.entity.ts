@@ -80,5 +80,4 @@ export class UniversityUpload {
 
   @CreateDateColumn()
   updated_at!: Date;
-
 }

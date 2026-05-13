@@ -41,7 +41,7 @@ export class AdminService {
             status: true,
             user: {
               id: true,
-              first_name : true, // adjust to your actual field name
+              first_name: true, // adjust to your actual field name
             },
           },
         }),
@@ -63,10 +63,10 @@ export class AdminService {
         total_events: eventCount,
         pending_count: pendingList.length,
       },
-       pending: pendingList.map(item => ({
-      ...item,
-      author_name: item.user?.first_name ?? 'Unknown', // ✅ map it here
-    })),
+      pending: pendingList.map((item) => ({
+        ...item,
+        author_name: item.user?.first_name ?? 'Unknown', // ✅ map it here
+      })),
     };
   }
 

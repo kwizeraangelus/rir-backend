@@ -2,14 +2,16 @@ import { Entity, PrimaryColumn, Column, BeforeInsert } from 'typeorm';
 import * as bcrypt from 'bcrypt';
 import { v4 as uuidv4 } from 'uuid';
 
-export enum UserCategory {
-  RESEARCHER = 'researcher',
-  UNIVERSITY = 'university',
-  CONF_ORGANIZER = 'conf_organizer',
-  PUBLIC_VISITOR = 'public_visitor',
-  INNOVATOR = 'innovator',
-  ADMIN = 'admin',
-}
+export const UserCategory = {
+  RESEARCHER: 'researcher',
+  UNIVERSITY: 'university',
+  CONF_ORGANIZER: 'conf_organizer',
+  PUBLIC_VISITOR: 'public_visitor',
+  INNOVATOR: 'innovator',
+  ADMIN: 'admin',
+} as const;
+
+export type UserCategory = (typeof UserCategory)[keyof typeof UserCategory];
 
 @Entity('users')
 export class User {
@@ -33,7 +35,7 @@ export class User {
 
   @Column({
     type: 'enum',
-    enum: UserCategory,
+    enum: Object.values(UserCategory), // Uses the string values directly for MySQL compatibility
   })
   user_category: UserCategory = UserCategory.PUBLIC_VISITOR;
 
