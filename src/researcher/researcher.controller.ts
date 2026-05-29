@@ -86,4 +86,9 @@ export class ResearcherController {
   async getResearcherDetail(@Param('id') id: string) {
     return this.researcherService.getResearcherDetail(id);
   }
+
+  @Get('experts')
+  async getAllExperts(@Query('search') search?: string) {
+    return this.researcherService.getAllExperts(search);
+  }
 }

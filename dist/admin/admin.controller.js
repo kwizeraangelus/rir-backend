@@ -99,6 +99,10 @@ let AdminController = class AdminController {
     async deleteInnovation(id) {
         return this.adminService.deleteInnovation(id);
     }
+    async createResearch(req, body) {
+        const adminId = req.user.userId;
+        return this.adminService.createResearch(adminId, body);
+    }
 };
 exports.AdminController = AdminController;
 __decorate([
@@ -289,6 +293,15 @@ __decorate([
     __metadata("design:paramtypes", [String]),
     __metadata("design:returntype", Promise)
 ], AdminController.prototype, "deleteInnovation", null);
+__decorate([
+    (0, common_1.Post)('create-research'),
+    (0, common_1.UseGuards)(jwt_auth_guard_1.JwtAuthGuard),
+    __param(0, (0, common_1.Req)()),
+    __param(1, (0, common_1.Body)()),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", [Object, Object]),
+    __metadata("design:returntype", Promise)
+], AdminController.prototype, "createResearch", null);
 exports.AdminController = AdminController = __decorate([
     (0, common_1.Controller)('api/admin'),
     (0, common_1.UseGuards)(jwt_auth_guard_1.JwtAuthGuard, admin_guard_1.AdminGuard),

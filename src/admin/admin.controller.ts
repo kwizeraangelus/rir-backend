@@ -277,4 +277,13 @@ export class AdminController {
   async deleteInnovation(@Param('id') id: string) {
     return this.adminService.deleteInnovation(id);
   }
+ @Post('create-research')
+  @UseGuards(JwtAuthGuard)
+  async createResearch(
+    @Req() req,
+    @Body() body: any,
+  ) {
+    const adminId = req.user.userId;
+    return this.adminService.createResearch(adminId, body);
+  }
 }

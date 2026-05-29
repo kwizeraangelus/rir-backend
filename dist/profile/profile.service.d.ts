@@ -28,6 +28,7 @@ export declare class ProfileService {
         orcid?: string;
         cv?: string;
         resume?: string;
+        isExpert: boolean;
     }>;
     updateProfile(targetId: string, requesterId: string, isStaff: boolean, dto: UpdateProfileDto): Promise<{
         id: string;
@@ -50,6 +51,7 @@ export declare class ProfileService {
         orcid?: string;
         cv?: string;
         resume?: string;
+        isExpert: boolean;
     }>;
     updatePhoto(targetId: string, requesterId: string, isStaff: boolean, filePath: string): Promise<{
         id: string;
@@ -72,6 +74,7 @@ export declare class ProfileService {
         orcid?: string;
         cv?: string;
         resume?: string;
+        isExpert: boolean;
     }>;
     updateCv(targetId: string, requesterId: string, isStaff: boolean, filePath: string): Promise<{
         id: string;
@@ -94,6 +97,7 @@ export declare class ProfileService {
         orcid?: string;
         cv?: string;
         resume?: string;
+        isExpert: boolean;
     }>;
     updateResume(targetId: string, requesterId: string, isStaff: boolean, filePath: string): Promise<{
         id: string;
@@ -116,6 +120,7 @@ export declare class ProfileService {
         orcid?: string;
         cv?: string;
         resume?: string;
+        isExpert: boolean;
     }>;
     changePassword(targetId: string, requesterId: string, isStaff: boolean, dto: ChangePasswordDto): Promise<{
         message: string;

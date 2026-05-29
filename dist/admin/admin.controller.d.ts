@@ -145,4 +145,8 @@ export declare class AdminController {
     approveInnovation(id: string): Promise<import("typeorm").UpdateResult>;
     rejectInnovation(id: string, feedback: string): Promise<import("typeorm").UpdateResult>;
     deleteInnovation(id: string): Promise<import("typeorm").DeleteResult>;
+    createResearch(req: any, body: any): Promise<{
+        message: string;
+        publication: import("../researcher/entities/publication.entity").Publication;
+    }>;
 }

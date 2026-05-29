@@ -29,4 +29,13 @@ export declare class ResearcherController {
         university: string | undefined;
         publications: import("./entities/publication.entity").Publication[];
     }>;
+    getAllExperts(search?: string): Promise<{
+        id: string;
+        name: string;
+        qualification: string;
+        email: string;
+        contact: string;
+        specialization: string;
+        image: string;
+    }[]>;
 }

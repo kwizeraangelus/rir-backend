@@ -29,6 +29,7 @@ export declare class User {
     orcid?: string;
     cv?: string;
     resume?: string;
+    isExpert: boolean;
     generateId(): void;
     hashPassword(): Promise<void>;
 }

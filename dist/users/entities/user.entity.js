@@ -76,6 +76,7 @@ let User = class User {
     orcid;
     cv;
     resume;
+    isExpert = false;
     generateId() {
         if (!this.id) {
             this.id = (0, uuid_1.v4)();
@@ -173,6 +174,10 @@ __decorate([
     (0, typeorm_1.Column)({ nullable: true }),
     __metadata("design:type", String)
 ], User.prototype, "resume", void 0);
+__decorate([
+    (0, typeorm_1.Column)({ default: false }),
+    __metadata("design:type", Boolean)
+], User.prototype, "isExpert", void 0);
 __decorate([
     (0, typeorm_1.BeforeInsert)(),
     __metadata("design:type", Function),

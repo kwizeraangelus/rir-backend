@@ -212,6 +212,30 @@ let AdminService = class AdminService {
     async deleteInnovation(id) {
         return this.innovationRepo.delete(id);
     }
+    async createResearch(adminId, data) {
+        const assignedToExpertId = data.assignedToExpertId && data.assignedToExpertId.trim() !== ''
+            ? data.assignedToExpertId
+            : null;
+        const publication = this.pubRepo.create({
+            title: data.title,
+            authors: data.authors || [],
+            journal_name: data.journal_name,
+            conference_info: data.conference_info,
+            doi: data.doi,
+            url: data.url,
+            publisher: data.publisher,
+            book_title: data.book_title,
+            publication_type: data.publication_type || 'journal',
+            status: data.status ?? true,
+            assignedToExpertId: assignedToExpertId,
+            userId: adminId,
+        });
+        const savedPub = await this.pubRepo.save(publication);
+        return {
+            message: 'Research created successfully',
+            publication: savedPub,
+        };
+    }
 };
 exports.AdminService = AdminService;
 exports.AdminService = AdminService = __decorate([

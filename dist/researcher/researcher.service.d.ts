@@ -32,4 +32,13 @@ export declare class ResearcherService {
         university: string | undefined;
         publications: Publication[];
     }>;
+    getAllExperts(search?: string): Promise<{
+        id: string;
+        name: string;
+        qualification: string;
+        email: string;
+        contact: string;
+        specialization: string;
+        image: string;
+    }[]>;
 }

@@ -90,4 +90,8 @@ export declare class AdminService {
     approveInnovation(id: string): Promise<import("typeorm").UpdateResult>;
     rejectInnovation(id: string, feedback: string): Promise<import("typeorm").UpdateResult>;
     deleteInnovation(id: string): Promise<import("typeorm").DeleteResult>;
+    createResearch(adminId: string, data: any): Promise<{
+        message: string;
+        publication: Publication;
+    }>;
 }

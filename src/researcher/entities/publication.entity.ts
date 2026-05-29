@@ -17,8 +17,8 @@ export class Publication {
   @Column()
   title?: string;
 
-  @Column('simple-array') // Stores ['Author 1', 'Author 2'] as a string in DB
-  authors?: string[];
+  @Column('simple-array', { nullable: true })
+  authors: string[] = [];
 
   @Column({ nullable: true })
   journal_name?: string;
@@ -39,20 +39,25 @@ export class Publication {
   book_title?: string;
 
   @Column({ default: 'journal' })
-  publication_type?: string;
-
-  // src/researcher/entities/publication.entity.ts
+  publication_type: string = 'journal';
 
   @Column({ default: false })
   status: boolean = false;
 
-  @CreateDateColumn()
-  created_at?: Date;
+  @Column({ nullable: true })
+  assignedToExpertId?: string;
+
+  @ManyToOne(() => User, { nullable: true })
+  @JoinColumn({ name: 'assignedToExpertId' })
+  assignedToExpert?: User;
 
   @ManyToOne(() => User, (user) => user.id, { onDelete: 'CASCADE' })
-  @JoinColumn({ name: 'userId' }) // This links the relation to the column below
+  @JoinColumn({ name: 'userId' })
   user?: User;
 
-  @Column() // Remove 'nullable: true' if every publication MUST have a user
-  userId!: string;
+  @Column()
+  userId?: string;
+
+  @CreateDateColumn()
+  created_at?: Date;
 }

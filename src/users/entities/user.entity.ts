@@ -81,6 +81,11 @@ export class User {
   @Column({ nullable: true })
   resume?: string;
 
+
+  // src/users/entities/user.entity.ts
+  @Column({ default: false })
+  isExpert: boolean = false;
+
   @BeforeInsert()
   generateId() {
     if (!this.id) {

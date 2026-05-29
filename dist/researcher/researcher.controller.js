@@ -51,6 +51,9 @@ let ResearcherController = class ResearcherController {
     async getResearcherDetail(id) {
         return this.researcherService.getResearcherDetail(id);
     }
+    async getAllExperts(search) {
+        return this.researcherService.getAllExperts(search);
+    }
 };
 exports.ResearcherController = ResearcherController;
 __decorate([
@@ -114,6 +117,13 @@ __decorate([
     __metadata("design:paramtypes", [String]),
     __metadata("design:returntype", Promise)
 ], ResearcherController.prototype, "getResearcherDetail", null);
+__decorate([
+    (0, common_1.Get)('experts'),
+    __param(0, (0, common_1.Query)('search')),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", [String]),
+    __metadata("design:returntype", Promise)
+], ResearcherController.prototype, "getAllExperts", null);
 exports.ResearcherController = ResearcherController = __decorate([
     (0, common_1.Controller)('api'),
     __metadata("design:paramtypes", [researcher_service_1.ResearcherService])

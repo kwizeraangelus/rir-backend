@@ -74,7 +74,7 @@ let ResearcherService = class ResearcherService {
         try {
             const query = this.userRepo
                 .createQueryBuilder('user')
-                .where('user.user_category = :category AND user.is_active = true', {
+                .where('user.user_category = :category AND user.is_active = true AND user.isExpert = false', {
                 category: 'researcher',
             })
                 .select([
@@ -156,6 +156,39 @@ let ResearcherService = class ResearcherService {
             console.error('Error in getResearcherDetail:', error);
             throw error;
         }
+    }
+    async getAllExperts(search) {
+        const query = this.userRepo
+            .createQueryBuilder('user')
+            .where('user.user_category = :category AND user.is_active = true AND user.isExpert = true', {
+            category: 'researcher',
+        })
+            .select([
+            'user.id',
+            'user.first_name',
+            'user.last_name',
+            'user.email',
+            'user.phone_number',
+            'user.qualification', 'user.specialization',
+            'user.bio',
+            'user.profile_image',
+            'user.orcid'
+        ]);
+        if (search) {
+            query.andWhere('(user.first_name LIKE :search OR user.last_name LIKE :search OR user.specialization LIKE :search)', { search: `%${search}%` });
+        }
+        const users = await query.getMany();
+        return users.map(user => ({
+            id: user.id,
+            name: `${user.first_name} ${user.last_name}`.trim(),
+            qualification: user.qualification || 'Not Specified',
+            email: user.email,
+            contact: user.phone_number || 'N/A',
+            specialization: user.specialization || user.bio?.slice(0, 150) || 'Not Specified',
+            image: user.profile_image
+                ? `http://localhost:8000${user.profile_image.startsWith('/') ? '' : '/'}${user.profile_image}`
+                : 'https://via.placeholder.com/120x150/003087/ffffff?text=Expert',
+        }));
     }
 };
 exports.ResearcherService = ResearcherService;

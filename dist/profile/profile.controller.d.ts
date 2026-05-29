@@ -32,6 +32,7 @@ export declare class ProfileController {
         orcid?: string;
         cv?: string;
         resume?: string;
+        isExpert: boolean;
     }>;
     updateProfile(id: string, dto: UpdateProfileDto, req: {
         user: JwtUser;
@@ -56,6 +57,7 @@ export declare class ProfileController {
         orcid?: string;
         cv?: string;
         resume?: string;
+        isExpert: boolean;
     }>;
     updatePhoto(id: string, file: Express.Multer.File, req: {
         user: JwtUser;
@@ -80,6 +82,7 @@ export declare class ProfileController {
         orcid?: string;
         cv?: string;
         resume?: string;
+        isExpert: boolean;
     }>;
     updateCv(id: string, file: Express.Multer.File, req: {
         user: JwtUser;
@@ -104,6 +107,7 @@ export declare class ProfileController {
         orcid?: string;
         cv?: string;
         resume?: string;
+        isExpert: boolean;
     }>;
     updateResume(id: string, file: Express.Multer.File, req: {
         user: JwtUser;
@@ -128,6 +132,7 @@ export declare class ProfileController {
         orcid?: string;
         cv?: string;
         resume?: string;
+        isExpert: boolean;
     }>;
     changePassword(id: string, dto: ChangePasswordDto, req: {
         user: JwtUser;
