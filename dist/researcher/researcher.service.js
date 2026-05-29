@@ -40,15 +40,25 @@ let ResearcherService = class ResearcherService {
     }
     async updateProfile(userId, body, file) {
         const updateData = {};
-        if (body.bio)
+        if (body.bio !== undefined)
             updateData.bio = body.bio;
-        if (body.platformId)
+        if (body.platformId !== undefined)
             updateData.orcid = body.platformId;
+        if (body.qualification !== undefined)
+            updateData.qualification = body.qualification;
+        if (body.specialization !== undefined)
+            updateData.specialization = body.specialization;
         if (file) {
             updateData.profile_image = `/uploads/profiles/${file.filename}`;
+            console.log('✅ Image saved:', updateData.profile_image);
         }
-        if (!userId)
+        if (!userId) {
             throw new common_1.BadRequestException('User ID is missing');
+        }
+        console.log('Update Data:', updateData);
+        if (Object.keys(updateData).length === 0) {
+            return this.getProfile(userId);
+        }
         await this.userRepo.update(userId, updateData);
         return this.getProfile(userId);
     }
@@ -59,6 +69,93 @@ let ResearcherService = class ResearcherService {
             order: { created_at: 'DESC' },
         });
         return publications;
+    }
+    async getAllResearchers(search) {
+        try {
+            const query = this.userRepo
+                .createQueryBuilder('user')
+                .where('user.user_category = :category AND user.is_active = true', {
+                category: 'researcher',
+            })
+                .select([
+                'user.id',
+                'user.first_name',
+                'user.last_name',
+                'user.email',
+                'user.phone_number',
+                'user.qualification',
+                'user.specialization',
+                'user.bio',
+                'user.profile_image',
+                'user.orcid',
+            ]);
+            if (search) {
+                query.andWhere('(user.first_name LIKE :search OR user.last_name LIKE :search OR user.specialization LIKE :search)', { search: `%${search}%` });
+            }
+            const users = await query.getMany();
+            return users.map((user) => ({
+                id: user.id,
+                name: `${user.first_name} ${user.last_name}`.trim(),
+                qualification: user.qualification || 'Not Specified',
+                email: user.email,
+                contact: user.phone_number || 'N/A',
+                specialization: user.specialization || user.bio?.slice(0, 150) || 'Not Specified',
+                image: user.profile_image
+                    ? `http://localhost:8000${user.profile_image.startsWith('/') ? '' : '/'}${user.profile_image}`
+                    : 'https://via.placeholder.com/120x150/003087/ffffff?text=Researcher',
+            }));
+        }
+        catch (error) {
+            console.error('Error in getAllResearchers:', error);
+            throw error;
+        }
+    }
+    async getResearcherDetail(id) {
+        try {
+            const user = await this.userRepo.findOne({
+                where: { id, user_category: 'researcher', is_active: true },
+                select: [
+                    'id',
+                    'first_name',
+                    'last_name',
+                    'email',
+                    'phone_number',
+                    'qualification',
+                    'specialization',
+                    'bio',
+                    'profile_image',
+                    'orcid',
+                    'university_name',
+                ],
+            });
+            if (!user) {
+                throw new common_1.NotFoundException('Researcher not found');
+            }
+            const publications = await this.pubRepo.find({
+                where: { user: { id }, status: true },
+                order: { created_at: 'DESC' },
+                take: 10,
+            });
+            return {
+                id: user.id,
+                name: `${user.first_name} ${user.last_name}`.trim(),
+                qualification: user.qualification || 'Not Specified',
+                email: user.email,
+                contact: user.phone_number || 'N/A',
+                specialization: user.specialization || 'Not Specified',
+                bio: user.bio || '',
+                image: user.profile_image
+                    ? `/uploads/profiles/${user.profile_image.split('/').pop()}`
+                    : 'https://via.placeholder.com/300x400/003087/ffffff?text=Researcher',
+                orcid: user.orcid,
+                university: user.university_name,
+                publications: publications || [],
+            };
+        }
+        catch (error) {
+            console.error('Error in getResearcherDetail:', error);
+            throw error;
+        }
     }
 };
 exports.ResearcherService = ResearcherService;

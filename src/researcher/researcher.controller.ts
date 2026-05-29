@@ -11,6 +11,8 @@ import {
   UploadedFile,
   UploadedFiles,
   UnauthorizedException,
+  Query,
+  Param,
 } from '@nestjs/common';
 import { FileFieldsInterceptor } from '@nestjs/platform-express';
 import { JwtAuthGuard } from '../auth/jwt-auth/jwt-auth.guard';
@@ -60,7 +62,7 @@ export class ResearcherController {
   )
   async updateProfile(
     @Req() req,
-    @Body() body: { bio: string; platformId: string },
+    @Body() body: any,
     @UploadedFile() file: Express.Multer.File,
   ) {
     // Use .userId from your JwtStrategy
@@ -73,5 +75,15 @@ export class ResearcherController {
   @Get('publications/public') // GET /api/publications/public
   async getPublicPublications() {
     return this.researcherService.findAllApproved();
+  }
+
+  @Get('researchers')
+  async getAllResearchers(@Query('search') search?: string) {
+    return this.researcherService.getAllResearchers(search);
+  }
+
+  @Get('researchers/:id')
+  async getResearcherDetail(@Param('id') id: string) {
+    return this.researcherService.getResearcherDetail(id);
   }
 }

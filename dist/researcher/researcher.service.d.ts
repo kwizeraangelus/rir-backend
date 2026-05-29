@@ -10,4 +10,26 @@ export declare class ResearcherService {
     createPublication(userId: string, data: any): Promise<Publication[]>;
     updateProfile(userId: string, body: any, file?: Express.Multer.File): Promise<User | null>;
     findAllApproved(): Promise<Publication[]>;
+    getAllResearchers(search?: string): Promise<{
+        id: string;
+        name: string;
+        qualification: string;
+        email: string;
+        contact: string;
+        specialization: string;
+        image: string;
+    }[]>;
+    getResearcherDetail(id: string): Promise<{
+        id: string;
+        name: string;
+        qualification: string;
+        email: string;
+        contact: string;
+        specialization: string;
+        bio: string;
+        image: string;
+        orcid: string | undefined;
+        university: string | undefined;
+        publications: Publication[];
+    }>;
 }

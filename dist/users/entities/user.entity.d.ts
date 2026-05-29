@@ -14,6 +14,8 @@ export declare class User {
     first_name: string;
     last_name: string;
     phone_number: string;
+    qualification?: string;
+    specialization?: string;
     user_category: UserCategory;
     university_name?: string;
     password: string;

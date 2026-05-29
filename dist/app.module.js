@@ -20,6 +20,7 @@ const event_module_1 = require("./event/event.module");
 const admin_module_1 = require("./admin/admin.module");
 const researcher_module_1 = require("./researcher/researcher.module");
 const innovation_module_1 = require("./innovation/innovation.module");
+const profile_module_1 = require("./profile/profile.module");
 let AppModule = class AppModule {
 };
 exports.AppModule = AppModule;
@@ -38,7 +39,7 @@ exports.AppModule = AppModule = __decorate([
                 password: process.env.DB_PASSWORD,
                 database: process.env.DB_NAME,
                 entities: [__dirname + '/**/*.entity.js'],
-                synchronize: true,
+                synchronize: false,
                 dropSchema: false,
                 migrationsRun: false,
                 logging: true,
@@ -50,6 +51,7 @@ exports.AppModule = AppModule = __decorate([
             admin_module_1.AdminModule,
             researcher_module_1.ResearcherModule,
             innovation_module_1.InnovationModule,
+            profile_module_1.ProfileModule,
         ],
         controllers: [app_controller_1.AppController],
         providers: [app_service_1.AppService],

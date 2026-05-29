@@ -45,6 +45,12 @@ let ResearcherController = class ResearcherController {
     async getPublicPublications() {
         return this.researcherService.findAllApproved();
     }
+    async getAllResearchers(search) {
+        return this.researcherService.getAllResearchers(search);
+    }
+    async getResearcherDetail(id) {
+        return this.researcherService.getResearcherDetail(id);
+    }
 };
 exports.ResearcherController = ResearcherController;
 __decorate([
@@ -94,6 +100,20 @@ __decorate([
     __metadata("design:paramtypes", []),
     __metadata("design:returntype", Promise)
 ], ResearcherController.prototype, "getPublicPublications", null);
+__decorate([
+    (0, common_1.Get)('researchers'),
+    __param(0, (0, common_1.Query)('search')),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", [String]),
+    __metadata("design:returntype", Promise)
+], ResearcherController.prototype, "getAllResearchers", null);
+__decorate([
+    (0, common_1.Get)('researchers/:id'),
+    __param(0, (0, common_1.Param)('id')),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", [String]),
+    __metadata("design:returntype", Promise)
+], ResearcherController.prototype, "getResearcherDetail", null);
 exports.ResearcherController = ResearcherController = __decorate([
     (0, common_1.Controller)('api'),
     __metadata("design:paramtypes", [researcher_service_1.ResearcherService])

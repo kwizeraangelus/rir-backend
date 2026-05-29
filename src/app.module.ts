@@ -13,6 +13,7 @@ import { EventModule } from './event/event.module';
 import { AdminModule } from './admin/admin.module';
 import { ResearcherModule } from './researcher/researcher.module';
 import { InnovationModule } from './innovation/innovation.module';
+import { ProfileModule } from './profile/profile.module';
 
 @Module({
   imports: [
@@ -45,6 +46,7 @@ import { InnovationModule } from './innovation/innovation.module';
     AdminModule,
     ResearcherModule,
     InnovationModule,
+    ProfileModule,
   ],
   controllers: [AppController],
   providers: [AppService],

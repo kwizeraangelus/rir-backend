@@ -61,6 +61,8 @@ let User = class User {
     first_name = '';
     last_name = '';
     phone_number = '';
+    qualification;
+    specialization;
     user_category = exports.UserCategory.PUBLIC_VISITOR;
     university_name;
     password = '';
@@ -108,6 +110,14 @@ __decorate([
     (0, typeorm_1.Column)(),
     __metadata("design:type", String)
 ], User.prototype, "phone_number", void 0);
+__decorate([
+    (0, typeorm_1.Column)({ nullable: true }),
+    __metadata("design:type", String)
+], User.prototype, "qualification", void 0);
+__decorate([
+    (0, typeorm_1.Column)({ nullable: true }),
+    __metadata("design:type", String)
+], User.prototype, "specialization", void 0);
 __decorate([
     (0, typeorm_1.Column)({
         type: 'enum',

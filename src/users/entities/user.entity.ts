@@ -33,6 +33,12 @@ export class User {
   @Column()
   phone_number: string = '';
 
+  @Column({ nullable: true })
+  qualification?: string;
+
+  @Column({ nullable: true })
+  specialization?: string;
+
   @Column({
     type: 'enum',
     enum: Object.values(UserCategory), // Uses the string values directly for MySQL compatibility
