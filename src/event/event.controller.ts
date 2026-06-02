@@ -14,6 +14,7 @@ import { diskStorage } from 'multer';
 import { extname } from 'path';
 import { EventsService } from './event.service';
 import { JwtAuthGuard } from '../auth/jwt-auth/jwt-auth.guard';
+import * as express from 'express';
 
 @Controller('api')
 export class EventsController {
@@ -46,7 +47,8 @@ export class EventsController {
   }
 
   @Get('events')
-  async getAllPublicEvents() {
-    return this.eventsService.findAll();
+  async getAllPublicEvents(@Req() req: express.Request) {
+    const baseUrl = `${req.protocol}://${req.get('host')}`;
+    return this.eventsService.findAll(baseUrl);
   }
 }

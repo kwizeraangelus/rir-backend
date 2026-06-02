@@ -24,7 +24,7 @@ export class EventsService {
     });
   }
 
-  async findAll() {
+  async findAll(baseUrl: string) {
     const events = await this.eventRepo.find({
       where: { status: true }, // 👈 Only get approved events
       order: { date: 'ASC' },
@@ -33,7 +33,7 @@ export class EventsService {
     // Map the database 'photo' path to 'photo_url'
     return events.map((event) => ({
       ...event,
-      photo_url: event.photo ? `http://localhost:8000${event.photo}` : null,
+      photo_url: event.photo ? `${baseUrl}${event.photo}` : null,
     }));
   }
 }

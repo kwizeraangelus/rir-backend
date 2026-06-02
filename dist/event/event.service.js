@@ -36,14 +36,14 @@ let EventsService = class EventsService {
             order: { created_at: 'DESC' },
         });
     }
-    async findAll() {
+    async findAll(baseUrl) {
         const events = await this.eventRepo.find({
             where: { status: true },
             order: { date: 'ASC' },
         });
         return events.map((event) => ({
             ...event,
-            photo_url: event.photo ? `http://localhost:8000${event.photo}` : null,
+            photo_url: event.photo ? `${baseUrl}${event.photo}` : null,
         }));
     }
 };
