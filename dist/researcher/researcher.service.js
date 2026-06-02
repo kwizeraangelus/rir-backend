@@ -46,8 +46,10 @@ let ResearcherService = class ResearcherService {
             updateData.orcid = body.platformId;
         if (body.qualification !== undefined)
             updateData.qualification = body.qualification;
-        if (body.specialization !== undefined)
-            updateData.specialization = body.specialization;
+        if (body.Field !== undefined)
+            updateData.Field = body.Field;
+        if (body.Position !== undefined)
+            updateData.Position = body.Position;
         if (file) {
             updateData.profile_image = `/uploads/profiles/${file.filename}`;
             console.log('✅ Image saved:', updateData.profile_image);
@@ -84,22 +86,24 @@ let ResearcherService = class ResearcherService {
                 'user.email',
                 'user.phone_number',
                 'user.qualification',
-                'user.specialization',
+                'user.Position',
+                'user.Field',
                 'user.bio',
                 'user.profile_image',
                 'user.orcid',
             ]);
             if (search) {
-                query.andWhere('(user.first_name LIKE :search OR user.last_name LIKE :search OR user.specialization LIKE :search)', { search: `%${search}%` });
+                query.andWhere('(user.first_name LIKE :search OR user.last_name LIKE :search OR user.Position LIKE :search)', { search: `%${search}%` });
             }
             const users = await query.getMany();
             return users.map((user) => ({
                 id: user.id,
                 name: `${user.first_name} ${user.last_name}`.trim(),
                 qualification: user.qualification || 'Not Specified',
+                Field: user.Field || 'Not Specified',
                 email: user.email,
                 contact: user.phone_number || 'N/A',
-                specialization: user.specialization || user.bio?.slice(0, 150) || 'Not Specified',
+                Position: user.Position || user.bio?.slice(0, 150) || 'Not Specified',
                 image: user.profile_image
                     ? `http://localhost:8000${user.profile_image.startsWith('/') ? '' : '/'}${user.profile_image}`
                     : 'https://via.placeholder.com/120x150/003087/ffffff?text=Researcher',
@@ -121,7 +125,8 @@ let ResearcherService = class ResearcherService {
                     'email',
                     'phone_number',
                     'qualification',
-                    'specialization',
+                    'Field',
+                    'Position',
                     'bio',
                     'profile_image',
                     'orcid',
@@ -140,9 +145,10 @@ let ResearcherService = class ResearcherService {
                 id: user.id,
                 name: `${user.first_name} ${user.last_name}`.trim(),
                 qualification: user.qualification || 'Not Specified',
+                Field: user.Field || 'Not Specified',
                 email: user.email,
                 contact: user.phone_number || 'N/A',
-                specialization: user.specialization || 'Not Specified',
+                Position: user.Position || 'Not Specified',
                 bio: user.bio || '',
                 image: user.profile_image
                     ? `/uploads/profiles/${user.profile_image.split('/').pop()}`
@@ -169,22 +175,25 @@ let ResearcherService = class ResearcherService {
             'user.last_name',
             'user.email',
             'user.phone_number',
-            'user.qualification', 'user.specialization',
+            'user.qualification',
+            'user.Position',
+            'user.Field',
             'user.bio',
             'user.profile_image',
             'user.orcid'
         ]);
         if (search) {
-            query.andWhere('(user.first_name LIKE :search OR user.last_name LIKE :search OR user.specialization LIKE :search)', { search: `%${search}%` });
+            query.andWhere('(user.first_name LIKE :search OR user.last_name LIKE :search OR user.Position LIKE :search)', { search: `%${search}%` });
         }
         const users = await query.getMany();
         return users.map(user => ({
             id: user.id,
             name: `${user.first_name} ${user.last_name}`.trim(),
             qualification: user.qualification || 'Not Specified',
+            Field: user.Field || 'Not Specified',
             email: user.email,
             contact: user.phone_number || 'N/A',
-            specialization: user.specialization || user.bio?.slice(0, 150) || 'Not Specified',
+            Position: user.Position || user.bio?.slice(0, 150) || 'Not Specified',
             image: user.profile_image
                 ? `http://localhost:8000${user.profile_image.startsWith('/') ? '' : '/'}${user.profile_image}`
                 : 'https://via.placeholder.com/120x150/003087/ffffff?text=Expert',

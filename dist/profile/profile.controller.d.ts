@@ -19,7 +19,8 @@ export declare class ProfileController {
         last_name: string;
         phone_number: string;
         qualification?: string;
-        specialization?: string;
+        Position?: string;
+        Field?: string;
         user_category: import("../users/entities/user.entity").UserCategory;
         university_name?: string;
         is_active: boolean;
@@ -44,7 +45,8 @@ export declare class ProfileController {
         last_name: string;
         phone_number: string;
         qualification?: string;
-        specialization?: string;
+        Position?: string;
+        Field?: string;
         user_category: import("../users/entities/user.entity").UserCategory;
         university_name?: string;
         is_active: boolean;
@@ -69,7 +71,8 @@ export declare class ProfileController {
         last_name: string;
         phone_number: string;
         qualification?: string;
-        specialization?: string;
+        Position?: string;
+        Field?: string;
         user_category: import("../users/entities/user.entity").UserCategory;
         university_name?: string;
         is_active: boolean;
@@ -94,7 +97,8 @@ export declare class ProfileController {
         last_name: string;
         phone_number: string;
         qualification?: string;
-        specialization?: string;
+        Position?: string;
+        Field?: string;
         user_category: import("../users/entities/user.entity").UserCategory;
         university_name?: string;
         is_active: boolean;
@@ -119,7 +123,8 @@ export declare class ProfileController {
         last_name: string;
         phone_number: string;
         qualification?: string;
-        specialization?: string;
+        Position?: string;
+        Field?: string;
         user_category: import("../users/entities/user.entity").UserCategory;
         university_name?: string;
         is_active: boolean;

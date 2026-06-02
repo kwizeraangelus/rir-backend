@@ -37,7 +37,10 @@ export class User {
   qualification?: string;
 
   @Column({ nullable: true })
-  specialization?: string;
+  Position?: string;
+
+  @Column({ nullable: true })
+  Field?: string;
 
   @Column({
     type: 'enum',
@@ -80,7 +83,6 @@ export class User {
 
   @Column({ nullable: true })
   resume?: string;
-
 
   // src/users/entities/user.entity.ts
   @Column({ default: false })

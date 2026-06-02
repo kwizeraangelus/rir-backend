@@ -11,18 +11,20 @@ export declare class ResearcherController {
         id: string;
         name: string;
         qualification: string;
+        Field: string;
         email: string;
         contact: string;
-        specialization: string;
+        Position: string;
         image: string;
     }[]>;
     getResearcherDetail(id: string): Promise<{
         id: string;
         name: string;
         qualification: string;
+        Field: string;
         email: string;
         contact: string;
-        specialization: string;
+        Position: string;
         bio: string;
         image: string;
         orcid: string | undefined;
@@ -33,9 +35,10 @@ export declare class ResearcherController {
         id: string;
         name: string;
         qualification: string;
+        Field: string;
         email: string;
         contact: string;
-        specialization: string;
+        Position: string;
         image: string;
     }[]>;
 }

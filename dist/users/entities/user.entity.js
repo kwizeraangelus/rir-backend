@@ -62,7 +62,8 @@ let User = class User {
     last_name = '';
     phone_number = '';
     qualification;
-    specialization;
+    Position;
+    Field;
     user_category = exports.UserCategory.PUBLIC_VISITOR;
     university_name;
     password = '';
@@ -118,7 +119,11 @@ __decorate([
 __decorate([
     (0, typeorm_1.Column)({ nullable: true }),
     __metadata("design:type", String)
-], User.prototype, "specialization", void 0);
+], User.prototype, "Position", void 0);
+__decorate([
+    (0, typeorm_1.Column)({ nullable: true }),
+    __metadata("design:type", String)
+], User.prototype, "Field", void 0);
 __decorate([
     (0, typeorm_1.Column)({
         type: 'enum',
