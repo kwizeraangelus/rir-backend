@@ -1,11 +1,10 @@
 import { EventsService } from './event.service';
-import * as express from 'express';
 export declare class EventsController {
     private readonly eventsService;
     constructor(eventsService: EventsService);
     createEvent(req: any, body: any, file: Express.Multer.File): Promise<import("./entities/event.entity").Event[]>;
     getMyEvents(req: any): Promise<import("./entities/event.entity").Event[]>;
-    getAllPublicEvents(req: express.Request): Promise<{
+    getAllPublicEvents(): Promise<{
         photo_url: string | null;
         id: string;
         title: string;

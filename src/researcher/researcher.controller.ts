@@ -79,14 +79,9 @@ export class ResearcherController {
   }
 
  @Get('researchers')
-async getAllResearchers(
-  @Query('search') search: string | undefined,
-  @Req() req: express.Request,
-) {
-  const baseUrl = `${req.protocol}://${req.get('host')}`;
-  return this.researcherService.getAllResearchers(search, baseUrl);
+async getAllResearchers(@Query('search') search?: string) {
+  return this.researcherService.getAllResearchers(search);
 }
-
   @Get('researchers/:id')
   async getResearcherDetail(@Param('id') id: string) {
     return this.researcherService.getResearcherDetail(id);

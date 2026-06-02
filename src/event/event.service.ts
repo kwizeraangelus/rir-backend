@@ -24,16 +24,17 @@ export class EventsService {
     });
   }
 
-  async findAll(baseUrl: string) {
-    const events = await this.eventRepo.find({
-      where: { status: true }, // 👈 Only get approved events
-      order: { date: 'ASC' },
-    });
+  async findAll() {
+  const events = await this.eventRepo.find({
+    where: { status: true },
+    order: { date: 'ASC' },
+  });
 
-    // Map the database 'photo' path to 'photo_url'
-    return events.map((event) => ({
-      ...event,
-      photo_url: event.photo ? `${baseUrl}${event.photo}` : null,
-    }));
-  }
+  const baseUrl = process.env.BACKEND_URL || 'http://localhost:8000';
+
+  return events.map((event) => ({
+    ...event,
+    photo_url: event.photo ? `${baseUrl}${event.photo}` : null,
+  }));
+}
 }

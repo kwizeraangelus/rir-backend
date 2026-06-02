@@ -5,7 +5,7 @@ export declare class EventsService {
     constructor(eventRepo: Repository<Event>);
     create(userId: string, data: any, photoPath?: string): Promise<Event[]>;
     getMyEvents(userId: string): Promise<Event[]>;
-    findAll(baseUrl: string): Promise<{
+    findAll(): Promise<{
         photo_url: string | null;
         id: string;
         title: string;

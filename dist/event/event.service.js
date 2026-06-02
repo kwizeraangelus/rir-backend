@@ -36,11 +36,12 @@ let EventsService = class EventsService {
             order: { created_at: 'DESC' },
         });
     }
-    async findAll(baseUrl) {
+    async findAll() {
         const events = await this.eventRepo.find({
             where: { status: true },
             order: { date: 'ASC' },
         });
+        const baseUrl = process.env.BACKEND_URL || 'http://localhost:8000';
         return events.map((event) => ({
             ...event,
             photo_url: event.photo ? `${baseUrl}${event.photo}` : null,

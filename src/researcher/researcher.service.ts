@@ -68,7 +68,8 @@ export class ResearcherService {
 
     return publications;
   }
-  async getAllResearchers(search?: string, baseUrl?: string) {
+  async getAllResearchers(search?: string) {
+    const baseUrl = process.env.BACKEND_URL || 'http://localhost:8000';
     try {
       const query = this.userRepo
         .createQueryBuilder('user')

@@ -47,8 +47,7 @@ export class EventsController {
   }
 
   @Get('events')
-  async getAllPublicEvents(@Req() req: express.Request) {
-    const baseUrl = `${req.protocol}://${req.get('host')}`;
-    return this.eventsService.findAll(baseUrl);
+  async getAllPublicEvents() {
+    return this.eventsService.findAll();
   }
 }
