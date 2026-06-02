@@ -20,6 +20,7 @@ import { FileInterceptor } from '@nestjs/platform-express';
 import { ResearcherService } from './researcher.service';
 import { diskStorage } from 'multer';
 import { extname } from 'path';
+import * as express from 'express';
 
 @Controller('api')
 export class ResearcherController {
@@ -77,10 +78,14 @@ export class ResearcherController {
     return this.researcherService.findAllApproved();
   }
 
-  @Get('researchers')
-  async getAllResearchers(@Query('search') search?: string) {
-    return this.researcherService.getAllResearchers(search);
-  }
+ @Get('researchers')
+async getAllResearchers(
+  @Query('search') search: string | undefined,
+  @Req() req: express.Request,
+) {
+  const baseUrl = `${req.protocol}://${req.get('host')}`;
+  return this.researcherService.getAllResearchers(search, baseUrl);
+}
 
   @Get('researchers/:id')
   async getResearcherDetail(@Param('id') id: string) {

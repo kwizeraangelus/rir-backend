@@ -68,7 +68,7 @@ export class ResearcherService {
 
     return publications;
   }
-  async getAllResearchers(search?: string) {
+  async getAllResearchers(search?: string, baseUrl?: string) {
     try {
       const query = this.userRepo
         .createQueryBuilder('user')
@@ -110,7 +110,7 @@ export class ResearcherService {
         contact: user.phone_number || 'N/A',
         Position: user.Position || user.bio?.slice(0, 150) || 'Not Specified',
         image: user.profile_image
-  ? `http://localhost:8000${user.profile_image.startsWith('/') ? '' : '/'}${user.profile_image}`
+  ? `${baseUrl}${user.profile_image.startsWith('/') ? '' : '/'}${user.profile_image}`
   : 'https://via.placeholder.com/120x150/003087/ffffff?text=Researcher',
       }));
     } catch (error) {

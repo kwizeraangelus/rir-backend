@@ -1,4 +1,5 @@
 import { ResearcherService } from './researcher.service';
+import * as express from 'express';
 export declare class ResearcherController {
     private readonly researcherService;
     constructor(researcherService: ResearcherService);
@@ -7,7 +8,7 @@ export declare class ResearcherController {
     addPublication(req: any, body: any): Promise<import("./entities/publication.entity").Publication[]>;
     updateProfile(req: any, body: any, file: Express.Multer.File): Promise<import("../users/entities/user.entity").User | null>;
     getPublicPublications(): Promise<import("./entities/publication.entity").Publication[]>;
-    getAllResearchers(search?: string): Promise<{
+    getAllResearchers(search: string | undefined, req: express.Request): Promise<{
         id: string;
         name: string;
         qualification: string;
