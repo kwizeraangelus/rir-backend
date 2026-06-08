@@ -1,4 +1,8 @@
 import { AdminService } from './admin.service';
+import { ExpertService } from '../expert/expert.service';
+import { Expert } from '../expert/entities/expert.entity';
+import { CreateExpertDto } from "../expert/dto/create-expert.dto";
+import { UpdateExpertDto } from "../expert/dto/update-expert.dto";
 export interface RequestWithUser extends Request {
     user: {
         userId: string;
@@ -62,7 +66,8 @@ export interface MulterFile {
 }
 export declare class AdminController {
     private readonly adminService;
-    constructor(adminService: AdminService);
+    private readonly expertService;
+    constructor(adminService: AdminService, expertService: ExpertService);
     getDashboard(): Promise<{
         kpis: {
             total_users: number;
@@ -149,4 +154,9 @@ export declare class AdminController {
         message: string;
         publication: import("../researcher/entities/publication.entity").Publication;
     }>;
+    findAll(): Promise<Expert[]>;
+    findOne(id: string): Promise<Expert>;
+    create(dto: CreateExpertDto, req: any): Promise<Expert>;
+    update(id: string, dto: UpdateExpertDto, req: any): Promise<Expert>;
+    remove(id: string, req: any): Promise<void>;
 }

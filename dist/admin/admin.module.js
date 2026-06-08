@@ -18,6 +18,8 @@ const auth_module_1 = require("../auth/auth.module");
 const event_module_1 = require("../event/event.module");
 const publication_entity_1 = require("../researcher/entities/publication.entity");
 const innovation_entity_1 = require("../innovation/entities/innovation.entity");
+const expert_entity_1 = require("../expert/entities/expert.entity");
+const expert_module_1 = require("../expert/expert.module");
 let AdminModule = class AdminModule {
 };
 exports.AdminModule = AdminModule;
@@ -30,7 +32,9 @@ exports.AdminModule = AdminModule = __decorate([
                 event_entity_1.Event,
                 publication_entity_1.Publication,
                 innovation_entity_1.Innovation,
+                expert_entity_1.Expert,
             ]),
+            expert_module_1.ExpertModule,
             auth_module_1.AuthModule,
             event_module_1.EventModule,
         ],

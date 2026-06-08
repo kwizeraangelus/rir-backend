@@ -107,7 +107,7 @@ let ResearcherService = class ResearcherService {
                 Position: user.Position || user.bio?.slice(0, 150) || 'Not Specified',
                 image: user.profile_image
                     ? `${baseUrl}${user.profile_image.startsWith('/') ? '' : '/'}${user.profile_image}`
-                    : 'https://via.placeholder.com/120x150/003087/ffffff?text=Researcher',
+                    : 'https://unsplash.com/photos/a-persons-head-in-a-circle-wIG0Hhre7Ms',
             }));
         }
         catch (error) {
@@ -153,7 +153,7 @@ let ResearcherService = class ResearcherService {
                 bio: user.bio || '',
                 image: user.profile_image
                     ? `/uploads/profiles/${user.profile_image.split('/').pop()}`
-                    : 'https://via.placeholder.com/300x400/003087/ffffff?text=Researcher',
+                    : 'https://unsplash.com/photos/a-persons-head-in-a-circle-wIG0Hhre7Ms',
                 orcid: user.orcid,
                 university: user.university_name,
                 publications: publications || [],
@@ -197,7 +197,7 @@ let ResearcherService = class ResearcherService {
             Position: user.Position || user.bio?.slice(0, 150) || 'Not Specified',
             image: user.profile_image
                 ? `http://localhost:8000${user.profile_image.startsWith('/') ? '' : '/'}${user.profile_image}`
-                : 'https://via.placeholder.com/120x150/003087/ffffff?text=Expert',
+                : 'https://unsplash.com/photos/a-persons-head-in-a-circle-wIG0Hhre7Ms',
         }));
     }
 };

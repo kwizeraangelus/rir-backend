@@ -19,11 +19,17 @@ const admin_guard_1 = require("../auth/admin.guard");
 const multer_1 = require("multer");
 const path_1 = require("path");
 const common_1 = require("@nestjs/common");
+const swagger_1 = require("@nestjs/swagger");
 const admin_service_1 = require("./admin.service");
+const expert_service_1 = require("../expert/expert.service");
+const create_expert_dto_1 = require("../expert/dto/create-expert.dto");
+const update_expert_dto_1 = require("../expert/dto/update-expert.dto");
 let AdminController = class AdminController {
     adminService;
-    constructor(adminService) {
+    expertService;
+    constructor(adminService, expertService) {
         this.adminService = adminService;
+        this.expertService = expertService;
     }
     async getDashboard() {
         return this.adminService.getDashboardData();
@@ -102,6 +108,24 @@ let AdminController = class AdminController {
     async createResearch(req, body) {
         const adminId = req.user.userId;
         return this.adminService.createResearch(adminId, body);
+    }
+    findAll() {
+        return this.expertService.findAll();
+    }
+    async findOne(id) {
+        return await this.expertService.findById(id);
+    }
+    async create(dto, req) {
+        console.log(`[Admin] ${req.user.username} created: ${dto.name}`);
+        return await this.expertService.create(dto);
+    }
+    async update(id, dto, req) {
+        console.log(`[Admin] ${req.user.username} updated: ${id}`);
+        return await this.expertService.update(id, dto);
+    }
+    async remove(id, req) {
+        console.log(`[Admin] ${req.user.username} deleted: ${id}`);
+        await this.expertService.remove(id);
     }
 };
 exports.AdminController = AdminController;
@@ -302,9 +326,59 @@ __decorate([
     __metadata("design:paramtypes", [Object, Object]),
     __metadata("design:returntype", Promise)
 ], AdminController.prototype, "createResearch", null);
+__decorate([
+    (0, common_1.UseGuards)(jwt_auth_guard_1.JwtAuthGuard, admin_guard_1.AdminGuard),
+    (0, common_1.Get)(),
+    (0, swagger_1.ApiOperation)({ summary: '[Admin] List all experts' }),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", []),
+    __metadata("design:returntype", void 0)
+], AdminController.prototype, "findAll", null);
+__decorate([
+    (0, common_1.UseGuards)(jwt_auth_guard_1.JwtAuthGuard, admin_guard_1.AdminGuard),
+    (0, common_1.Get)(':id'),
+    (0, swagger_1.ApiOperation)({ summary: '[Admin] Get expert by ID' }),
+    __param(0, (0, common_1.Param)('id')),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", [String]),
+    __metadata("design:returntype", Promise)
+], AdminController.prototype, "findOne", null);
+__decorate([
+    (0, common_1.UseGuards)(jwt_auth_guard_1.JwtAuthGuard, admin_guard_1.AdminGuard),
+    (0, common_1.Post)(),
+    (0, swagger_1.ApiOperation)({ summary: '[Admin] Create expert' }),
+    __param(0, (0, common_1.Body)()),
+    __param(1, (0, common_1.Request)()),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", [create_expert_dto_1.CreateExpertDto, Object]),
+    __metadata("design:returntype", Promise)
+], AdminController.prototype, "create", null);
+__decorate([
+    (0, common_1.UseGuards)(jwt_auth_guard_1.JwtAuthGuard, admin_guard_1.AdminGuard),
+    (0, common_1.Patch)(':id'),
+    (0, swagger_1.ApiOperation)({ summary: '[Admin] Update expert (partial)' }),
+    __param(0, (0, common_1.Param)('id')),
+    __param(1, (0, common_1.Body)()),
+    __param(2, (0, common_1.Request)()),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", [String, update_expert_dto_1.UpdateExpertDto, Object]),
+    __metadata("design:returntype", Promise)
+], AdminController.prototype, "update", null);
+__decorate([
+    (0, common_1.UseGuards)(jwt_auth_guard_1.JwtAuthGuard, admin_guard_1.AdminGuard),
+    (0, common_1.Delete)(':id'),
+    (0, common_1.HttpCode)(204),
+    (0, swagger_1.ApiOperation)({ summary: '[Admin] Delete expert' }),
+    __param(0, (0, common_1.Param)('id')),
+    __param(1, (0, common_1.Request)()),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", [String, Object]),
+    __metadata("design:returntype", Promise)
+], AdminController.prototype, "remove", null);
 exports.AdminController = AdminController = __decorate([
     (0, common_1.Controller)('api/admin'),
     (0, common_1.UseGuards)(jwt_auth_guard_1.JwtAuthGuard, admin_guard_1.AdminGuard),
-    __metadata("design:paramtypes", [admin_service_1.AdminService])
+    __metadata("design:paramtypes", [admin_service_1.AdminService,
+        expert_service_1.ExpertService])
 ], AdminController);
 //# sourceMappingURL=admin.controller.js.map

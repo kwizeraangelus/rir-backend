@@ -14,6 +14,7 @@ import { AdminModule } from './admin/admin.module';
 import { ResearcherModule } from './researcher/researcher.module';
 import { InnovationModule } from './innovation/innovation.module';
 import { ProfileModule } from './profile/profile.module';
+import { ExpertModule } from './expert/expert.module';
 
 @Module({
   imports: [
@@ -31,7 +32,7 @@ import { ProfileModule } from './profile/profile.module';
       database: process.env.DB_NAME,
       entities: [__dirname + '/**/*.entity.js'],
 
-      synchronize: false,
+      synchronize: true,
 
       // development settings
       dropSchema: false,
@@ -47,6 +48,7 @@ import { ProfileModule } from './profile/profile.module';
     ResearcherModule,
     InnovationModule,
     ProfileModule,
+    ExpertModule,
   ],
   controllers: [AppController],
   providers: [AppService],

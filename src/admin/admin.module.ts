@@ -11,6 +11,8 @@ import { AuthModule } from 'src/auth/auth.module';
 import { EventModule } from '../event/event.module';
 import { Publication } from 'src/researcher/entities/publication.entity';
 import { Innovation } from 'src/innovation/entities/innovation.entity';
+import { Expert } from '../expert/entities/expert.entity';
+import { ExpertModule } from 'src/expert/expert.module';
 
 @Module({
   imports: [
@@ -20,12 +22,14 @@ import { Innovation } from 'src/innovation/entities/innovation.entity';
       Event,
       Publication,
       Innovation,
+      Expert,
     ]),
-    AuthModule, // <--- This brings in the Guard and Strategy
-    EventModule, // <--- This brings in the EventsService
+    ExpertModule,
+    AuthModule,
+    EventModule,
   ],
-
   controllers: [AdminController],
   providers: [AdminService],
+  // ← add ExpertProfileService
 })
 export class AdminModule {}

@@ -11,17 +11,24 @@ import {
   Get,
   Post,
   Put,
+  Patch,
   Delete,
   Body,
   Param,
   UseGuards,
   Query,
   Req,
+  HttpCode,
   UseInterceptors,
   UploadedFile,
   Request,
 } from '@nestjs/common';
+import { ApiOperation } from '@nestjs/swagger';
 import { AdminService } from './admin.service';
+import { ExpertService } from '../expert/expert.service';
+import { Expert } from '../expert/entities/expert.entity';
+import { CreateExpertDto } from 'src/expert/dto/create-expert.dto';
+import { UpdateExpertDto } from 'src/expert/dto/update-expert.dto';
 
 export interface RequestWithUser extends Request {
   user: {
@@ -94,7 +101,10 @@ export interface MulterFile {
 @Controller('api/admin')
 @UseGuards(JwtAuthGuard, AdminGuard) // Only logged-in staff/admin can access
 export class AdminController {
-  constructor(private readonly adminService: AdminService) {}
+  constructor(
+    private readonly adminService: AdminService,
+    private readonly expertService: ExpertService,
+  ) {}
 
   // 1. Dashboard Stats & Pending Books
   @Get('dashboard')
@@ -277,7 +287,7 @@ export class AdminController {
   async deleteInnovation(@Param('id') id: string) {
     return this.adminService.deleteInnovation(id);
   }
- @Post('create-research')
+@Post('create-research')
   @UseGuards(JwtAuthGuard)
   async createResearch(
     @Req() req,
@@ -285,5 +295,39 @@ export class AdminController {
   ) {
     const adminId = req.user.userId;
     return this.adminService.createResearch(adminId, body);
+  }
+  @UseGuards(JwtAuthGuard, AdminGuard) 
+  @Get()
+  @ApiOperation({ summary: '[Admin] List all experts' })
+  findAll() {
+    return this.expertService.findAll();
+  }
+  @UseGuards(JwtAuthGuard, AdminGuard)
+  @Get(':id')
+  @ApiOperation({ summary: '[Admin] Get expert by ID' })
+  async findOne(@Param('id') id: string): Promise<Expert> {
+    return await this.expertService.findById(id);
+  }
+  @UseGuards(JwtAuthGuard, AdminGuard)
+  @Post()
+  @ApiOperation({ summary: '[Admin] Create expert' })
+  async create(@Body() dto: CreateExpertDto, @Request() req): Promise<Expert> {
+    console.log(`[Admin] ${req.user.username} created: ${dto.name}`);
+    return await this.expertService.create(dto);
+  }
+  @UseGuards(JwtAuthGuard, AdminGuard)
+  @Patch(':id')
+  @ApiOperation({ summary: '[Admin] Update expert (partial)' })
+  async update(@Param('id') id: string, @Body() dto: UpdateExpertDto, @Request() req): Promise<Expert> {
+    console.log(`[Admin] ${req.user.username} updated: ${id}`);
+    return await this.expertService.update(id, dto);
+  }
+  @UseGuards(JwtAuthGuard, AdminGuard)
+  @Delete(':id')
+  @HttpCode(204)
+  @ApiOperation({ summary: '[Admin] Delete expert' })
+  async remove(@Param('id') id: string, @Request() req): Promise<void> {
+    console.log(`[Admin] ${req.user.username} deleted: ${id}`);
+    await this.expertService.remove(id);
   }
 }

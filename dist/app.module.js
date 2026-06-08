@@ -21,6 +21,7 @@ const admin_module_1 = require("./admin/admin.module");
 const researcher_module_1 = require("./researcher/researcher.module");
 const innovation_module_1 = require("./innovation/innovation.module");
 const profile_module_1 = require("./profile/profile.module");
+const expert_module_1 = require("./expert/expert.module");
 let AppModule = class AppModule {
 };
 exports.AppModule = AppModule;
@@ -39,7 +40,7 @@ exports.AppModule = AppModule = __decorate([
                 password: process.env.DB_PASSWORD,
                 database: process.env.DB_NAME,
                 entities: [__dirname + '/**/*.entity.js'],
-                synchronize: false,
+                synchronize: true,
                 dropSchema: false,
                 migrationsRun: false,
                 logging: true,
@@ -52,6 +53,7 @@ exports.AppModule = AppModule = __decorate([
             researcher_module_1.ResearcherModule,
             innovation_module_1.InnovationModule,
             profile_module_1.ProfileModule,
+            expert_module_1.ExpertModule,
         ],
         controllers: [app_controller_1.AppController],
         providers: [app_service_1.AppService],
