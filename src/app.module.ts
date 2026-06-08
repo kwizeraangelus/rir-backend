@@ -15,6 +15,7 @@ import { ResearcherModule } from './researcher/researcher.module';
 import { InnovationModule } from './innovation/innovation.module';
 import { ProfileModule } from './profile/profile.module';
 import { ExpertModule } from './expert/expert.module';
+import { MailModule } from './mail/mail.module';
 
 @Module({
   imports: [
@@ -49,6 +50,7 @@ import { ExpertModule } from './expert/expert.module';
     InnovationModule,
     ProfileModule,
     ExpertModule,
+    MailModule,
   ],
   controllers: [AppController],
   providers: [AppService],

@@ -50,14 +50,18 @@ const common_1 = require("@nestjs/common");
 const typeorm_1 = require("@nestjs/typeorm");
 const typeorm_2 = require("typeorm");
 const user_entity_1 = require("../users/entities/user.entity");
+const mail_service_1 = require("../mail/mail.service");
 const jwt_1 = require("@nestjs/jwt");
 const bcrypt = __importStar(require("bcrypt"));
+const uuid_1 = require("uuid");
 let AuthService = class AuthService {
     userRepository;
     jwtService;
-    constructor(userRepository, jwtService) {
+    mailService;
+    constructor(userRepository, jwtService, mailService) {
         this.userRepository = userRepository;
         this.jwtService = jwtService;
+        this.mailService = mailService;
     }
     async signup(dto) {
         if (dto.password !== dto.confirmPassword) {
@@ -186,12 +190,50 @@ let AuthService = class AuthService {
             console.log(' ✅ NEW ADMIN SEEDED: admin123');
         }
     }
+    async forgotPassword(email) {
+        const user = await this.userRepository.findOne({ where: { email } });
+        if (!user)
+            return;
+        const token = (0, uuid_1.v4)();
+        const expiresAt = new Date(Date.now() + 1000 * 60 * 60);
+        user.resetPasswordToken = token;
+        user.resetPasswordExpires = expiresAt;
+        await this.userRepository.save(user);
+        const resetUrl = `${process.env.FRONTEND_URL}/reset-password?token=${token}`;
+        await this.mailService.sendPasswordReset(user.email, user.first_name || user.username, resetUrl);
+    }
+    async verifyResetToken(token) {
+        const user = await this.userRepository.findOne({
+            where: { resetPasswordToken: token },
+        });
+        if (!user || !user.resetPasswordExpires)
+            return false;
+        if (user.resetPasswordExpires < new Date())
+            return false;
+        return true;
+    }
+    async resetPassword(token, newPassword) {
+        const user = await this.userRepository.findOne({
+            where: { resetPasswordToken: token },
+        });
+        if (!user)
+            throw new common_1.BadRequestException('Invalid or expired reset token');
+        if (!user.resetPasswordExpires || user.resetPasswordExpires < new Date()) {
+            throw new common_1.BadRequestException('Reset token has expired. Please request a new one.');
+        }
+        const hashed = await bcrypt.hash(newPassword, 12);
+        user.password = hashed;
+        user.resetPasswordToken = null;
+        user.resetPasswordExpires = null;
+        await this.userRepository.save(user);
+    }
 };
 exports.AuthService = AuthService;
 exports.AuthService = AuthService = __decorate([
     (0, common_1.Injectable)(),
     __param(0, (0, typeorm_1.InjectRepository)(user_entity_1.User)),
     __metadata("design:paramtypes", [typeorm_2.Repository,
-        jwt_1.JwtService])
+        jwt_1.JwtService,
+        mail_service_1.MailService])
 ], AuthService);
 //# sourceMappingURL=auth.service.js.map

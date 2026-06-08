@@ -33,4 +33,6 @@ export declare class User {
     isExpert: boolean;
     generateId(): void;
     hashPassword(): Promise<void>;
+    resetPasswordToken: string | null;
+    resetPasswordExpires: Date | null;
 }

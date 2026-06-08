@@ -30,6 +30,8 @@ export declare class ProfileService {
         cv?: string;
         resume?: string;
         isExpert: boolean;
+        resetPasswordToken: string | null;
+        resetPasswordExpires: Date | null;
     }>;
     updateProfile(targetId: string, requesterId: string, isStaff: boolean, dto: UpdateProfileDto): Promise<{
         id: string;
@@ -54,6 +56,8 @@ export declare class ProfileService {
         cv?: string;
         resume?: string;
         isExpert: boolean;
+        resetPasswordToken: string | null;
+        resetPasswordExpires: Date | null;
     }>;
     updatePhoto(targetId: string, requesterId: string, isStaff: boolean, filePath: string): Promise<{
         id: string;
@@ -78,6 +82,8 @@ export declare class ProfileService {
         cv?: string;
         resume?: string;
         isExpert: boolean;
+        resetPasswordToken: string | null;
+        resetPasswordExpires: Date | null;
     }>;
     updateCv(targetId: string, requesterId: string, isStaff: boolean, filePath: string): Promise<{
         id: string;
@@ -102,6 +108,8 @@ export declare class ProfileService {
         cv?: string;
         resume?: string;
         isExpert: boolean;
+        resetPasswordToken: string | null;
+        resetPasswordExpires: Date | null;
     }>;
     updateResume(targetId: string, requesterId: string, isStaff: boolean, filePath: string): Promise<{
         id: string;
@@ -126,6 +134,8 @@ export declare class ProfileService {
         cv?: string;
         resume?: string;
         isExpert: boolean;
+        resetPasswordToken: string | null;
+        resetPasswordExpires: Date | null;
     }>;
     changePassword(targetId: string, requesterId: string, isStaff: boolean, dto: ChangePasswordDto): Promise<{
         message: string;

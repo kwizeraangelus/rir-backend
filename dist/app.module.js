@@ -22,6 +22,7 @@ const researcher_module_1 = require("./researcher/researcher.module");
 const innovation_module_1 = require("./innovation/innovation.module");
 const profile_module_1 = require("./profile/profile.module");
 const expert_module_1 = require("./expert/expert.module");
+const mail_module_1 = require("./mail/mail.module");
 let AppModule = class AppModule {
 };
 exports.AppModule = AppModule;
@@ -54,6 +55,7 @@ exports.AppModule = AppModule = __decorate([
             innovation_module_1.InnovationModule,
             profile_module_1.ProfileModule,
             expert_module_1.ExpertModule,
+            mail_module_1.MailModule,
         ],
         controllers: [app_controller_1.AppController],
         providers: [app_service_1.AppService],

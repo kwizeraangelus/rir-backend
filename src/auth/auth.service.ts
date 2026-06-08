@@ -7,10 +7,11 @@ import {
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { User, UserCategory } from '../users/entities/user.entity';
+import { MailService } from '../mail/mail.service';
 import { RegisterDto } from './dto/register.dto';
 import { JwtService } from '@nestjs/jwt';
 import * as bcrypt from 'bcrypt';
-
+import { v4 as uuidv4 } from 'uuid';
 import { LoginDto } from './dto/login.dto';
 import { SignupDto } from './dto/signup.dto';
 
@@ -20,6 +21,7 @@ export class AuthService {
     @InjectRepository(User)
     private userRepository: Repository<User>,
     private jwtService: JwtService,
+    private readonly mailService: MailService,
   ) {}
 
   // src/auth/auth.service.ts
@@ -186,5 +188,53 @@ export class AuthService {
       await this.userRepository.save(admin);
       console.log(' ✅ NEW ADMIN SEEDED: admin123');
     }
+  }
+
+  async forgotPassword(email: string): Promise<void> {
+    const user = await this.userRepository.findOne({ where: { email } });
+
+    // Always return success even if email not found (security best practice)
+    if (!user) return;
+
+    const token = uuidv4();
+    const expiresAt = new Date(Date.now() + 1000 * 60 * 60); // 1 hour from now
+
+    user.resetPasswordToken = token;
+    user.resetPasswordExpires = expiresAt;
+    await this.userRepository.save(user);
+
+    const resetUrl = `${process.env.FRONTEND_URL}/reset-password?token=${token}`;
+
+    await this.mailService.sendPasswordReset(user.email, user.first_name || user.username, resetUrl);
+  }
+
+  // ─── VERIFY RESET TOKEN ───────────────────────────────────────────────────
+  async verifyResetToken(token: string): Promise<boolean> {
+    const user = await this.userRepository.findOne({
+      where: { resetPasswordToken: token },
+    });
+
+    if (!user || !user.resetPasswordExpires) return false;
+    if (user.resetPasswordExpires < new Date()) return false;
+
+    return true;
+  }
+
+  // ─── RESET PASSWORD ───────────────────────────────────────────────────────
+  async resetPassword(token: string, newPassword: string): Promise<void> {
+    const user = await this.userRepository.findOne({
+      where: { resetPasswordToken: token },
+    });
+
+    if (!user) throw new BadRequestException('Invalid or expired reset token');
+    if (!user.resetPasswordExpires || user.resetPasswordExpires < new Date()) {
+      throw new BadRequestException('Reset token has expired. Please request a new one.');
+    }
+
+    const hashed = await bcrypt.hash(newPassword, 12);
+    user.password = hashed;
+    user.resetPasswordToken = null;
+    user.resetPasswordExpires = null;
+    await this.userRepository.save(user);
   }
 }

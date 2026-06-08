@@ -34,6 +34,8 @@ export declare class ProfileController {
         cv?: string;
         resume?: string;
         isExpert: boolean;
+        resetPasswordToken: string | null;
+        resetPasswordExpires: Date | null;
     }>;
     updateProfile(id: string, dto: UpdateProfileDto, req: {
         user: JwtUser;
@@ -60,6 +62,8 @@ export declare class ProfileController {
         cv?: string;
         resume?: string;
         isExpert: boolean;
+        resetPasswordToken: string | null;
+        resetPasswordExpires: Date | null;
     }>;
     updatePhoto(id: string, file: Express.Multer.File, req: {
         user: JwtUser;
@@ -86,6 +90,8 @@ export declare class ProfileController {
         cv?: string;
         resume?: string;
         isExpert: boolean;
+        resetPasswordToken: string | null;
+        resetPasswordExpires: Date | null;
     }>;
     updateCv(id: string, file: Express.Multer.File, req: {
         user: JwtUser;
@@ -112,6 +118,8 @@ export declare class ProfileController {
         cv?: string;
         resume?: string;
         isExpert: boolean;
+        resetPasswordToken: string | null;
+        resetPasswordExpires: Date | null;
     }>;
     updateResume(id: string, file: Express.Multer.File, req: {
         user: JwtUser;
@@ -138,6 +146,8 @@ export declare class ProfileController {
         cv?: string;
         resume?: string;
         isExpert: boolean;
+        resetPasswordToken: string | null;
+        resetPasswordExpires: Date | null;
     }>;
     changePassword(id: string, dto: ChangePasswordDto, req: {
         user: JwtUser;

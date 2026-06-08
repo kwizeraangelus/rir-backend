@@ -17,6 +17,7 @@ const passport_1 = require("@nestjs/passport");
 const jwt_strategy_1 = require("./jwt.strategy");
 const jwt_auth_guard_1 = require("./jwt-auth/jwt-auth.guard");
 const admin_guard_1 = require("./admin.guard");
+const mail_module_1 = require("../mail/mail.module");
 let AuthModule = class AuthModule {
 };
 exports.AuthModule = AuthModule;
@@ -29,10 +30,11 @@ exports.AuthModule = AuthModule = __decorate([
                 secret: 'super-secret-key-change-this-in-production-very-long-random-string-987654321',
                 signOptions: { expiresIn: '1d' },
             }),
+            mail_module_1.MailModule,
         ],
         providers: [auth_service_1.AuthService, jwt_strategy_1.JwtStrategy, jwt_auth_guard_1.JwtAuthGuard, admin_guard_1.AdminGuard],
         controllers: [auth_controller_1.AuthController],
-        exports: [auth_service_1.AuthService, jwt_1.JwtModule, jwt_auth_guard_1.JwtAuthGuard, admin_guard_1.AdminGuard, passport_1.PassportModule],
+        exports: [auth_service_1.AuthService, jwt_1.JwtModule, jwt_auth_guard_1.JwtAuthGuard, admin_guard_1.AdminGuard, passport_1.PassportModule, mail_module_1.MailModule],
     })
 ], AuthModule);
 //# sourceMappingURL=auth.module.js.map
