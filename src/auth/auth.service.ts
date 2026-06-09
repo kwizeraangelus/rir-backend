@@ -210,8 +210,9 @@ export class AuthService {
 
   // ─── VERIFY RESET TOKEN ───────────────────────────────────────────────────
   async verifyResetToken(token: string): Promise<boolean> {
+    const cleanToken = token?.trim();
     const user = await this.userRepository.findOne({
-      where: { resetPasswordToken: token },
+      where: { resetPasswordToken: cleanToken },
     });
 
     if (!user || !user.resetPasswordExpires) return false;
@@ -222,8 +223,9 @@ export class AuthService {
 
   // ─── RESET PASSWORD ───────────────────────────────────────────────────────
   async resetPassword(token: string, newPassword: string): Promise<void> {
+    const cleanToken = token?.trim();
     const user = await this.userRepository.findOne({
-      where: { resetPasswordToken: token },
+      where: { resetPasswordToken: cleanToken },
     });
 
     if (!user) throw new BadRequestException('Invalid or expired reset token');

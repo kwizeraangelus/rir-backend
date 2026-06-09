@@ -22,6 +22,7 @@ import { MailModule } from './mail/mail.module';
     ScheduleModule.forRoot(),
     ConfigModule.forRoot({
       isGlobal: true,
+      envFilePath: '.env',
     }),
 
     TypeOrmModule.forRoot({

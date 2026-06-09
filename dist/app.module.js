@@ -32,6 +32,7 @@ exports.AppModule = AppModule = __decorate([
             schedule_1.ScheduleModule.forRoot(),
             config_1.ConfigModule.forRoot({
                 isGlobal: true,
+                envFilePath: '.env',
             }),
             typeorm_1.TypeOrmModule.forRoot({
                 type: 'mysql',

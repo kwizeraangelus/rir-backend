@@ -48,7 +48,7 @@ export class AuthController {
   }
 
 
-  @Post('forgot-password')
+  @Post('/auth/forgot-password')
   @HttpCode(HttpStatus.OK)
   async forgotPassword(@Body() dto: ForgotPasswordDto) {
     await this.authService.forgotPassword(dto.email);
@@ -57,7 +57,7 @@ export class AuthController {
   }
 
   // GET /api/auth/verify-reset-token?token=xxx
-  @Get('verify-reset-token')
+  @Get('/auth/verify-reset-token')
   async verifyResetToken(@Query('token') token: string) {
     if (!token) throw new BadRequestException('Token is required');
     const valid = await this.authService.verifyResetToken(token);
@@ -66,7 +66,7 @@ export class AuthController {
   }
 
   // POST /api/auth/reset-password
-  @Post('reset-password')
+  @Post('/auth/reset-password')
   @HttpCode(HttpStatus.OK)
   async resetPassword(@Body() dto: ResetPasswordDto) {
     await this.authService.resetPassword(dto.token, dto.newPassword);

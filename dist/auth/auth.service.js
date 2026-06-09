@@ -203,8 +203,9 @@ let AuthService = class AuthService {
         await this.mailService.sendPasswordReset(user.email, user.first_name || user.username, resetUrl);
     }
     async verifyResetToken(token) {
+        const cleanToken = token?.trim();
         const user = await this.userRepository.findOne({
-            where: { resetPasswordToken: token },
+            where: { resetPasswordToken: cleanToken },
         });
         if (!user || !user.resetPasswordExpires)
             return false;
@@ -213,8 +214,9 @@ let AuthService = class AuthService {
         return true;
     }
     async resetPassword(token, newPassword) {
+        const cleanToken = token?.trim();
         const user = await this.userRepository.findOne({
-            where: { resetPasswordToken: token },
+            where: { resetPasswordToken: cleanToken },
         });
         if (!user)
             throw new common_1.BadRequestException('Invalid or expired reset token');

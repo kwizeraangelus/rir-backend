@@ -4,15 +4,24 @@ import * as nodemailer from 'nodemailer';
 @Injectable()
 export class MailService {
   private transporter = nodemailer.createTransport({
-    host: process.env.MAIL_HOST,
-    port: Number(process.env.MAIL_PORT) || 587,
-    auth: {
-      user: process.env.MAIL_USER,
-      pass: process.env.MAIL_PASS,
-    },
-  });
-
-  async sendPasswordReset(to: string, name: string, resetUrl: string): Promise<void> {
+host: process.env.MAIL_HOST,
+port: Number(process.env.MAIL_PORT) || 587,
+secure: false,
+requireTLS: true,
+family: 4,
+auth: {
+  user: process.env.MAIL_USER,
+  pass: process.env.MAIL_PASS,
+},
+tls: {
+  rejectUnauthorized: false,
+},
+});
+  async sendPasswordReset(
+    to: string,
+    name: string,
+    resetUrl: string,
+  ): Promise<void> {
     await this.transporter.sendMail({
       from: `"RIRI Platform" <${process.env.MAIL_FROM}>`,
       to,
