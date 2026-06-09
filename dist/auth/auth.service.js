@@ -200,7 +200,12 @@ let AuthService = class AuthService {
         user.resetPasswordExpires = expiresAt;
         await this.userRepository.save(user);
         const resetUrl = `${process.env.FRONTEND_URL}/reset-password?token=${token}`;
-        await this.mailService.sendPasswordReset(user.email, user.first_name || user.username, resetUrl);
+        try {
+            await this.mailService.sendPasswordReset(user.email, user.first_name || user.username, resetUrl);
+        }
+        catch (error) {
+            console.error('EMAIL ERROR:', error);
+        }
     }
     async verifyResetToken(token) {
         const cleanToken = token?.trim();

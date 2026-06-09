@@ -205,7 +205,14 @@ export class AuthService {
 
     const resetUrl = `${process.env.FRONTEND_URL}/reset-password?token=${token}`;
 
-    await this.mailService.sendPasswordReset(user.email, user.first_name || user.username, resetUrl);
+    try {
+  await this.mailService.sendPasswordReset(
+    user.email,
+    user.first_name || user.username,
+    resetUrl,
+  );
+} catch (error) {
+  console.error('EMAIL ERROR:', error);}
   }
 
   // ─── VERIFY RESET TOKEN ───────────────────────────────────────────────────
