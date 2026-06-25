@@ -39,6 +39,7 @@ export class ResearcherService {
   if (body.Position !== undefined) updateData.Position = body.Position;
   if (body.ResearchArea !== undefined) updateData.ResearchArea =body.ResearchArea;
 
+
   if (file) {
     updateData.profile_image = `/uploads/profiles/${file.filename}`;
     console.log('✅ Image saved:', updateData.profile_image); // Debug
@@ -124,7 +125,6 @@ export class ResearcherService {
   }
 
   async getResearcherDetail(id: string) {
-      const baseUrl = process.env.BACKEND_URL || 'http://localhost:8000';
     try {
       const user = await this.userRepo.findOne({
         where: { id, user_category: 'researcher', is_active: true },
@@ -165,9 +165,9 @@ export class ResearcherService {
         Position: user.Position || 'Not Specified',
         ResearchArea: user.ResearchArea || 'not specified',
         bio: user.bio || '',
-         image: user.profile_image
-  ? `${baseUrl}${user.profile_image.startsWith('/') ? '' : '/'}${user.profile_image}`
-  : 'https://unsplash.com/photos/a-persons-head-in-a-circle-wIG0Hhre7Ms',
+        image: user.profile_image
+          ? `/uploads/profiles/${user.profile_image.split('/').pop()}`
+          : 'https://unsplash.com/photos/a-persons-head-in-a-circle-wIG0Hhre7Ms',
         orcid: user.orcid,
         university: user.university_name,
         publications: publications || [],

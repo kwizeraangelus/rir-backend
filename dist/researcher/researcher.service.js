@@ -120,7 +120,6 @@ let ResearcherService = class ResearcherService {
         }
     }
     async getResearcherDetail(id) {
-        const baseUrl = process.env.BACKEND_URL || 'http://localhost:8000';
         try {
             const user = await this.userRepo.findOne({
                 where: { id, user_category: 'researcher', is_active: true },
@@ -159,7 +158,7 @@ let ResearcherService = class ResearcherService {
                 ResearchArea: user.ResearchArea || 'not specified',
                 bio: user.bio || '',
                 image: user.profile_image
-                    ? `${baseUrl}${user.profile_image.startsWith('/') ? '' : '/'}${user.profile_image}`
+                    ? `/uploads/profiles/${user.profile_image.split('/').pop()}`
                     : 'https://unsplash.com/photos/a-persons-head-in-a-circle-wIG0Hhre7Ms',
                 orcid: user.orcid,
                 university: user.university_name,
