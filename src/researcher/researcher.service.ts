@@ -39,6 +39,7 @@ private getImageUrl(profile_image: string | null | undefined): string {
   
   // Normalize: strip leading slash, then re-add cleanly
   const cleanPath = profile_image.replace(/^\/+/, '');
+  console.log('BACKEND_URL:', process.env.BACKEND_URL);
   return `${baseUrl}/${cleanPath}`;
 }
 
