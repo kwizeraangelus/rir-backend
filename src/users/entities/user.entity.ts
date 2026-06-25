@@ -42,6 +42,9 @@ export class User {
   @Column({ nullable: true })
   Field?: string;
 
+  @Column({ nullable: true })
+  ResearchArea?: string;
+
   @Column({
     type: 'enum',
     enum: Object.values(UserCategory), // Uses the string values directly for MySQL compatibility

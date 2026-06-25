@@ -14,6 +14,7 @@ export declare class ResearcherController {
         Field: string;
         email: string;
         contact: string;
+        ResearchArea: string;
         Position: string;
         image: string;
     }[]>;
@@ -25,6 +26,7 @@ export declare class ResearcherController {
         email: string;
         contact: string;
         Position: string;
+        ResearchArea: string;
         bio: string;
         image: string;
         orcid: string | undefined;
@@ -36,6 +38,7 @@ export declare class ResearcherController {
         name: string;
         qualification: string;
         Field: string;
+        ResearchArea: string;
         email: string;
         contact: string;
         Position: string;

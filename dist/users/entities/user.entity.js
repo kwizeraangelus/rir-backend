@@ -64,6 +64,7 @@ let User = class User {
     qualification;
     Position;
     Field;
+    ResearchArea;
     user_category = exports.UserCategory.PUBLIC_VISITOR;
     university_name;
     password = '';
@@ -126,6 +127,10 @@ __decorate([
     (0, typeorm_1.Column)({ nullable: true }),
     __metadata("design:type", String)
 ], User.prototype, "Field", void 0);
+__decorate([
+    (0, typeorm_1.Column)({ nullable: true }),
+    __metadata("design:type", String)
+], User.prototype, "ResearchArea", void 0);
 __decorate([
     (0, typeorm_1.Column)({
         type: 'enum',

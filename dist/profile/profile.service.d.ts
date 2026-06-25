@@ -17,6 +17,7 @@ export declare class ProfileService {
         qualification?: string;
         Position?: string;
         Field?: string;
+        ResearchArea?: string;
         user_category: import("../users/entities/user.entity").UserCategory;
         university_name?: string;
         is_active: boolean;
@@ -43,6 +44,7 @@ export declare class ProfileService {
         qualification?: string;
         Position?: string;
         Field?: string;
+        ResearchArea?: string;
         user_category: import("../users/entities/user.entity").UserCategory;
         university_name?: string;
         is_active: boolean;
@@ -69,6 +71,7 @@ export declare class ProfileService {
         qualification?: string;
         Position?: string;
         Field?: string;
+        ResearchArea?: string;
         user_category: import("../users/entities/user.entity").UserCategory;
         university_name?: string;
         is_active: boolean;
@@ -95,6 +98,7 @@ export declare class ProfileService {
         qualification?: string;
         Position?: string;
         Field?: string;
+        ResearchArea?: string;
         user_category: import("../users/entities/user.entity").UserCategory;
         university_name?: string;
         is_active: boolean;
@@ -121,6 +125,7 @@ export declare class ProfileService {
         qualification?: string;
         Position?: string;
         Field?: string;
+        ResearchArea?: string;
         user_category: import("../users/entities/user.entity").UserCategory;
         university_name?: string;
         is_active: boolean;

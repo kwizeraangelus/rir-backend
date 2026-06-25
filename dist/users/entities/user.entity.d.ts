@@ -17,6 +17,7 @@ export declare class User {
     qualification?: string;
     Position?: string;
     Field?: string;
+    ResearchArea?: string;
     user_category: UserCategory;
     university_name?: string;
     password: string;

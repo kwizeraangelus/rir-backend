@@ -17,6 +17,7 @@ export declare class ResearcherService {
         Field: string;
         email: string;
         contact: string;
+        ResearchArea: string;
         Position: string;
         image: string;
     }[]>;
@@ -28,6 +29,7 @@ export declare class ResearcherService {
         email: string;
         contact: string;
         Position: string;
+        ResearchArea: string;
         bio: string;
         image: string;
         orcid: string | undefined;
@@ -39,6 +41,7 @@ export declare class ResearcherService {
         name: string;
         qualification: string;
         Field: string;
+        ResearchArea: string;
         email: string;
         contact: string;
         Position: string;

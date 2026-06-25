@@ -50,6 +50,8 @@ let ResearcherService = class ResearcherService {
             updateData.Field = body.Field;
         if (body.Position !== undefined)
             updateData.Position = body.Position;
+        if (body.ResearchArea !== undefined)
+            updateData.ResearchArea = body.ResearchArea;
         if (file) {
             updateData.profile_image = `/uploads/profiles/${file.filename}`;
             console.log('✅ Image saved:', updateData.profile_image);
@@ -89,6 +91,7 @@ let ResearcherService = class ResearcherService {
                 'user.qualification',
                 'user.Position',
                 'user.Field',
+                'user.ResearchArea',
                 'user.bio',
                 'user.profile_image',
                 'user.orcid',
@@ -104,6 +107,7 @@ let ResearcherService = class ResearcherService {
                 Field: user.Field || 'Not Specified',
                 email: user.email,
                 contact: user.phone_number || 'N/A',
+                ResearchArea: user.ResearchArea || 'not specified',
                 Position: user.Position || user.bio?.slice(0, 150) || 'Not Specified',
                 image: user.profile_image
                     ? `${baseUrl}${user.profile_image.startsWith('/') ? '' : '/'}${user.profile_image}`
@@ -116,6 +120,7 @@ let ResearcherService = class ResearcherService {
         }
     }
     async getResearcherDetail(id) {
+        const baseUrl = process.env.BACKEND_URL || 'http://localhost:8000';
         try {
             const user = await this.userRepo.findOne({
                 where: { id, user_category: 'researcher', is_active: true },
@@ -128,6 +133,7 @@ let ResearcherService = class ResearcherService {
                     'qualification',
                     'Field',
                     'Position',
+                    'ResearchArea',
                     'bio',
                     'profile_image',
                     'orcid',
@@ -150,9 +156,10 @@ let ResearcherService = class ResearcherService {
                 email: user.email,
                 contact: user.phone_number || 'N/A',
                 Position: user.Position || 'Not Specified',
+                ResearchArea: user.ResearchArea || 'not specified',
                 bio: user.bio || '',
                 image: user.profile_image
-                    ? `/uploads/profiles/${user.profile_image.split('/').pop()}`
+                    ? `${baseUrl}${user.profile_image.startsWith('/') ? '' : '/'}${user.profile_image}`
                     : 'https://unsplash.com/photos/a-persons-head-in-a-circle-wIG0Hhre7Ms',
                 orcid: user.orcid,
                 university: user.university_name,
@@ -177,6 +184,7 @@ let ResearcherService = class ResearcherService {
             'user.email',
             'user.phone_number',
             'user.qualification',
+            'user.ResearchArea',
             'user.Position',
             'user.Field',
             'user.bio',
@@ -192,6 +200,7 @@ let ResearcherService = class ResearcherService {
             name: `${user.first_name} ${user.last_name}`.trim(),
             qualification: user.qualification || 'Not Specified',
             Field: user.Field || 'Not Specified',
+            ResearchArea: user.ResearchArea || 'not specified',
             email: user.email,
             contact: user.phone_number || 'N/A',
             Position: user.Position || user.bio?.slice(0, 150) || 'Not Specified',
