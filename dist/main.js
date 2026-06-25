@@ -29,6 +29,7 @@ async function bootstrap() {
         const port = Number(process.env.PORT) || 3000;
         await app.listen(port);
         console.log(`🚀 Server running on port ${port}`);
+        console.log(`🌍 NODE_ENV: ${process.env.NODE_ENV}`);
     }
     catch (error) {
         console.error('❌ Application failed to start:', error);

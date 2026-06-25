@@ -32,14 +32,12 @@ export class ResearcherService {
 
   // Add this helper at the top of the class
 private getImageUrl(profile_image: string | null | undefined): string {
-  const baseUrl = process.env.BACKEND_URL || 'http://localhost:8000';
-  const fallback = `${baseUrl}/uploads/profiles/default-avatar.png`;
-  
-  if (!profile_image) return fallback;
-  
-  // Normalize: strip leading slash, then re-add cleanly
+  const baseUrl = process.env.NODE_ENV === 'production'
+    ? 'https://api.riri.rw'
+    : 'http://localhost:8000';
+
+  if (!profile_image) return `${baseUrl}/uploads/profiles/default.png`;
   const cleanPath = profile_image.replace(/^\/+/, '');
-  console.log('BACKEND_URL:', process.env.BACKEND_URL);
   return `${baseUrl}/${cleanPath}`;
 }
 

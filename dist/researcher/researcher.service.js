@@ -35,10 +35,11 @@ let ResearcherService = class ResearcherService {
         });
     }
     getImageUrl(profile_image) {
-        const baseUrl = process.env.BACKEND_URL || 'http://localhost:8000';
-        const fallback = `${baseUrl}/uploads/profiles/default-avatar.png`;
+        const baseUrl = process.env.NODE_ENV === 'production'
+            ? 'https://api.riri.rw'
+            : 'http://localhost:8000';
         if (!profile_image)
-            return fallback;
+            return `${baseUrl}/uploads/profiles/default.png`;
         const cleanPath = profile_image.replace(/^\/+/, '');
         return `${baseUrl}/${cleanPath}`;
     }
