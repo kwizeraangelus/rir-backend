@@ -39,7 +39,6 @@ export class ResearcherService {
   if (body.Position !== undefined) updateData.Position = body.Position;
   if (body.ResearchArea !== undefined) updateData.ResearchArea =body.ResearchArea;
 
-
   if (file) {
     updateData.profile_image = `/uploads/profiles/${file.filename}`;
     console.log('✅ Image saved:', updateData.profile_image); // Debug
