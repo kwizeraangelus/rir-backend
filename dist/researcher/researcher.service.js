@@ -34,6 +34,14 @@ let ResearcherService = class ResearcherService {
             order: { created_at: 'DESC' },
         });
     }
+    getImageUrl(profile_image) {
+        const baseUrl = process.env.BACKEND_URL || 'http://localhost:8000';
+        const fallback = `${baseUrl}/uploads/profiles/default-avatar.png`;
+        if (!profile_image)
+            return fallback;
+        const cleanPath = profile_image.replace(/^\/+/, '');
+        return `${baseUrl}/${cleanPath}`;
+    }
     async createPublication(userId, data) {
         const pub = this.pubRepo.create({ ...data, user: { id: userId } });
         return this.pubRepo.save(pub);
@@ -75,7 +83,6 @@ let ResearcherService = class ResearcherService {
         return publications;
     }
     async getAllResearchers(search) {
-        const baseUrl = process.env.BACKEND_URL || 'http://localhost:8000';
         try {
             const query = this.userRepo
                 .createQueryBuilder('user')
@@ -109,9 +116,7 @@ let ResearcherService = class ResearcherService {
                 contact: user.phone_number || 'N/A',
                 ResearchArea: user.ResearchArea || 'not specified',
                 Position: user.Position || user.bio?.slice(0, 150) || 'Not Specified',
-                image: user.profile_image
-                    ? `${baseUrl}${user.profile_image.startsWith('/') ? '' : '/'}${user.profile_image}`
-                    : 'https://unsplash.com/photos/a-persons-head-in-a-circle-wIG0Hhre7Ms',
+                image: this.getImageUrl(user.profile_image),
             }));
         }
         catch (error) {
@@ -157,9 +162,7 @@ let ResearcherService = class ResearcherService {
                 Position: user.Position || 'Not Specified',
                 ResearchArea: user.ResearchArea || 'not specified',
                 bio: user.bio || '',
-                image: user.profile_image
-                    ? `/uploads/profiles/${user.profile_image.split('/').pop()}`
-                    : 'https://unsplash.com/photos/a-persons-head-in-a-circle-wIG0Hhre7Ms',
+                image: this.getImageUrl(user.profile_image),
                 orcid: user.orcid,
                 university: user.university_name,
                 publications: publications || [],
@@ -203,9 +206,7 @@ let ResearcherService = class ResearcherService {
             email: user.email,
             contact: user.phone_number || 'N/A',
             Position: user.Position || user.bio?.slice(0, 150) || 'Not Specified',
-            image: user.profile_image
-                ? `http://localhost:8000${user.profile_image.startsWith('/') ? '' : '/'}${user.profile_image}`
-                : 'https://unsplash.com/photos/a-persons-head-in-a-circle-wIG0Hhre7Ms',
+            image: this.getImageUrl(user.profile_image),
         }));
     }
 };

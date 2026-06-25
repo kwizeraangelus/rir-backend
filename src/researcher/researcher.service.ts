@@ -5,6 +5,10 @@ import { Repository } from 'typeorm';
 import { User } from '../users/entities/user.entity';
 import { Publication } from './entities/publication.entity';
 
+
+
+
+
 @Injectable()
 export class ResearcherService {
   constructor(
@@ -22,6 +26,21 @@ export class ResearcherService {
       order: { created_at: 'DESC' },
     });
   }
+
+
+
+
+  // Add this helper at the top of the class
+private getImageUrl(profile_image: string | null | undefined): string {
+  const baseUrl = process.env.BACKEND_URL || 'http://localhost:8000';
+  const fallback = `${baseUrl}/uploads/profiles/default-avatar.png`;
+  
+  if (!profile_image) return fallback;
+  
+  // Normalize: strip leading slash, then re-add cleanly
+  const cleanPath = profile_image.replace(/^\/+/, '');
+  return `${baseUrl}/${cleanPath}`;
+}
 
   async createPublication(userId: string, data: any) {
     const pub = this.pubRepo.create({ ...data, user: { id: userId } });
@@ -70,7 +89,6 @@ export class ResearcherService {
     return publications;
   }
   async getAllResearchers(search?: string) {
-    const baseUrl = process.env.BACKEND_URL || 'http://localhost:8000';
     try {
       const query = this.userRepo
         .createQueryBuilder('user')
@@ -113,9 +131,7 @@ export class ResearcherService {
         contact: user.phone_number || 'N/A',
         ResearchArea: user.ResearchArea || 'not specified',
         Position: user.Position || user.bio?.slice(0, 150) || 'Not Specified',
-        image: user.profile_image
-  ? `${baseUrl}${user.profile_image.startsWith('/') ? '' : '/'}${user.profile_image}`
-  : 'https://unsplash.com/photos/a-persons-head-in-a-circle-wIG0Hhre7Ms',
+        image: this.getImageUrl(user.profile_image),
       }));
     } catch (error) {
       console.error('Error in getAllResearchers:', error);
@@ -164,9 +180,7 @@ export class ResearcherService {
         Position: user.Position || 'Not Specified',
         ResearchArea: user.ResearchArea || 'not specified',
         bio: user.bio || '',
-        image: user.profile_image
-          ? `/uploads/profiles/${user.profile_image.split('/').pop()}`
-          : 'https://unsplash.com/photos/a-persons-head-in-a-circle-wIG0Hhre7Ms',
+        image: this.getImageUrl(user.profile_image),
         orcid: user.orcid,
         university: user.university_name,
         publications: publications || [],
@@ -218,9 +232,7 @@ export class ResearcherService {
     email: user.email,
     contact: user.phone_number || 'N/A',
     Position: user.Position || user.bio?.slice(0, 150) || 'Not Specified',
-    image: user.profile_image 
-      ? `http://localhost:8000${user.profile_image.startsWith('/') ? '' : '/'}${user.profile_image}`
-      : 'https://unsplash.com/photos/a-persons-head-in-a-circle-wIG0Hhre7Ms',
+    image: this.getImageUrl(user.profile_image),
   }));
 }
 }
