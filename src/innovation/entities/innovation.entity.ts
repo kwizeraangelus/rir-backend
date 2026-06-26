@@ -1,15 +1,15 @@
+// src/innovator/entities/innovation.entity.ts
 import {
   Entity,
   PrimaryGeneratedColumn,
   Column,
   ManyToOne,
   CreateDateColumn,
+  UpdateDateColumn,
   JoinColumn,
 } from 'typeorm';
 import { User } from '../../users/entities/user.entity';
 
-// src/innovator/entities/innovation.entity.ts
-// src/innovator/entities/innovation.entity.ts
 @Entity('innovations')
 export class Innovation {
   @PrimaryGeneratedColumn('uuid')
@@ -28,7 +28,10 @@ export class Innovation {
   sponsorship_needed?: string;
 
   @Column({ default: false })
-  status?: boolean;
+  status!: boolean;
+
+  @Column({ nullable: true, type: 'text' }) // Admin feedback
+  feedback?: string;
 
   @Column()
   userId?: string;
@@ -39,4 +42,7 @@ export class Innovation {
 
   @CreateDateColumn()
   created_at?: Date;
+
+  @UpdateDateColumn()
+  updated_at?: Date;
 }

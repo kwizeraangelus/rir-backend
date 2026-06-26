@@ -215,4 +215,33 @@ export class UniversityService {
     }
     return null;
   }
+
+
+
+  async updateUpload(userId: string, uploadId: string, updateData: any, filePath?: string) {
+  // Verify ownership
+  const upload = await this.uploadRepo.findOne({
+    where: { id: uploadId, user: { id: userId } },
+  });
+
+  if (!upload) throw new NotFoundException('Upload not found or unauthorized');
+
+  // Update allowed fields only
+  const allowedFields = ['title', 'authors', 'description', 'supervisor_name', 'year'];
+  const dataToUpdate: any = {};
+
+  allowedFields.forEach(field => {
+    if (updateData[field] !== undefined && updateData[field] !== null) {
+      dataToUpdate[field] = updateData[field];
+    }
+  });
+
+  // Update file if provided
+  if (filePath) {
+    dataToUpdate.file_path = filePath;
+  }
+
+  await this.uploadRepo.update(uploadId, dataToUpdate);
+  return this.uploadRepo.findOneBy({ id: uploadId });
+}
 }

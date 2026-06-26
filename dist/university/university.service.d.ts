@@ -81,4 +81,5 @@ export declare class UniversityService {
         average_rating?: number;
         updated_at: Date;
     } | null>;
+    updateUpload(userId: string, uploadId: string, updateData: any, filePath?: string): Promise<UniversityUpload | null>;
 }

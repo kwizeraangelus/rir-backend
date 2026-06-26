@@ -169,6 +169,25 @@ let UniversityService = class UniversityService {
         }
         return null;
     }
+    async updateUpload(userId, uploadId, updateData, filePath) {
+        const upload = await this.uploadRepo.findOne({
+            where: { id: uploadId, user: { id: userId } },
+        });
+        if (!upload)
+            throw new common_1.NotFoundException('Upload not found or unauthorized');
+        const allowedFields = ['title', 'authors', 'description', 'supervisor_name', 'year'];
+        const dataToUpdate = {};
+        allowedFields.forEach(field => {
+            if (updateData[field] !== undefined && updateData[field] !== null) {
+                dataToUpdate[field] = updateData[field];
+            }
+        });
+        if (filePath) {
+            dataToUpdate.file_path = filePath;
+        }
+        await this.uploadRepo.update(uploadId, dataToUpdate);
+        return this.uploadRepo.findOneBy({ id: uploadId });
+    }
 };
 exports.UniversityService = UniversityService;
 exports.UniversityService = UniversityService = __decorate([

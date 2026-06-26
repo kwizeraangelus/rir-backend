@@ -19,6 +19,7 @@ let Publication = class Publication {
     journal_name;
     conference_info;
     doi;
+    abstract;
     url;
     publisher;
     book_title;
@@ -55,6 +56,10 @@ __decorate([
     (0, typeorm_1.Column)({ nullable: true }),
     __metadata("design:type", String)
 ], Publication.prototype, "doi", void 0);
+__decorate([
+    (0, typeorm_1.Column)('text'),
+    __metadata("design:type", String)
+], Publication.prototype, "abstract", void 0);
 __decorate([
     (0, typeorm_1.Column)({ nullable: true }),
     __metadata("design:type", String)

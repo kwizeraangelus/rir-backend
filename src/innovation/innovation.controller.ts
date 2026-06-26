@@ -1,7 +1,10 @@
+// src/innovator/innovation.controller.ts
 import {
   Controller,
   Get,
   Post,
+  Patch,
+  Delete,
   Body,
   Param,
   UseGuards,
@@ -34,21 +37,6 @@ export interface RequestWithUser extends Request {
   user: JwtUser;
 }
 
-export interface CreateInnovationDto {
-  title: string;
-  description: string;
-  category: string;
-  target_group: string;
-  innovation_type: string;
-  problem_statement: string;
-  proposed_solution: string;
-  expected_impact: string;
-  timeline: string;
-  budget: string;
-  sponsorship_needed: string;
-  status: string;
-}
-
 @Controller('api')
 export class InnovationController {
   constructor(private readonly innovationService: InnovationService) {}
@@ -65,7 +53,6 @@ export class InnovationController {
   @Post('innovations/create')
   @UseInterceptors(
     FileInterceptor('photo', {
-      // This must match your frontend 'photo' key
       storage: diskStorage({
         destination: './uploads/innovations',
         filename: (req, file, cb) =>
@@ -75,13 +62,51 @@ export class InnovationController {
   )
   async createInnovation(
     @Req() req: RequestWithUser,
-    @Body() body: CreateInnovationDto,
+    @Body() body: any,
     @UploadedFile() file: MulterFile,
   ): Promise<any> {
     const photoPath = file ? `/uploads/innovations/${file.filename}` : null;
     return this.innovationService.create(req.user.userId, body, photoPath);
   }
 
+  // 3. Update innovation (PATCH)
+  @UseGuards(JwtAuthGuard)
+  @Patch('innovations/:id')
+  @UseInterceptors(
+    FileInterceptor('photo', {
+      storage: diskStorage({
+        destination: './uploads/innovations',
+        filename: (req, file, cb) =>
+          cb(null, `${Date.now()}${extname(file.originalname)}`),
+      }),
+    }),
+  )
+  async updateInnovation(
+    @Req() req: RequestWithUser,
+    @Param('id') id: string,
+    @Body() body: any,
+    @UploadedFile() file?: MulterFile,
+  ): Promise<any> {
+    const photoPath = file ? `/uploads/innovations/${file.filename}` : undefined;
+    return this.innovationService.updateInnovation(
+      req.user.userId,
+      id,
+      body,
+      photoPath,
+    );
+  }
+
+  // 4. Delete innovation (DELETE)
+  @UseGuards(JwtAuthGuard)
+  @Delete('innovations/:id')
+  async deleteInnovation(
+    @Req() req: RequestWithUser,
+    @Param('id') id: string,
+  ): Promise<any> {
+    return this.innovationService.deleteInnovation(req.user.userId, id);
+  }
+
+  // 5. Get public list
   @Get('innovations/public-lists')
   async getPublicList(
     @Query('search') search?: string,
@@ -90,15 +115,14 @@ export class InnovationController {
     return this.innovationService.findAllPublic(search, sponsorship);
   }
 
-  // Match: http://localhost:8000/api/innovations/public-countss/
+  // 6. Get public counts
   @Get('innovations/public-countss')
   async getCounts(): Promise<any> {
     return this.innovationService.getPublicCounts();
   }
 
-  // src/innovation/innovation.controller.ts
-
-  @Get('innovation/:id') // This matches: GET /api/innovations/:id
+  // 7. Get single innovation detail (public)
+  @Get('innovation/:id')
   async getOne(@Param('id') id: string): Promise<any> {
     const innovation = await this.innovationService.findOne(id);
 

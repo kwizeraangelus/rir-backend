@@ -77,6 +77,36 @@ let InnovationService = class InnovationService {
         }
         return innovation;
     }
+    async updateInnovation(userId, innovationId, updateData, photoPath) {
+        const innovation = await this.innovationRepo.findOne({
+            where: { id: innovationId, userId },
+        });
+        if (!innovation) {
+            throw new common_1.NotFoundException('Innovation not found or unauthorized');
+        }
+        const allowedFields = ['name', 'description', 'sponsorship_needed'];
+        const dataToUpdate = {};
+        allowedFields.forEach(field => {
+            if (updateData[field] !== undefined && updateData[field] !== null) {
+                dataToUpdate[field] = updateData[field];
+            }
+        });
+        if (photoPath) {
+            dataToUpdate.photo = photoPath;
+        }
+        await this.innovationRepo.update(innovationId, dataToUpdate);
+        return this.innovationRepo.findOneBy({ id: innovationId });
+    }
+    async deleteInnovation(userId, innovationId) {
+        const innovation = await this.innovationRepo.findOne({
+            where: { id: innovationId, userId },
+        });
+        if (!innovation) {
+            throw new common_1.NotFoundException('Innovation not found or unauthorized');
+        }
+        await this.innovationRepo.delete(innovationId);
+        return { success: true, message: 'Innovation deleted successfully' };
+    }
 };
 exports.InnovationService = InnovationService;
 exports.InnovationService = InnovationService = __decorate([

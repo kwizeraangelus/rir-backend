@@ -19,9 +19,11 @@ let Innovation = class Innovation {
     photo;
     sponsorship_needed;
     status;
+    feedback;
     userId;
     user;
     created_at;
+    updated_at;
 };
 exports.Innovation = Innovation;
 __decorate([
@@ -49,6 +51,10 @@ __decorate([
     __metadata("design:type", Boolean)
 ], Innovation.prototype, "status", void 0);
 __decorate([
+    (0, typeorm_1.Column)({ nullable: true, type: 'text' }),
+    __metadata("design:type", String)
+], Innovation.prototype, "feedback", void 0);
+__decorate([
     (0, typeorm_1.Column)(),
     __metadata("design:type", String)
 ], Innovation.prototype, "userId", void 0);
@@ -61,6 +67,10 @@ __decorate([
     (0, typeorm_1.CreateDateColumn)(),
     __metadata("design:type", Date)
 ], Innovation.prototype, "created_at", void 0);
+__decorate([
+    (0, typeorm_1.UpdateDateColumn)(),
+    __metadata("design:type", Date)
+], Innovation.prototype, "updated_at", void 0);
 exports.Innovation = Innovation = __decorate([
     (0, typeorm_1.Entity)('innovations')
 ], Innovation);

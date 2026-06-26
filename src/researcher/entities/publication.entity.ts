@@ -29,6 +29,9 @@ export class Publication {
   @Column({ nullable: true })
   doi?: string;
 
+  @Column('text')
+  abstract!: string;
+
   @Column({ nullable: true })
   url?: string;
 

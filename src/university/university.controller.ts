@@ -160,4 +160,21 @@ export class UniversityController {
   async rateBook(@Param('id') id: string, @Body('rating') rating: number) {
     return this.universityService.addRating(id, rating);
   }
+
+
+  @UseGuards(JwtAuthGuard)
+@Patch('upload/:id')
+@UseInterceptors(
+  FileInterceptor('file', {
+    storage: diskStorage({
+      destination: './uploads/research',
+      filename: (req, file, cb) =>
+        cb(null, `${Date.now()}-${file.originalname}`),
+    }),
+  }),
+)
+async updateUpload(@Req() req, @Param('id') id: string, @Body() body, @UploadedFile() file?) {
+  const filePath = file ? file.path : undefined;
+  return this.universityService.updateUpload(req.user.sub, id, body, filePath);
+}
 }

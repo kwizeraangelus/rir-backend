@@ -87,6 +87,10 @@ let UniversityController = class UniversityController {
     async rateBook(id, rating) {
         return this.universityService.addRating(id, rating);
     }
+    async updateUpload(req, id, body, file) {
+        const filePath = file ? file.path : undefined;
+        return this.universityService.updateUpload(req.user.sub, id, body, filePath);
+    }
 };
 exports.UniversityController = UniversityController;
 __decorate([
@@ -197,6 +201,23 @@ __decorate([
     __metadata("design:paramtypes", [String, Number]),
     __metadata("design:returntype", Promise)
 ], UniversityController.prototype, "rateBook", null);
+__decorate([
+    (0, common_1.UseGuards)(jwt_auth_guard_1.JwtAuthGuard),
+    (0, common_1.Patch)('upload/:id'),
+    (0, common_1.UseInterceptors)((0, platform_express_1.FileInterceptor)('file', {
+        storage: (0, multer_1.diskStorage)({
+            destination: './uploads/research',
+            filename: (req, file, cb) => cb(null, `${Date.now()}-${file.originalname}`),
+        }),
+    })),
+    __param(0, (0, common_1.Req)()),
+    __param(1, (0, common_1.Param)('id')),
+    __param(2, (0, common_1.Body)()),
+    __param(3, (0, common_1.UploadedFile)()),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", [Object, String, Object, Object]),
+    __metadata("design:returntype", Promise)
+], UniversityController.prototype, "updateUpload", null);
 exports.UniversityController = UniversityController = __decorate([
     (0, common_1.Controller)('api'),
     __metadata("design:paramtypes", [university_service_1.UniversityService])

@@ -31,6 +31,13 @@ let InnovationController = class InnovationController {
         const photoPath = file ? `/uploads/innovations/${file.filename}` : null;
         return this.innovationService.create(req.user.userId, body, photoPath);
     }
+    async updateInnovation(req, id, body, file) {
+        const photoPath = file ? `/uploads/innovations/${file.filename}` : undefined;
+        return this.innovationService.updateInnovation(req.user.userId, id, body, photoPath);
+    }
+    async deleteInnovation(req, id) {
+        return this.innovationService.deleteInnovation(req.user.userId, id);
+    }
     async getPublicList(search, sponsorship) {
         return this.innovationService.findAllPublic(search, sponsorship);
     }
@@ -70,6 +77,32 @@ __decorate([
     __metadata("design:paramtypes", [Object, Object, Object]),
     __metadata("design:returntype", Promise)
 ], InnovationController.prototype, "createInnovation", null);
+__decorate([
+    (0, common_1.UseGuards)(jwt_auth_guard_1.JwtAuthGuard),
+    (0, common_1.Patch)('innovations/:id'),
+    (0, common_1.UseInterceptors)((0, platform_express_1.FileInterceptor)('photo', {
+        storage: (0, multer_1.diskStorage)({
+            destination: './uploads/innovations',
+            filename: (req, file, cb) => cb(null, `${Date.now()}${(0, path_1.extname)(file.originalname)}`),
+        }),
+    })),
+    __param(0, (0, common_1.Req)()),
+    __param(1, (0, common_1.Param)('id')),
+    __param(2, (0, common_1.Body)()),
+    __param(3, (0, common_1.UploadedFile)()),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", [Object, String, Object, Object]),
+    __metadata("design:returntype", Promise)
+], InnovationController.prototype, "updateInnovation", null);
+__decorate([
+    (0, common_1.UseGuards)(jwt_auth_guard_1.JwtAuthGuard),
+    (0, common_1.Delete)('innovations/:id'),
+    __param(0, (0, common_1.Req)()),
+    __param(1, (0, common_1.Param)('id')),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", [Object, String]),
+    __metadata("design:returntype", Promise)
+], InnovationController.prototype, "deleteInnovation", null);
 __decorate([
     (0, common_1.Get)('innovations/public-lists'),
     __param(0, (0, common_1.Query)('search')),

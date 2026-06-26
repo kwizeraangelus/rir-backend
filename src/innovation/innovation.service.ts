@@ -1,5 +1,5 @@
 // src/innovator/innovator.service.ts
-import { Injectable } from '@nestjs/common';
+import { Injectable, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { Innovation } from './entities/innovation.entity'; // Check this path
@@ -83,5 +83,60 @@ export class InnovationService {
     }
 
     return innovation;
+  }
+
+
+
+   async updateInnovation(
+    userId: string,
+    innovationId: string,
+    updateData: any,
+    photoPath?: string,
+  ) {
+    // Verify ownership
+    const innovation = await this.innovationRepo.findOne({
+      where: { id: innovationId, userId },
+    });
+ 
+    if (!innovation) {
+      throw new NotFoundException(
+        'Innovation not found or unauthorized',
+      );
+    }
+ 
+    // Allowed fields to update
+    const allowedFields = ['name', 'description', 'sponsorship_needed'];
+    const dataToUpdate: any = {};
+ 
+    allowedFields.forEach(field => {
+      if (updateData[field] !== undefined && updateData[field] !== null) {
+        dataToUpdate[field] = updateData[field];
+      }
+    });
+ 
+    // Update photo if provided
+    if (photoPath) {
+      dataToUpdate.photo = photoPath;
+    }
+ 
+    await this.innovationRepo.update(innovationId, dataToUpdate);
+    return this.innovationRepo.findOneBy({ id: innovationId });
+  }
+ 
+  // ============= NEW: DELETE INNOVATION =============
+  async deleteInnovation(userId: string, innovationId: string) {
+    // Verify ownership
+    const innovation = await this.innovationRepo.findOne({
+      where: { id: innovationId, userId },
+    });
+ 
+    if (!innovation) {
+      throw new NotFoundException(
+        'Innovation not found or unauthorized',
+      );
+    }
+ 
+    await this.innovationRepo.delete(innovationId);
+    return { success: true, message: 'Innovation deleted successfully' };
   }
 }

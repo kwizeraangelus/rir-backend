@@ -15,4 +15,9 @@ export declare class InnovationService {
         no_need: number;
     }>;
     findOne(id: string): Promise<Innovation | null>;
+    updateInnovation(userId: string, innovationId: string, updateData: any, photoPath?: string): Promise<Innovation | null>;
+    deleteInnovation(userId: string, innovationId: string): Promise<{
+        success: boolean;
+        message: string;
+    }>;
 }

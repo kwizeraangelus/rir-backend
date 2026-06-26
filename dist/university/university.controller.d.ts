@@ -82,4 +82,5 @@ export declare class UniversityController {
         success: boolean;
         average: number;
     }>;
+    updateUpload(req: any, id: string, body: any, file?: any): Promise<import("./entities/university-upload.entity").UniversityUpload | null>;
 }

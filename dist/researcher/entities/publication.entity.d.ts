@@ -6,6 +6,7 @@ export declare class Publication {
     journal_name?: string;
     conference_info?: string;
     doi?: string;
+    abstract: string;
     url?: string;
     publisher?: string;
     book_title?: string;
