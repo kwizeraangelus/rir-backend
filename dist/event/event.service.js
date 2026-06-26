@@ -41,10 +41,12 @@ let EventsService = class EventsService {
             where: { status: true },
             order: { date: 'ASC' },
         });
-        const baseUrl = process.env.BACKEND_URL || 'http://localhost:8000';
+        const baseUrl = process.env.NODE_ENV === 'production'
+            ? 'https://api.riri.rw'
+            : 'http://localhost:8000';
         return events.map((event) => ({
             ...event,
-            photo_url: event.photo ? `${baseUrl}${event.photo}` : null,
+            photo_url: event.photo ? `${baseUrl}/${event.photo.replace(/^\/+/, '')}` : null,
         }));
     }
 };
