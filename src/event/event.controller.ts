@@ -1,9 +1,11 @@
-// src/events/events.controller.ts
 import {
   Controller,
   Get,
   Post,
+  Put,
+  Delete,
   Body,
+  Param,
   UseGuards,
   Req,
   UseInterceptors,
@@ -49,5 +51,42 @@ export class EventsController {
   @Get('events')
   async getAllPublicEvents() {
     return this.eventsService.findAll();
+  }
+
+  // ============= NEW: UPDATE EVENT =============
+  @UseGuards(JwtAuthGuard)
+  @Put('events/:id')
+  @UseInterceptors(
+    FileInterceptor('photo', {
+      storage: diskStorage({
+        destination: './uploads/events',
+        filename: (req, file, cb) =>
+          cb(null, `${Date.now()}${extname(file.originalname)}`),
+      }),
+    }),
+  )
+  async updateEvent(
+    @Req() req: any,
+    @Param('id') eventId: string,
+    @Body() body: any,
+    @UploadedFile() file: Express.Multer.File,
+  ) {
+    const photoPath = file ? `/uploads/events/${file.filename}` : undefined;
+    return this.eventsService.updateEvent(
+      req.user.userId,
+      eventId,
+      body,
+      photoPath,
+    );
+  }
+
+  // ============= NEW: DELETE EVENT =============
+  @UseGuards(JwtAuthGuard)
+  @Delete('events/:id')
+  async deleteEvent(
+    @Req() req: any,
+    @Param('id') eventId: string,
+  ) {
+    return this.eventsService.deleteEvent(req.user.userId, eventId);
   }
 }

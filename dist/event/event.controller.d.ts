@@ -19,4 +19,9 @@ export declare class EventsController {
         status?: boolean;
         rejection_feedback?: string;
     }[]>;
+    updateEvent(req: any, eventId: string, body: any, file: Express.Multer.File): Promise<import("./entities/event.entity").Event | null>;
+    deleteEvent(req: any, eventId: string): Promise<{
+        success: boolean;
+        message: string;
+    }>;
 }

@@ -1,5 +1,4 @@
-// src/events/events.service.ts
-import { Injectable } from '@nestjs/common';
+import { Injectable, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { Event } from './entities/event.entity';
@@ -25,18 +24,75 @@ export class EventsService {
   }
 
   async findAll() {
-  const events = await this.eventRepo.find({
-    where: { status: true },
-    order: { date: 'ASC' },
-  });
+    const events = await this.eventRepo.find({
+      where: { status: true },
+      order: { date: 'ASC' },
+    });
 
-  const baseUrl = process.env.NODE_ENV === 'production'
-    ? 'https://api.riri.rw'
-    : 'http://localhost:8000';
+    const baseUrl = process.env.NODE_ENV === 'production'
+      ? 'https://api.riri.rw'
+      : 'http://localhost:8000';
 
-  return events.map((event) => ({
-    ...event,
-    photo_url: event.photo ? `${baseUrl}/${event.photo.replace(/^\/+/, '')}` : null,
-  }));
-}
+    return events.map((event) => ({
+      ...event,
+      photo_url: event.photo ? `${baseUrl}/${event.photo.replace(/^\/+/, '')}` : null,
+    }));
+  }
+
+  // ============= NEW: UPDATE EVENT =============
+  async updateEvent(
+    userId: string,
+    eventId: string,
+    updateData: any,
+    photoPath?: string,
+  ) {
+    // Verify ownership
+    const event = await this.eventRepo.findOne({
+      where: { id: eventId, user: { id: userId } },
+    });
+
+    if (!event) {
+      throw new NotFoundException(
+        'Event not found or unauthorized',
+      );
+    }
+
+    // Allowed fields to update
+    const allowedFields = ['title', 'description', 'date', 'location', 'link', 'icon'];
+    const dataToUpdate: any = {};
+
+    allowedFields.forEach(field => {
+      if (updateData[field] !== undefined && updateData[field] !== null) {
+        dataToUpdate[field] = updateData[field];
+      }
+    });
+
+    // Update photo if provided
+    if (photoPath) {
+      dataToUpdate.photo = photoPath;
+    }
+
+    await this.eventRepo.update(eventId, dataToUpdate);
+    return this.eventRepo.findOne({
+      where: { id: eventId },
+      relations: ['user'],
+    });
+  }
+
+  // ============= NEW: DELETE EVENT =============
+  async deleteEvent(userId: string, eventId: string) {
+    // Verify ownership
+    const event = await this.eventRepo.findOne({
+      where: { id: eventId, user: { id: userId } },
+    });
+
+    if (!event) {
+      throw new NotFoundException(
+        'Event not found or unauthorized',
+      );
+    }
+
+    await this.eventRepo.delete(eventId);
+    return { success: true, message: 'Event deleted successfully' };
+  }
 }

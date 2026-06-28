@@ -20,4 +20,9 @@ export declare class EventsService {
         status?: boolean;
         rejection_feedback?: string;
     }[]>;
+    updateEvent(userId: string, eventId: string, updateData: any, photoPath?: string): Promise<Event | null>;
+    deleteEvent(userId: string, eventId: string): Promise<{
+        success: boolean;
+        message: string;
+    }>;
 }

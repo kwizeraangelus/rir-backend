@@ -49,6 +49,39 @@ let EventsService = class EventsService {
             photo_url: event.photo ? `${baseUrl}/${event.photo.replace(/^\/+/, '')}` : null,
         }));
     }
+    async updateEvent(userId, eventId, updateData, photoPath) {
+        const event = await this.eventRepo.findOne({
+            where: { id: eventId, user: { id: userId } },
+        });
+        if (!event) {
+            throw new common_1.NotFoundException('Event not found or unauthorized');
+        }
+        const allowedFields = ['title', 'description', 'date', 'location', 'link', 'icon'];
+        const dataToUpdate = {};
+        allowedFields.forEach(field => {
+            if (updateData[field] !== undefined && updateData[field] !== null) {
+                dataToUpdate[field] = updateData[field];
+            }
+        });
+        if (photoPath) {
+            dataToUpdate.photo = photoPath;
+        }
+        await this.eventRepo.update(eventId, dataToUpdate);
+        return this.eventRepo.findOne({
+            where: { id: eventId },
+            relations: ['user'],
+        });
+    }
+    async deleteEvent(userId, eventId) {
+        const event = await this.eventRepo.findOne({
+            where: { id: eventId, user: { id: userId } },
+        });
+        if (!event) {
+            throw new common_1.NotFoundException('Event not found or unauthorized');
+        }
+        await this.eventRepo.delete(eventId);
+        return { success: true, message: 'Event deleted successfully' };
+    }
 };
 exports.EventsService = EventsService;
 exports.EventsService = EventsService = __decorate([

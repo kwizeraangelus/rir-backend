@@ -34,6 +34,13 @@ let EventsController = class EventsController {
     async getAllPublicEvents() {
         return this.eventsService.findAll();
     }
+    async updateEvent(req, eventId, body, file) {
+        const photoPath = file ? `/uploads/events/${file.filename}` : undefined;
+        return this.eventsService.updateEvent(req.user.userId, eventId, body, photoPath);
+    }
+    async deleteEvent(req, eventId) {
+        return this.eventsService.deleteEvent(req.user.userId, eventId);
+    }
 };
 exports.EventsController = EventsController;
 __decorate([
@@ -66,6 +73,32 @@ __decorate([
     __metadata("design:paramtypes", []),
     __metadata("design:returntype", Promise)
 ], EventsController.prototype, "getAllPublicEvents", null);
+__decorate([
+    (0, common_1.UseGuards)(jwt_auth_guard_1.JwtAuthGuard),
+    (0, common_1.Put)('events/:id'),
+    (0, common_1.UseInterceptors)((0, platform_express_1.FileInterceptor)('photo', {
+        storage: (0, multer_1.diskStorage)({
+            destination: './uploads/events',
+            filename: (req, file, cb) => cb(null, `${Date.now()}${(0, path_1.extname)(file.originalname)}`),
+        }),
+    })),
+    __param(0, (0, common_1.Req)()),
+    __param(1, (0, common_1.Param)('id')),
+    __param(2, (0, common_1.Body)()),
+    __param(3, (0, common_1.UploadedFile)()),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", [Object, String, Object, Object]),
+    __metadata("design:returntype", Promise)
+], EventsController.prototype, "updateEvent", null);
+__decorate([
+    (0, common_1.UseGuards)(jwt_auth_guard_1.JwtAuthGuard),
+    (0, common_1.Delete)('events/:id'),
+    __param(0, (0, common_1.Req)()),
+    __param(1, (0, common_1.Param)('id')),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", [Object, String]),
+    __metadata("design:returntype", Promise)
+], EventsController.prototype, "deleteEvent", null);
 exports.EventsController = EventsController = __decorate([
     (0, common_1.Controller)('api'),
     __metadata("design:paramtypes", [event_service_1.EventsService])
