@@ -2,6 +2,7 @@ import {
   IsEmail,
   IsEnum,
   IsNotEmpty,
+  IsOptional,
   IsString,
   Matches,
   MinLength,
@@ -26,9 +27,8 @@ export class RegisterDto {
   @IsNotEmpty()
   last_name: string = '';
 
+  @IsOptional()
   @IsString()
-  @IsNotEmpty()
-  @Matches(/^\+?[1-9]\d{1,14}$/, { message: 'Invalid phone number format' })
   phone_number: string = '';
 
   @IsEnum(UserCategory)

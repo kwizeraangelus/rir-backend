@@ -13,7 +13,7 @@ export declare class ProfileService {
         email: string;
         first_name: string;
         last_name: string;
-        phone_number: string;
+        phone_number?: string;
         qualification?: string;
         Position?: string;
         Field?: string;
@@ -40,7 +40,7 @@ export declare class ProfileService {
         email: string;
         first_name: string;
         last_name: string;
-        phone_number: string;
+        phone_number?: string;
         qualification?: string;
         Position?: string;
         Field?: string;
@@ -67,7 +67,7 @@ export declare class ProfileService {
         email: string;
         first_name: string;
         last_name: string;
-        phone_number: string;
+        phone_number?: string;
         qualification?: string;
         Position?: string;
         Field?: string;
@@ -94,7 +94,7 @@ export declare class ProfileService {
         email: string;
         first_name: string;
         last_name: string;
-        phone_number: string;
+        phone_number?: string;
         qualification?: string;
         Position?: string;
         Field?: string;
@@ -121,7 +121,7 @@ export declare class ProfileService {
         email: string;
         first_name: string;
         last_name: string;
-        phone_number: string;
+        phone_number?: string;
         qualification?: string;
         Position?: string;
         Field?: string;

@@ -45,9 +45,8 @@ __decorate([
     __metadata("design:type", String)
 ], RegisterDto.prototype, "last_name", void 0);
 __decorate([
+    (0, class_validator_1.IsOptional)(),
     (0, class_validator_1.IsString)(),
-    (0, class_validator_1.IsNotEmpty)(),
-    (0, class_validator_1.Matches)(/^\+?[1-9]\d{1,14}$/, { message: 'Invalid phone number format' }),
     __metadata("design:type", String)
 ], RegisterDto.prototype, "phone_number", void 0);
 __decorate([

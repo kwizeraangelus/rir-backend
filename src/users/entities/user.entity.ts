@@ -30,8 +30,8 @@ export class User {
   @Column()
   last_name: string = '';
 
-  @Column()
-  phone_number: string = '';
+  @Column({ nullable: true })
+  phone_number?: string = '';
 
   @Column({ nullable: true })
   qualification?: string;

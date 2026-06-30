@@ -13,7 +13,7 @@ export declare class User {
     email: string;
     first_name: string;
     last_name: string;
-    phone_number: string;
+    phone_number?: string;
     qualification?: string;
     Position?: string;
     Field?: string;

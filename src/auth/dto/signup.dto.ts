@@ -3,6 +3,7 @@ import {
   IsEmail,
   IsEnum,
   IsNotEmpty,
+  IsOptional,
   IsString,
   MinLength,
 } from 'class-validator';
@@ -24,9 +25,9 @@ export class SignupDto {
   @IsString()
   @IsNotEmpty()
   last_name?: string; // Changed from lastName
-
+  
+  @IsOptional()
   @IsString()
-  @IsNotEmpty()
   phone_number?: string;
 
   @IsEnum(UserCategory)
