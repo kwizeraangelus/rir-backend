@@ -8,7 +8,7 @@ export declare class ResearcherService {
     getProfile(userId: string): Promise<User | null>;
     getPublications(userId: string): Promise<Publication[]>;
     private getImageUrl;
-    createPublication(userId: string, data: any): Promise<Publication[]>;
+    createPublication(userId: string, data: any, file?: Express.Multer.File): Promise<Publication[]>;
     updateProfile(userId: string, body: any, file?: Express.Multer.File): Promise<User | null>;
     findAllApproved(): Promise<Publication[]>;
     getAllResearchers(search?: string): Promise<{
@@ -48,4 +48,9 @@ export declare class ResearcherService {
         Position: string;
         image: string;
     }[]>;
+    updatePublication(userId: string, pubId: string, data: any, file?: Express.Multer.File): Promise<Publication>;
+    deletePublication(userId: string, pubId: string): Promise<{
+        success: boolean;
+        id: string;
+    }>;
 }

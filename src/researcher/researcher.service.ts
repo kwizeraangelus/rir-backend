@@ -1,5 +1,5 @@
 // src/researcher/researcher.service.ts
-import { BadRequestException,Injectable, NotFoundException } from '@nestjs/common';
+import { BadRequestException, Injectable, NotFoundException, UnauthorizedException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { User } from '../users/entities/user.entity';
@@ -41,11 +41,16 @@ private getImageUrl(profile_image: string | null | undefined): string {
   return `${baseUrl}/${cleanPath}`;
 }
 
-  async createPublication(userId: string, data: any) {
-    const pub = this.pubRepo.create({ ...data, user: { id: userId } });
-    return this.pubRepo.save(pub);
+  async createPublication(userId: string, data: any, file?: Express.Multer.File) {
+  const pubData: any = { ...data, user: { id: userId } };
+
+  if (file) {
+    pubData.pdf_path = `/uploads/publications/${file.filename}`;
   }
 
+  const pub = this.pubRepo.create(pubData);
+  return this.pubRepo.save(pub);
+}
   async updateProfile(userId: string, body: any, file?: Express.Multer.File) {
   const updateData: any = {};
 
@@ -233,5 +238,55 @@ private getImageUrl(profile_image: string | null | undefined): string {
     Position: user.Position || user.bio?.slice(0, 150) || 'Not Specified',
     image: this.getImageUrl(user.profile_image),
   }));
+}
+
+
+async updatePublication(
+  userId: string,
+  pubId: string,
+  data: any,
+  file?: Express.Multer.File,
+) {
+  const pub = await this.pubRepo.findOne({
+    where: { id: pubId },
+    relations: ['user'],
+  });
+
+  if (!pub) throw new NotFoundException('Publication not found');
+  if (pub.user?.id !== userId) {
+    throw new UnauthorizedException('You are not allowed to edit this publication');
+  }
+
+  // Strip fields the client should never be able to overwrite
+  const {
+    id, userId: _uid, user, created_at,
+    status, assignedToExpertId, assignedToExpert,
+    pdf_path, // 👈 also strip this — only the server sets it, from `file`
+    ...updatable
+  } = data;
+
+  Object.assign(pub, updatable);
+
+  if (file) {
+    pub.pdf_path = `/uploads/publications/${file.filename}`;
+    // (or simply: pub.pdf_path = `/uploads/publications/${file.filename}`;)
+  }
+
+  return this.pubRepo.save(pub);
+}
+
+async deletePublication(userId: string, pubId: string) {
+  const pub = await this.pubRepo.findOne({
+    where: { id: pubId },
+    relations: ['user'],
+  });
+
+  if (!pub) throw new NotFoundException('Publication not found');
+  if (pub.user?.id !== userId) {
+    throw new UnauthorizedException('You are not allowed to delete this publication');
+  }
+
+  await this.pubRepo.remove(pub);
+  return { success: true, id: pubId };
 }
 }

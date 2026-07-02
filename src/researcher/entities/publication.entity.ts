@@ -49,6 +49,9 @@ export class Publication {
 
   @Column({ nullable: true })
   assignedToExpertId?: string;
+  
+  @Column({ nullable: true })
+  pdf_path?: string;
 
   @ManyToOne(() => User, { nullable: true })
   @JoinColumn({ name: 'assignedToExpertId' })

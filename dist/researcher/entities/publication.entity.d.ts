@@ -13,6 +13,7 @@ export declare class Publication {
     publication_type: string;
     status: boolean;
     assignedToExpertId?: string;
+    pdf_path?: string;
     assignedToExpert?: User;
     user?: User;
     userId?: string;

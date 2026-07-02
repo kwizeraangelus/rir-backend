@@ -10,31 +10,7 @@ export declare class UniversityService {
     getMyUploads(userId: string): Promise<UniversityUpload[]>;
     getUserById(userId: string): Promise<User | null>;
     getUploadById(id: string): Promise<UniversityUpload | null>;
-    findApproved(search?: string, degreeType?: string, fieldKeywords?: string): Promise<{
-        file_url: string;
-        cover_image: string | null;
-        id: string;
-        submission_type: string;
-        university: string;
-        title: string;
-        authors: string;
-        year: number;
-        description: string;
-        supervisor_name: string;
-        degree_type?: string;
-        file_path: string;
-        status: "pending" | "approved" | "rejected";
-        userId?: string;
-        user?: User;
-        created_at: Date;
-        views_count: number;
-        likes_count?: number;
-        feedback?: string;
-        rating_sum?: number;
-        rating_count?: number;
-        average_rating?: number;
-        updated_at: Date;
-    }[]>;
+    findApproved(search?: string, degreeType?: string, fieldKeywords?: string): Promise<any[]>;
     getCounts(degreeType?: string): Promise<{
         thesis: number;
         dissertation: number;

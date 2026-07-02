@@ -43,8 +43,12 @@ let ResearcherService = class ResearcherService {
         const cleanPath = profile_image.replace(/^\/+/, '');
         return `${baseUrl}/${cleanPath}`;
     }
-    async createPublication(userId, data) {
-        const pub = this.pubRepo.create({ ...data, user: { id: userId } });
+    async createPublication(userId, data, file) {
+        const pubData = { ...data, user: { id: userId } };
+        if (file) {
+            pubData.pdf_path = `/uploads/publications/${file.filename}`;
+        }
+        const pub = this.pubRepo.create(pubData);
         return this.pubRepo.save(pub);
     }
     async updateProfile(userId, body, file) {
@@ -209,6 +213,36 @@ let ResearcherService = class ResearcherService {
             Position: user.Position || user.bio?.slice(0, 150) || 'Not Specified',
             image: this.getImageUrl(user.profile_image),
         }));
+    }
+    async updatePublication(userId, pubId, data, file) {
+        const pub = await this.pubRepo.findOne({
+            where: { id: pubId },
+            relations: ['user'],
+        });
+        if (!pub)
+            throw new common_1.NotFoundException('Publication not found');
+        if (pub.user?.id !== userId) {
+            throw new common_1.UnauthorizedException('You are not allowed to edit this publication');
+        }
+        const { id, userId: _uid, user, created_at, status, assignedToExpertId, assignedToExpert, pdf_path, ...updatable } = data;
+        Object.assign(pub, updatable);
+        if (file) {
+            pub.pdf_path = `/uploads/publications/${file.filename}`;
+        }
+        return this.pubRepo.save(pub);
+    }
+    async deletePublication(userId, pubId) {
+        const pub = await this.pubRepo.findOne({
+            where: { id: pubId },
+            relations: ['user'],
+        });
+        if (!pub)
+            throw new common_1.NotFoundException('Publication not found');
+        if (pub.user?.id !== userId) {
+            throw new common_1.UnauthorizedException('You are not allowed to delete this publication');
+        }
+        await this.pubRepo.remove(pub);
+        return { success: true, id: pubId };
     }
 };
 exports.ResearcherService = ResearcherService;

@@ -44,4 +44,10 @@ export declare class ResearcherController {
         Position: string;
         image: string;
     }[]>;
+    updatePublication(req: any, id: string, body: any, file?: Express.Multer.File): Promise<import("./entities/publication.entity").Publication>;
+    deletePublication(req: any, id: string): Promise<{
+        success: boolean;
+        id: string;
+    }>;
+    s: any;
 }

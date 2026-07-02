@@ -56,6 +56,8 @@ let UniversityService = class UniversityService {
     async findApproved(search, degreeType, fieldKeywords) {
         const query = this.uploadRepo
             .createQueryBuilder('p')
+            .leftJoin('p.user', 'user')
+            .addSelect(['user.university_name'])
             .where('p.status = :status', { status: 'approved' });
         if (search) {
             query.andWhere(new typeorm_2.Brackets((qb) => {
@@ -65,7 +67,15 @@ let UniversityService = class UniversityService {
             }));
         }
         if (degreeType && degreeType !== 'all') {
-            query.andWhere('p.degree_type = :dt', { dt: degreeType });
+            query.andWhere(new typeorm_2.Brackets((qb) => {
+                qb.where('p.degree_type = :dt', { dt: degreeType }).orWhere(new typeorm_2.Brackets((qb2) => {
+                    qb2
+                        .where('p.degree_type IS NULL')
+                        .andWhere('p.submission_type LIKE :dtPrefix', {
+                        dtPrefix: `${degreeType}%`,
+                    });
+                }));
+            }));
         }
         if (fieldKeywords) {
             const keywords = fieldKeywords.split(',');
@@ -78,26 +88,56 @@ let UniversityService = class UniversityService {
             }));
         }
         const results = await query.getMany();
-        return results.map((p) => ({
-            ...p,
-            file_url: `http://localhost:8000${p.file_path}`,
-            cover_image: p.cover_image
-                ? `http://localhost:8000${p.cover_image}`
-                : null,
-        }));
+        const inferDegree = (p) => {
+            if (p.degree_type)
+                return p.degree_type;
+            if (p.submission_type?.toLowerCase().startsWith('dissertation'))
+                return 'dissertation';
+            if (p.submission_type?.toLowerCase().startsWith('thesis'))
+                return 'thesis';
+            return undefined;
+        };
+        return results.map((p) => {
+            const mapped = {
+                ...p,
+                university_name: p.user?.university_name || null,
+                degree_type: inferDegree(p),
+                file_url: `http://localhost:8000${p.file_path}`,
+                cover_image: p.cover_image ? `http://localhost:8000${p.cover_image}` : null,
+            };
+            delete mapped.user;
+            delete mapped.university;
+            return mapped;
+        });
     }
     async getCounts(degreeType) {
         const query = this.uploadRepo
             .createQueryBuilder('p')
             .where('p.status = :status', { status: 'approved' });
         if (degreeType && degreeType !== 'all') {
-            query.andWhere('p.degree_type = :dt', { dt: degreeType });
+            query.andWhere(new typeorm_2.Brackets((qb) => {
+                qb.where('p.degree_type = :dt', { dt: degreeType }).orWhere(new typeorm_2.Brackets((qb2) => {
+                    qb2
+                        .where('p.degree_type IS NULL')
+                        .andWhere('p.submission_type LIKE :dtPrefix', {
+                        dtPrefix: `${degreeType}%`,
+                    });
+                }));
+            }));
         }
         const items = await query.getMany();
+        const inferDegree = (i) => {
+            if (i.degree_type)
+                return i.degree_type;
+            if (i.submission_type?.toLowerCase().startsWith('dissertation'))
+                return 'dissertation';
+            if (i.submission_type?.toLowerCase().startsWith('thesis'))
+                return 'thesis';
+            return undefined;
+        };
         return {
-            thesis: items.filter((i) => i.degree_type === 'thesis').length,
-            dissertation: items.filter((i) => i.degree_type === 'dissertation')
-                .length,
+            thesis: items.filter((i) => inferDegree(i) === 'thesis').length,
+            dissertation: items.filter((i) => inferDegree(i) === 'dissertation').length,
             engineering: items.filter((i) => i.submission_type.includes('engineering')).length,
             medicine_health_sciences: items.filter((i) => i.submission_type.match(/medicine|health|nursing/)).length,
             arts_humanities: items.filter((i) => i.submission_type.match(/law|arts|history/)).length,
@@ -105,8 +145,7 @@ let UniversityService = class UniversityService {
             social_sciences: items.filter((i) => i.submission_type.match(/sociology|psychology|social/)).length,
             business_economics: items.filter((i) => i.submission_type.match(/business|economics|finance/)).length,
             computer_science_it: items.filter((i) => i.submission_type.match(/computer|it|software/)).length,
-            education: items.filter((i) => i.submission_type.includes('education'))
-                .length,
+            education: items.filter((i) => i.submission_type.includes('education')).length,
         };
     }
     async getPublicBookDetail(id) {
@@ -147,8 +186,12 @@ let UniversityService = class UniversityService {
         const book = await this.uploadRepo.findOneBy({ id });
         if (!book)
             throw new common_1.NotFoundException();
-        const newSum = book.rating_sum ?? +rating;
-        const newCount = book.rating_count ?? +1;
+        const numericRating = Number(rating);
+        if (!Number.isFinite(numericRating) || numericRating < 1 || numericRating > 5) {
+            throw new common_1.BadRequestException('Rating must be a number between 1 and 5');
+        }
+        const newSum = (book.rating_sum ?? 0) + numericRating;
+        const newCount = (book.rating_count ?? 0) + 1;
         const newAverage = newSum / newCount;
         await this.uploadRepo.update(id, {
             rating_sum: newSum,

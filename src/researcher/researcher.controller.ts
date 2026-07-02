@@ -1,18 +1,8 @@
 // src/researcher/researcher.controller.ts
 import {
-  Controller,
-  Get,
-  Post,
-  Patch,
-  Body,
-  UseGuards,
-  Req,
-  UseInterceptors,
-  UploadedFile,
-  UploadedFiles,
-  UnauthorizedException,
-  Query,
-  Param,
+  Controller, Get, Post, Patch, Delete, Body, UseGuards, Req,
+  UseInterceptors, UploadedFile, UploadedFiles, UnauthorizedException,
+  Query, Param,
 } from '@nestjs/common';
 import { FileFieldsInterceptor } from '@nestjs/platform-express';
 import { JwtAuthGuard } from '../auth/jwt-auth/jwt-auth.guard';
@@ -91,4 +81,37 @@ async getAllResearchers(@Query('search') search?: string) {
   async getAllExperts(@Query('search') search?: string) {
     return this.researcherService.getAllExperts(search);
   }
+
+  @UseGuards(JwtAuthGuard)
+@Patch('researches/:id')
+@UseInterceptors(
+  FileInterceptor('pdf', {
+    storage: diskStorage({
+      destination: './uploads/publications',
+      filename: (req, file, cb) =>
+        cb(null, `${Date.now()}${extname(file.originalname)}`),
+    }),
+  }),
+)
+async updatePublication(
+  @Req() req,
+  @Param('id') id: string,
+  @Body() body: any,
+  @UploadedFile() file?: Express.Multer.File,
+) {
+  const userId = req.user?.userId;
+  if (!userId) {
+    throw new UnauthorizedException('User ID not found in token payload');
+  }
+
+  return this.researcherService.updatePublication(userId, id, body, file);
+}
+
+@UseGuards(JwtAuthGuard)
+@Delete('researches/:id')
+async deletePublication(@Req() req, @Param('id') id: string) {
+  const userId = req.user?.userId;
+  if (!userId) throw new UnauthorizedException('User ID not found in token payload');
+  return this.researcherService.deletePublication(userId, id);
+}s
 }
