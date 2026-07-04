@@ -16,16 +16,16 @@ exports.EventsController = void 0;
 const common_1 = require("@nestjs/common");
 const platform_express_1 = require("@nestjs/platform-express");
 const multer_1 = require("multer");
-const path_1 = require("path");
 const event_service_1 = require("./event.service");
 const jwt_auth_guard_1 = require("../auth/jwt-auth/jwt-auth.guard");
+const r2_storage_1 = require("../storage/r2.storage");
 let EventsController = class EventsController {
     eventsService;
     constructor(eventsService) {
         this.eventsService = eventsService;
     }
     async createEvent(req, body, file) {
-        const photoPath = file ? `/uploads/events/${file.filename}` : undefined;
+        const photoPath = file ? await (0, r2_storage_1.uploadFileToR2)(file, 'events') : undefined;
         return this.eventsService.create(req.user.userId, body, photoPath);
     }
     async getMyEvents(req) {
@@ -35,7 +35,7 @@ let EventsController = class EventsController {
         return this.eventsService.findAll();
     }
     async updateEvent(req, eventId, body, file) {
-        const photoPath = file ? `/uploads/events/${file.filename}` : undefined;
+        const photoPath = file ? await (0, r2_storage_1.uploadFileToR2)(file, 'events') : undefined;
         return this.eventsService.updateEvent(req.user.userId, eventId, body, photoPath);
     }
     async deleteEvent(req, eventId) {
@@ -46,12 +46,7 @@ exports.EventsController = EventsController;
 __decorate([
     (0, common_1.UseGuards)(jwt_auth_guard_1.JwtAuthGuard),
     (0, common_1.Post)('events/create'),
-    (0, common_1.UseInterceptors)((0, platform_express_1.FileInterceptor)('photo', {
-        storage: (0, multer_1.diskStorage)({
-            destination: './uploads/events',
-            filename: (req, file, cb) => cb(null, `${Date.now()}${(0, path_1.extname)(file.originalname)}`),
-        }),
-    })),
+    (0, common_1.UseInterceptors)((0, platform_express_1.FileInterceptor)('photo', { storage: (0, multer_1.memoryStorage)() })),
     __param(0, (0, common_1.Req)()),
     __param(1, (0, common_1.Body)()),
     __param(2, (0, common_1.UploadedFile)()),
@@ -76,12 +71,7 @@ __decorate([
 __decorate([
     (0, common_1.UseGuards)(jwt_auth_guard_1.JwtAuthGuard),
     (0, common_1.Put)('events/:id'),
-    (0, common_1.UseInterceptors)((0, platform_express_1.FileInterceptor)('photo', {
-        storage: (0, multer_1.diskStorage)({
-            destination: './uploads/events',
-            filename: (req, file, cb) => cb(null, `${Date.now()}${(0, path_1.extname)(file.originalname)}`),
-        }),
-    })),
+    (0, common_1.UseInterceptors)((0, platform_express_1.FileInterceptor)('photo', { storage: (0, multer_1.memoryStorage)() })),
     __param(0, (0, common_1.Req)()),
     __param(1, (0, common_1.Param)('id')),
     __param(2, (0, common_1.Body)()),

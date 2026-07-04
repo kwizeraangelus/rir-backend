@@ -17,26 +17,44 @@ export class EventsService {
   }
 
   async getMyEvents(userId: string) {
-    return this.eventRepo.find({
-      where: { user: { id: userId } },
-      order: { created_at: 'DESC' },
-    });
-  }
+  const events = await this.eventRepo.find({
+    where: { user: { id: userId } },
+    order: { created_at: 'DESC' },
+  });
 
+  return events.map((event) => ({
+    ...event,
+    photo_url: event.photo
+      ? event.photo.startsWith('http')
+        ? event.photo
+        : (() => {
+            const baseUrl = process.env.NODE_ENV === 'production'
+              ? 'https://api.riri.rw'
+              : 'http://localhost:8000';
+            return `${baseUrl}/${event.photo.replace(/^\/+/, '')}`;
+          })()
+      : null,
+  }));
+}
   async findAll() {
     const events = await this.eventRepo.find({
       where: { status: true },
       order: { date: 'ASC' },
     });
 
-    const baseUrl = process.env.NODE_ENV === 'production'
-      ? 'https://api.riri.rw'
-      : 'http://localhost:8000';
-
-    return events.map((event) => ({
-      ...event,
-      photo_url: event.photo ? `${baseUrl}/${event.photo.replace(/^\/+/, '')}` : null,
-    }));
+   return events.map((event) => ({
+  ...event,
+  photo_url: event.photo
+    ? event.photo.startsWith('http')
+      ? event.photo          // R2 full URL — use directly
+      : (() => {             // legacy local path fallback
+          const baseUrl = process.env.NODE_ENV === 'production'
+            ? 'https://api.riri.rw'
+            : 'http://localhost:8000';
+          return `${baseUrl}/${event.photo.replace(/^\/+/, '')}`;
+        })()
+    : null,
+}));
   }
 
   // ============= NEW: UPDATE EVENT =============

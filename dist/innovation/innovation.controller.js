@@ -16,9 +16,10 @@ exports.InnovationController = void 0;
 const common_1 = require("@nestjs/common");
 const platform_express_1 = require("@nestjs/platform-express");
 const multer_1 = require("multer");
-const path_1 = require("path");
 const innovation_service_1 = require("./innovation.service");
 const jwt_auth_guard_1 = require("../auth/jwt-auth/jwt-auth.guard");
+const r2_storage_1 = require("../storage/r2.storage");
+const memory = (0, multer_1.memoryStorage)();
 let InnovationController = class InnovationController {
     innovationService;
     constructor(innovationService) {
@@ -28,11 +29,11 @@ let InnovationController = class InnovationController {
         return this.innovationService.findMyInnovations(req.user.userId);
     }
     async createInnovation(req, body, file) {
-        const photoPath = file ? `/uploads/innovations/${file.filename}` : null;
+        const photoPath = file ? await (0, r2_storage_1.uploadFileToR2)(file, 'innovations') : null;
         return this.innovationService.create(req.user.userId, body, photoPath);
     }
     async updateInnovation(req, id, body, file) {
-        const photoPath = file ? `/uploads/innovations/${file.filename}` : undefined;
+        const photoPath = file ? await (0, r2_storage_1.uploadFileToR2)(file, 'innovations') : undefined;
         return this.innovationService.updateInnovation(req.user.userId, id, body, photoPath);
     }
     async deleteInnovation(req, id) {
@@ -46,9 +47,8 @@ let InnovationController = class InnovationController {
     }
     async getOne(id) {
         const innovation = await this.innovationService.findOne(id);
-        if (!innovation) {
+        if (!innovation)
             throw new common_1.NotFoundException('Innovation not found or not approved');
-        }
         return innovation;
     }
 };
@@ -64,12 +64,7 @@ __decorate([
 __decorate([
     (0, common_1.UseGuards)(jwt_auth_guard_1.JwtAuthGuard),
     (0, common_1.Post)('innovations/create'),
-    (0, common_1.UseInterceptors)((0, platform_express_1.FileInterceptor)('photo', {
-        storage: (0, multer_1.diskStorage)({
-            destination: './uploads/innovations',
-            filename: (req, file, cb) => cb(null, `${Date.now()}${(0, path_1.extname)(file.originalname)}`),
-        }),
-    })),
+    (0, common_1.UseInterceptors)((0, platform_express_1.FileInterceptor)('photo', { storage: memory })),
     __param(0, (0, common_1.Req)()),
     __param(1, (0, common_1.Body)()),
     __param(2, (0, common_1.UploadedFile)()),
@@ -80,12 +75,7 @@ __decorate([
 __decorate([
     (0, common_1.UseGuards)(jwt_auth_guard_1.JwtAuthGuard),
     (0, common_1.Patch)('innovations/:id'),
-    (0, common_1.UseInterceptors)((0, platform_express_1.FileInterceptor)('photo', {
-        storage: (0, multer_1.diskStorage)({
-            destination: './uploads/innovations',
-            filename: (req, file, cb) => cb(null, `${Date.now()}${(0, path_1.extname)(file.originalname)}`),
-        }),
-    })),
+    (0, common_1.UseInterceptors)((0, platform_express_1.FileInterceptor)('photo', { storage: (0, multer_1.memoryStorage)() })),
     __param(0, (0, common_1.Req)()),
     __param(1, (0, common_1.Param)('id')),
     __param(2, (0, common_1.Body)()),

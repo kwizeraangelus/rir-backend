@@ -17,13 +17,14 @@ const jwt_auth_guard_1 = require("../auth/jwt-auth/jwt-auth.guard");
 const platform_express_1 = require("@nestjs/platform-express");
 const admin_guard_1 = require("../auth/admin.guard");
 const multer_1 = require("multer");
-const path_1 = require("path");
+const r2_storage_1 = require("../storage/r2.storage");
 const common_1 = require("@nestjs/common");
 const swagger_1 = require("@nestjs/swagger");
 const admin_service_1 = require("./admin.service");
 const expert_service_1 = require("../expert/expert.service");
 const create_expert_dto_1 = require("../expert/dto/create-expert.dto");
 const update_expert_dto_1 = require("../expert/dto/update-expert.dto");
+const memory = (0, multer_1.memoryStorage)();
 let AdminController = class AdminController {
     adminService;
     expertService;
@@ -53,7 +54,7 @@ let AdminController = class AdminController {
         return this.adminService.createUser(body);
     }
     async createAdminEvent(req, body, file) {
-        const photoPath = file ? `/uploads/events/${file.filename}` : null;
+        const photoPath = file ? await (0, r2_storage_1.uploadFileToR2)(file, 'events') : null;
         return this.adminService.createEvent(req.user.userId, body, photoPath);
     }
     async getAllEvents() {
@@ -63,7 +64,7 @@ let AdminController = class AdminController {
         return this.adminService.deleteEvent(id);
     }
     async updateAdminEvent(id, body, file) {
-        const photoPath = file ? `/uploads/events/${file.filename}` : undefined;
+        const photoPath = file ? await (0, r2_storage_1.uploadFileToR2)(file, 'events') : undefined;
         return this.adminService.updateEvent(id, body, photoPath);
     }
     async deleteBook(id) {
@@ -181,12 +182,7 @@ __decorate([
 ], AdminController.prototype, "createUser", null);
 __decorate([
     (0, common_1.Post)('events/create'),
-    (0, common_1.UseInterceptors)((0, platform_express_1.FileInterceptor)('photo', {
-        storage: (0, multer_1.diskStorage)({
-            destination: './uploads/events',
-            filename: (req, file, cb) => cb(null, `${Date.now()}${(0, path_1.extname)(file.originalname)}`),
-        }),
-    })),
+    (0, common_1.UseInterceptors)((0, platform_express_1.FileInterceptor)('photo', { storage: memory })),
     __param(0, (0, common_1.Req)()),
     __param(1, (0, common_1.Body)()),
     __param(2, (0, common_1.UploadedFile)()),
@@ -212,12 +208,7 @@ __decorate([
 __decorate([
     (0, common_1.Put)('events/:id/update'),
     (0, common_1.UseGuards)(jwt_auth_guard_1.JwtAuthGuard, admin_guard_1.AdminGuard),
-    (0, common_1.UseInterceptors)((0, platform_express_1.FileInterceptor)('photo', {
-        storage: (0, multer_1.diskStorage)({
-            destination: './uploads/events',
-            filename: (req, file, cb) => cb(null, `${Date.now()}${(0, path_1.extname)(file.originalname)}`),
-        }),
-    })),
+    (0, common_1.UseInterceptors)((0, platform_express_1.FileInterceptor)('photo', { storage: memory })),
     __param(0, (0, common_1.Param)('id')),
     __param(1, (0, common_1.Body)()),
     __param(2, (0, common_1.UploadedFile)()),

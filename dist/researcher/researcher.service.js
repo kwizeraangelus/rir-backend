@@ -18,6 +18,7 @@ const typeorm_1 = require("@nestjs/typeorm");
 const typeorm_2 = require("typeorm");
 const user_entity_1 = require("../users/entities/user.entity");
 const publication_entity_1 = require("./entities/publication.entity");
+const r2_storage_1 = require("../storage/r2.storage");
 let ResearcherService = class ResearcherService {
     userRepo;
     pubRepo;
@@ -35,18 +36,22 @@ let ResearcherService = class ResearcherService {
         });
     }
     getImageUrl(profile_image) {
+        if (!profile_image)
+            return '';
+        if (profile_image.startsWith('http'))
+            return profile_image;
         const baseUrl = process.env.NODE_ENV === 'production'
             ? 'https://api.riri.rw'
             : 'http://localhost:8000';
-        if (!profile_image)
-            return `${baseUrl}/uploads/profiles/default.png`;
-        const cleanPath = profile_image.replace(/^\/+/, '');
-        return `${baseUrl}/${cleanPath}`;
+        return `${baseUrl}/${profile_image.replace(/^\/+/, '')}`;
     }
     async createPublication(userId, data, file) {
+        if (!data.title || data.title.trim() === '') {
+            throw new common_1.BadRequestException('Title is required');
+        }
         const pubData = { ...data, user: { id: userId } };
         if (file) {
-            pubData.pdf_path = `/uploads/publications/${file.filename}`;
+            pubData.pdf_path = await (0, r2_storage_1.uploadFileToR2)(file, 'publications');
         }
         const pub = this.pubRepo.create(pubData);
         return this.pubRepo.save(pub);
@@ -66,47 +71,31 @@ let ResearcherService = class ResearcherService {
         if (body.ResearchArea !== undefined)
             updateData.ResearchArea = body.ResearchArea;
         if (file) {
-            updateData.profile_image = `/uploads/profiles/${file.filename}`;
-            console.log('✅ Image saved:', updateData.profile_image);
+            updateData.profile_image = await (0, r2_storage_1.uploadFileToR2)(file, 'profiles');
         }
-        if (!userId) {
+        if (!userId)
             throw new common_1.BadRequestException('User ID is missing');
-        }
-        console.log('Update Data:', updateData);
-        if (Object.keys(updateData).length === 0) {
+        if (Object.keys(updateData).length === 0)
             return this.getProfile(userId);
-        }
         await this.userRepo.update(userId, updateData);
         return this.getProfile(userId);
     }
     async findAllApproved() {
-        const publications = await this.pubRepo.find({
+        return this.pubRepo.find({
             where: { status: true },
             relations: ['user'],
             order: { created_at: 'DESC' },
         });
-        return publications;
     }
     async getAllResearchers(search) {
         try {
             const query = this.userRepo
                 .createQueryBuilder('user')
-                .where('user.user_category = :category AND user.is_active = true AND user.isExpert = false', {
-                category: 'researcher',
-            })
+                .where('user.user_category = :category AND user.is_active = true AND user.isExpert = false', { category: 'researcher' })
                 .select([
-                'user.id',
-                'user.first_name',
-                'user.last_name',
-                'user.email',
-                'user.phone_number',
-                'user.qualification',
-                'user.Position',
-                'user.Field',
-                'user.ResearchArea',
-                'user.bio',
-                'user.profile_image',
-                'user.orcid',
+                'user.id', 'user.first_name', 'user.last_name', 'user.email',
+                'user.phone_number', 'user.qualification', 'user.Position',
+                'user.Field', 'user.ResearchArea', 'user.bio', 'user.profile_image', 'user.orcid',
             ]);
             if (search) {
                 query.andWhere('(user.first_name LIKE :search OR user.last_name LIKE :search OR user.Position LIKE :search)', { search: `%${search}%` });
@@ -134,24 +123,13 @@ let ResearcherService = class ResearcherService {
             const user = await this.userRepo.findOne({
                 where: { id, user_category: 'researcher', is_active: true },
                 select: [
-                    'id',
-                    'first_name',
-                    'last_name',
-                    'email',
-                    'phone_number',
-                    'qualification',
-                    'Field',
-                    'Position',
-                    'ResearchArea',
-                    'bio',
-                    'profile_image',
-                    'orcid',
-                    'university_name',
+                    'id', 'first_name', 'last_name', 'email', 'phone_number',
+                    'qualification', 'Field', 'Position', 'ResearchArea', 'bio',
+                    'profile_image', 'orcid', 'university_name',
                 ],
             });
-            if (!user) {
+            if (!user)
                 throw new common_1.NotFoundException('Researcher not found');
-            }
             const publications = await this.pubRepo.find({
                 where: { user: { id }, status: true },
                 order: { created_at: 'DESC' },
@@ -181,28 +159,17 @@ let ResearcherService = class ResearcherService {
     async getAllExperts(search) {
         const query = this.userRepo
             .createQueryBuilder('user')
-            .where('user.user_category = :category AND user.is_active = true AND user.isExpert = true', {
-            category: 'researcher',
-        })
+            .where('user.user_category = :category AND user.is_active = true AND user.isExpert = true', { category: 'researcher' })
             .select([
-            'user.id',
-            'user.first_name',
-            'user.last_name',
-            'user.email',
-            'user.phone_number',
-            'user.qualification',
-            'user.ResearchArea',
-            'user.Position',
-            'user.Field',
-            'user.bio',
-            'user.profile_image',
-            'user.orcid'
+            'user.id', 'user.first_name', 'user.last_name', 'user.email',
+            'user.phone_number', 'user.qualification', 'user.ResearchArea',
+            'user.Position', 'user.Field', 'user.bio', 'user.profile_image', 'user.orcid',
         ]);
         if (search) {
             query.andWhere('(user.first_name LIKE :search OR user.last_name LIKE :search OR user.Position LIKE :search)', { search: `%${search}%` });
         }
         const users = await query.getMany();
-        return users.map(user => ({
+        return users.map((user) => ({
             id: user.id,
             name: `${user.first_name} ${user.last_name}`.trim(),
             qualification: user.qualification || 'Not Specified',
@@ -227,7 +194,7 @@ let ResearcherService = class ResearcherService {
         const { id, userId: _uid, user, created_at, status, assignedToExpertId, assignedToExpert, pdf_path, ...updatable } = data;
         Object.assign(pub, updatable);
         if (file) {
-            pub.pdf_path = `/uploads/publications/${file.filename}`;
+            pub.pdf_path = await (0, r2_storage_1.uploadFileToR2)(file, 'publications');
         }
         return this.pubRepo.save(pub);
     }

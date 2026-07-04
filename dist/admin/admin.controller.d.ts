@@ -54,16 +54,6 @@ export interface AdminFilters {
     page?: string;
     limit?: string;
 }
-export interface MulterFile {
-    filename: string;
-    originalname: string;
-    encoding: string;
-    mimetype: string;
-    size: number;
-    destination: string;
-    path: string;
-    buffer: Buffer;
-}
 export declare class AdminController {
     private readonly adminService;
     private readonly expertService;
@@ -121,14 +111,14 @@ export declare class AdminController {
     createUser(body: CreateUserDto): Promise<{
         message: string;
     }>;
-    createAdminEvent(req: RequestWithUser, body: CreateEventDto, file: MulterFile): Promise<{
+    createAdminEvent(req: RequestWithUser, body: CreateEventDto, file: Express.Multer.File): Promise<{
         message: string;
     }>;
     getAllEvents(): Promise<import("../event/entities/event.entity").Event[]>;
     deleteEvent(id: string): Promise<{
         message: string;
     }>;
-    updateAdminEvent(id: string, body: UpdateEventDto, file: MulterFile): Promise<{
+    updateAdminEvent(id: string, body: UpdateEventDto, file: Express.Multer.File): Promise<{
         message: string;
     }>;
     deleteBook(id: string): Promise<{

@@ -12,11 +12,10 @@ import {
   UploadedFile,
 } from '@nestjs/common';
 import { FileInterceptor } from '@nestjs/platform-express';
-import { diskStorage } from 'multer';
-import { extname } from 'path';
+import { memoryStorage } from 'multer';
 import { EventsService } from './event.service';
 import { JwtAuthGuard } from '../auth/jwt-auth/jwt-auth.guard';
-import * as express from 'express';
+import { uploadFileToR2 } from '../storage/r2.storage';
 
 @Controller('api')
 export class EventsController {
@@ -24,21 +23,13 @@ export class EventsController {
 
   @UseGuards(JwtAuthGuard)
   @Post('events/create')
-  @UseInterceptors(
-    FileInterceptor('photo', {
-      storage: diskStorage({
-        destination: './uploads/events',
-        filename: (req, file, cb) =>
-          cb(null, `${Date.now()}${extname(file.originalname)}`),
-      }),
-    }),
-  )
+  @UseInterceptors(FileInterceptor('photo', { storage: memoryStorage() }))
   async createEvent(
     @Req() req: any,
     @Body() body: any,
     @UploadedFile() file: Express.Multer.File,
   ) {
-    const photoPath = file ? `/uploads/events/${file.filename}` : undefined;
+    const photoPath = file ? await uploadFileToR2(file, 'events') : undefined;
     return this.eventsService.create(req.user.userId, body, photoPath);
   }
 
@@ -53,40 +44,22 @@ export class EventsController {
     return this.eventsService.findAll();
   }
 
-  // ============= NEW: UPDATE EVENT =============
   @UseGuards(JwtAuthGuard)
   @Put('events/:id')
-  @UseInterceptors(
-    FileInterceptor('photo', {
-      storage: diskStorage({
-        destination: './uploads/events',
-        filename: (req, file, cb) =>
-          cb(null, `${Date.now()}${extname(file.originalname)}`),
-      }),
-    }),
-  )
+  @UseInterceptors(FileInterceptor('photo', { storage: memoryStorage() }))
   async updateEvent(
     @Req() req: any,
     @Param('id') eventId: string,
     @Body() body: any,
     @UploadedFile() file: Express.Multer.File,
   ) {
-    const photoPath = file ? `/uploads/events/${file.filename}` : undefined;
-    return this.eventsService.updateEvent(
-      req.user.userId,
-      eventId,
-      body,
-      photoPath,
-    );
+    const photoPath = file ? await uploadFileToR2(file, 'events') : undefined;
+    return this.eventsService.updateEvent(req.user.userId, eventId, body, photoPath);
   }
 
-  // ============= NEW: DELETE EVENT =============
   @UseGuards(JwtAuthGuard)
   @Delete('events/:id')
-  async deleteEvent(
-    @Req() req: any,
-    @Param('id') eventId: string,
-  ) {
+  async deleteEvent(@Req() req: any, @Param('id') eventId: string) {
     return this.eventsService.deleteEvent(req.user.userId, eventId);
   }
 }

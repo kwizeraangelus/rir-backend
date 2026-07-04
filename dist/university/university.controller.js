@@ -17,8 +17,9 @@ const common_1 = require("@nestjs/common");
 const platform_express_1 = require("@nestjs/platform-express");
 const university_service_1 = require("./university.service");
 const multer_1 = require("multer");
-const path_1 = require("path");
 const jwt_auth_guard_1 = require("../auth/jwt-auth/jwt-auth.guard");
+const r2_storage_1 = require("../storage/r2.storage");
+const memory = (0, multer_1.memoryStorage)();
 let UniversityController = class UniversityController {
     universityService;
     constructor(universityService) {
@@ -42,24 +43,31 @@ let UniversityController = class UniversityController {
             delete updateData.university;
         }
         if (file) {
-            updateData.profile_image = `/uploads/profiles/${file.filename}`;
+            updateData.profile_image = await (0, r2_storage_1.uploadFileToR2)(file, 'profiles');
         }
         return this.universityService.updateProfile(userId, updateData);
     }
     async uploadResearch(req, body, file) {
-        return this.universityService.createUpload(req.user.sub, body, file.path);
+        const fileUrl = await (0, r2_storage_1.uploadFileToR2)(file, 'research');
+        return this.universityService.createUpload(req.user.sub, body, fileUrl);
     }
     async getMyUploads(req) {
         return this.universityService.getMyUploads(req.user.id);
     }
     async getBook(id) {
         const book = await this.universityService.getUploadById(id);
-        if (!book) {
+        if (!book)
             throw new common_1.NotFoundException('Book not found');
-        }
         return {
             ...book,
-            file_url: `http://localhost:8000/${book.file_path}`,
+            file_url: book.file_path.startsWith('http')
+                ? book.file_path
+                : (() => {
+                    const baseUrl = process.env.NODE_ENV === 'production'
+                        ? 'https://api.riri.rw'
+                        : 'http://localhost:8000';
+                    return `${baseUrl}/${book.file_path.replace(/^\/+/, '')}`;
+                })(),
             status_display: book.status.toUpperCase(),
         };
     }
@@ -88,7 +96,7 @@ let UniversityController = class UniversityController {
         return this.universityService.addRating(id, rating);
     }
     async updateUpload(req, id, body, file) {
-        const filePath = file ? file.path : undefined;
+        const filePath = file ? await (0, r2_storage_1.uploadFileToR2)(file, 'research') : undefined;
         return this.universityService.updateUpload(req.user.sub, id, body, filePath);
     }
 };
@@ -104,12 +112,7 @@ __decorate([
 __decorate([
     (0, common_1.UseGuards)(jwt_auth_guard_1.JwtAuthGuard),
     (0, common_1.Patch)('update'),
-    (0, common_1.UseInterceptors)((0, platform_express_1.FileInterceptor)('profile_image', {
-        storage: (0, multer_1.diskStorage)({
-            destination: './uploads/profiles',
-            filename: (req, file, cb) => cb(null, `${Date.now()}${(0, path_1.extname)(file.originalname)}`),
-        }),
-    })),
+    (0, common_1.UseInterceptors)((0, platform_express_1.FileInterceptor)('profile_image', { storage: memory })),
     __param(0, (0, common_1.Req)()),
     __param(1, (0, common_1.Body)()),
     __param(2, (0, common_1.UploadedFile)()),
@@ -120,12 +123,7 @@ __decorate([
 __decorate([
     (0, common_1.UseGuards)(jwt_auth_guard_1.JwtAuthGuard),
     (0, common_1.Post)('upload'),
-    (0, common_1.UseInterceptors)((0, platform_express_1.FileInterceptor)('file', {
-        storage: (0, multer_1.diskStorage)({
-            destination: './uploads/research',
-            filename: (req, file, cb) => cb(null, `${Date.now()}-${file.originalname}`),
-        }),
-    })),
+    (0, common_1.UseInterceptors)((0, platform_express_1.FileInterceptor)('file', { storage: memory })),
     __param(0, (0, common_1.Req)()),
     __param(1, (0, common_1.Body)()),
     __param(2, (0, common_1.UploadedFile)()),
@@ -204,12 +202,7 @@ __decorate([
 __decorate([
     (0, common_1.UseGuards)(jwt_auth_guard_1.JwtAuthGuard),
     (0, common_1.Patch)('upload/:id'),
-    (0, common_1.UseInterceptors)((0, platform_express_1.FileInterceptor)('file', {
-        storage: (0, multer_1.diskStorage)({
-            destination: './uploads/research',
-            filename: (req, file, cb) => cb(null, `${Date.now()}-${file.originalname}`),
-        }),
-    })),
+    (0, common_1.UseInterceptors)((0, platform_express_1.FileInterceptor)('file', { storage: memory })),
     __param(0, (0, common_1.Req)()),
     __param(1, (0, common_1.Param)('id')),
     __param(2, (0, common_1.Body)()),

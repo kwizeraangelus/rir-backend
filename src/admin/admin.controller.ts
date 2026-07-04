@@ -1,9 +1,8 @@
 import { JwtAuthGuard } from '../auth/jwt-auth/jwt-auth.guard';
 import { FileInterceptor } from '@nestjs/platform-express';
 import { AdminGuard } from '../auth/admin.guard';
-import { diskStorage } from 'multer';
-
-import { extname } from 'path';
+import { memoryStorage } from 'multer';
+import { uploadFileToR2 } from '../storage/r2.storage';
 
 // src/admin/admin.controller.ts
 import {
@@ -29,6 +28,8 @@ import { ExpertService } from '../expert/expert.service';
 import { Expert } from '../expert/entities/expert.entity';
 import { CreateExpertDto } from 'src/expert/dto/create-expert.dto';
 import { UpdateExpertDto } from 'src/expert/dto/update-expert.dto';
+
+const memory = memoryStorage();
 
 export interface RequestWithUser extends Request {
   user: {
@@ -87,32 +88,19 @@ export interface AdminFilters {
   limit?: string;
 }
 
-export interface MulterFile {
-  filename: string;
-  originalname: string;
-  encoding: string;
-  mimetype: string;
-  size: number;
-  destination: string;
-  path: string;
-  buffer: Buffer;
-}
-
 @Controller('api/admin')
-@UseGuards(JwtAuthGuard, AdminGuard) // Only logged-in staff/admin can access
+@UseGuards(JwtAuthGuard, AdminGuard)
 export class AdminController {
   constructor(
     private readonly adminService: AdminService,
     private readonly expertService: ExpertService,
   ) {}
 
-  // 1. Dashboard Stats & Pending Books
   @Get('dashboard')
   async getDashboard() {
     return this.adminService.getDashboardData();
   }
 
-  // 2. Approve/Reject Research
   @Post('upload/:id/update')
   async updateUploadStatus(
     @Param('id') id: string,
@@ -121,7 +109,6 @@ export class AdminController {
     return this.adminService.processUpload(id, body.action, body.feedback);
   }
 
-  // 3. User Management
   @Get('users')
   async getAllUsers() {
     return this.adminService.getUsers();
@@ -137,42 +124,28 @@ export class AdminController {
     return this.adminService.deleteUser(id);
   }
 
-  // 4. Approved Books with Filters
   @Get('approved-books')
   async getApproved(@Query() filters: AdminFilters) {
     return this.adminService.getApprovedBooks(filters);
   }
 
-  // src/admin/admin.controller.ts
   @Post('users/create')
   @UseGuards(JwtAuthGuard, AdminGuard)
   async createUser(@Body() body: CreateUserDto) {
     return this.adminService.createUser(body);
   }
 
-  // src/admin/admin.controller.ts
-
+  // ← photo upload now goes to R2
   @Post('events/create')
-  @UseInterceptors(
-    FileInterceptor('photo', {
-      storage: diskStorage({
-        destination: './uploads/events',
-        filename: (req, file, cb) =>
-          cb(null, `${Date.now()}${extname(file.originalname)}`),
-      }),
-    }),
-  )
+  @UseInterceptors(FileInterceptor('photo', { storage: memory }))
   async createAdminEvent(
     @Req() req: RequestWithUser,
     @Body() body: CreateEventDto,
-    @UploadedFile() file: MulterFile,
+    @UploadedFile() file: Express.Multer.File,
   ) {
-    const photoPath = file ? `/uploads/events/${file.filename}` : null;
-    // Use req.user.userId (or sub) from your JwtStrategy
+    const photoPath = file ? await uploadFileToR2(file, 'events') : null;
     return this.adminService.createEvent(req.user.userId, body, photoPath);
   }
-
-  // src/admin/admin.controller.ts
 
   @Get('events')
   @UseGuards(JwtAuthGuard, AdminGuard)
@@ -180,37 +153,24 @@ export class AdminController {
     return this.adminService.getAllEvents();
   }
 
-  // src/admin/admin.controller.ts
-
   @Delete('events/:id/delete')
   @UseGuards(JwtAuthGuard, AdminGuard)
   async deleteEvent(@Param('id') id: string) {
     return this.adminService.deleteEvent(id);
   }
 
-  // src/admin/admin.controller.ts
-
+  // ← photo upload now goes to R2
   @Put('events/:id/update')
   @UseGuards(JwtAuthGuard, AdminGuard)
-  @UseInterceptors(
-    FileInterceptor('photo', {
-      storage: diskStorage({
-        destination: './uploads/events',
-        filename: (req, file, cb) =>
-          cb(null, `${Date.now()}${extname(file.originalname)}`),
-      }),
-    }),
-  )
+  @UseInterceptors(FileInterceptor('photo', { storage: memory }))
   async updateAdminEvent(
     @Param('id') id: string,
     @Body() body: UpdateEventDto,
-    @UploadedFile() file: MulterFile,
+    @UploadedFile() file: Express.Multer.File,
   ) {
-    const photoPath = file ? `/uploads/events/${file.filename}` : undefined;
+    const photoPath = file ? await uploadFileToR2(file, 'events') : undefined;
     return this.adminService.updateEvent(id, body, photoPath);
   }
-
-  // src/admin/admin.controller.ts
 
   @Delete('books/:id/delete')
   @UseGuards(JwtAuthGuard, AdminGuard)
@@ -223,25 +183,20 @@ export class AdminController {
     return this.adminService.findPending();
   }
 
-  // 2. POST Approve (set status to true)
   @Post('events/:id/approve')
   async approve(@Param('id') id: string) {
     return this.adminService.updateStatus(id, true);
   }
 
-  // 3. POST Reject (Keep status false and add feedback)
   @Post('events/:id/reject')
   async reject(@Param('id') id: string, @Body('feedback') feedback: string) {
     return this.adminService.rejectEvent(id, feedback);
   }
 
-  // 4. DELETE Permanent
   @Delete('events/:id')
   async delete(@Param('id') id: string) {
     return this.adminService.remove(id);
   }
-
-  // src/admin/admin.controller.ts
 
   @Get('publications/pending')
   async getPendingPubs() {
@@ -262,8 +217,6 @@ export class AdminController {
   async deletePub(@Param('id') id: string) {
     return this.adminService.deletePublication(id);
   }
-
-  // src/admin/admin.controller.ts
 
   @Get('innovations/pending')
   async getPendingInnovations() {
@@ -287,27 +240,28 @@ export class AdminController {
   async deleteInnovation(@Param('id') id: string) {
     return this.adminService.deleteInnovation(id);
   }
-@Post('create-research')
+
+  @Post('create-research')
   @UseGuards(JwtAuthGuard)
-  async createResearch(
-    @Req() req,
-    @Body() body: any,
-  ) {
+  async createResearch(@Req() req, @Body() body: any) {
     const adminId = req.user.userId;
     return this.adminService.createResearch(adminId, body);
   }
-  @UseGuards(JwtAuthGuard, AdminGuard) 
+
+  @UseGuards(JwtAuthGuard, AdminGuard)
   @Get()
   @ApiOperation({ summary: '[Admin] List all experts' })
   findAll() {
     return this.expertService.findAll();
   }
+
   @UseGuards(JwtAuthGuard, AdminGuard)
   @Get(':id')
   @ApiOperation({ summary: '[Admin] Get expert by ID' })
   async findOne(@Param('id') id: string): Promise<Expert> {
     return await this.expertService.findById(id);
   }
+
   @UseGuards(JwtAuthGuard, AdminGuard)
   @Post()
   @ApiOperation({ summary: '[Admin] Create expert' })
@@ -315,6 +269,7 @@ export class AdminController {
     console.log(`[Admin] ${req.user.username} created: ${dto.name}`);
     return await this.expertService.create(dto);
   }
+
   @UseGuards(JwtAuthGuard, AdminGuard)
   @Patch(':id')
   @ApiOperation({ summary: '[Admin] Update expert (partial)' })
@@ -322,6 +277,7 @@ export class AdminController {
     console.log(`[Admin] ${req.user.username} updated: ${id}`);
     return await this.expertService.update(id, dto);
   }
+
   @UseGuards(JwtAuthGuard, AdminGuard)
   @Delete(':id')
   @HttpCode(204)
