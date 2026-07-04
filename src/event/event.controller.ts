@@ -17,13 +17,15 @@ import { EventsService } from './event.service';
 import { JwtAuthGuard } from '../auth/jwt-auth/jwt-auth.guard';
 import { uploadFileToR2 } from '../storage/r2.storage';
 
+const memory = memoryStorage();
+
 @Controller('api')
 export class EventsController {
   constructor(private readonly eventsService: EventsService) {}
 
   @UseGuards(JwtAuthGuard)
   @Post('events/create')
-  @UseInterceptors(FileInterceptor('photo', { storage: memoryStorage() }))
+  @UseInterceptors(FileInterceptor('photo', { storage: memory }))
   async createEvent(
     @Req() req: any,
     @Body() body: any,
@@ -46,7 +48,7 @@ export class EventsController {
 
   @UseGuards(JwtAuthGuard)
   @Put('events/:id')
-  @UseInterceptors(FileInterceptor('photo', { storage: memoryStorage() }))
+  @UseInterceptors(FileInterceptor('photo', { storage: memory }))
   async updateEvent(
     @Req() req: any,
     @Param('id') eventId: string,
