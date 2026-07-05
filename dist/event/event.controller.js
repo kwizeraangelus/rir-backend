@@ -19,6 +19,7 @@ const multer_1 = require("multer");
 const event_service_1 = require("./event.service");
 const jwt_auth_guard_1 = require("../auth/jwt-auth/jwt-auth.guard");
 const r2_storage_1 = require("../storage/r2.storage");
+const memory = (0, multer_1.memoryStorage)();
 let EventsController = class EventsController {
     eventsService;
     constructor(eventsService) {
@@ -46,7 +47,7 @@ exports.EventsController = EventsController;
 __decorate([
     (0, common_1.UseGuards)(jwt_auth_guard_1.JwtAuthGuard),
     (0, common_1.Post)('events/create'),
-    (0, common_1.UseInterceptors)((0, platform_express_1.FileInterceptor)('photo', { storage: (0, multer_1.memoryStorage)() })),
+    (0, common_1.UseInterceptors)((0, platform_express_1.FileInterceptor)('photo', { storage: memory })),
     __param(0, (0, common_1.Req)()),
     __param(1, (0, common_1.Body)()),
     __param(2, (0, common_1.UploadedFile)()),
@@ -71,7 +72,7 @@ __decorate([
 __decorate([
     (0, common_1.UseGuards)(jwt_auth_guard_1.JwtAuthGuard),
     (0, common_1.Put)('events/:id'),
-    (0, common_1.UseInterceptors)((0, platform_express_1.FileInterceptor)('photo', { storage: (0, multer_1.memoryStorage)() })),
+    (0, common_1.UseInterceptors)((0, platform_express_1.FileInterceptor)('photo', { storage: memory })),
     __param(0, (0, common_1.Req)()),
     __param(1, (0, common_1.Param)('id')),
     __param(2, (0, common_1.Body)()),
