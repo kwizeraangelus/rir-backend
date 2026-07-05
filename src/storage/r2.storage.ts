@@ -27,4 +27,13 @@ export async function uploadFileToR2(
   }));
 
   return `${process.env.CLOUDFLARE_R2_PUBLIC_URL}/${key}`;
+
+
+
+  console.log('R2 ENV CHECK:', {
+    account: process.env.CLOUDFLARE_ACCOUNT_ID,
+    key: process.env.CLOUDFLARE_R2_ACCESS_KEY,
+    secret: process.env.CLOUDFLARE_R2_SECRET_KEY ? 'set' : 'undefined',
+    url: process.env.CLOUDFLARE_R2_PUBLIC_URL,
+  });
 }
