@@ -6,7 +6,14 @@ export async function uploadFileToR2(
   file: Express.Multer.File,
   folder: string,
 ): Promise<string> {
-  // ← create client here, inside the function, so env vars are loaded first
+  // ← debug FIRST before anything else
+  console.log('R2 ENV CHECK:', {
+    account: process.env.CLOUDFLARE_ACCOUNT_ID,
+    key: process.env.CLOUDFLARE_R2_ACCESS_KEY,
+    secret: process.env.CLOUDFLARE_R2_SECRET_KEY ? 'set' : 'undefined',
+    url: process.env.CLOUDFLARE_R2_PUBLIC_URL,
+  });
+
   const r2 = new S3Client({
     region: 'auto',
     endpoint: `https://${process.env.CLOUDFLARE_ACCOUNT_ID!}.r2.cloudflarestorage.com`,
@@ -25,12 +32,6 @@ export async function uploadFileToR2(
     Body: file.buffer,
     ContentType: file.mimetype,
   }));
-   console.log('R2 ENV CHECK:', {
-    account: process.env.CLOUDFLARE_ACCOUNT_ID,
-    key: process.env.CLOUDFLARE_R2_ACCESS_KEY,
-    secret: process.env.CLOUDFLARE_R2_SECRET_KEY ? 'set' : 'undefined',
-    url: process.env.CLOUDFLARE_R2_PUBLIC_URL,
-  });
 
   return `${process.env.CLOUDFLARE_R2_PUBLIC_URL}/${key}`;
 }
