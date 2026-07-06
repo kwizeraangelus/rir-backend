@@ -13,6 +13,8 @@ import { Publication } from 'src/researcher/entities/publication.entity';
 import { Innovation } from 'src/innovation/entities/innovation.entity';
 import { Expert } from '../expert/entities/expert.entity';
 import { ExpertModule } from 'src/expert/expert.module';
+import { Contact } from '../contact/contact.entity'; // ← add
+import { MailModule } from '../mail/mail.module';
 
 @Module({
   imports: [
@@ -23,10 +25,12 @@ import { ExpertModule } from 'src/expert/expert.module';
       Publication,
       Innovation,
       Expert,
+      Contact,
     ]),
     ExpertModule,
     AuthModule,
     EventModule,
+    MailModule,
   ],
   controllers: [AdminController],
   providers: [AdminService],

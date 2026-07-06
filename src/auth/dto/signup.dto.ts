@@ -5,6 +5,7 @@ import {
   IsNotEmpty,
   IsOptional,
   IsString,
+  ValidateIf,
   MinLength,
 } from 'class-validator';
 import { UserCategory } from '../../users/entities/user.entity';
@@ -33,6 +34,11 @@ export class SignupDto {
   @IsEnum(UserCategory)
   @IsNotEmpty()
   user_category?: UserCategory; // Changed from userCategory
+
+  @ValidateIf((o) => o.user_category === UserCategory.UNIVERSITY)
+  @IsString()
+  @IsNotEmpty({ message: 'University name required for university category' })
+  university_name?: string;
 
   @IsString()
   @MinLength(8)

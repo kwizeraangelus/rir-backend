@@ -23,6 +23,7 @@ const innovation_module_1 = require("./innovation/innovation.module");
 const profile_module_1 = require("./profile/profile.module");
 const expert_module_1 = require("./expert/expert.module");
 const mail_module_1 = require("./mail/mail.module");
+const contact_module_1 = require("./contact/contact.module");
 let AppModule = class AppModule {
 };
 exports.AppModule = AppModule;
@@ -57,6 +58,7 @@ exports.AppModule = AppModule = __decorate([
             profile_module_1.ProfileModule,
             expert_module_1.ExpertModule,
             mail_module_1.MailModule,
+            contact_module_1.ContactModule,
         ],
         controllers: [app_controller_1.AppController],
         providers: [app_service_1.AppService],

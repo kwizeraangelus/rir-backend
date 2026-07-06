@@ -144,6 +144,12 @@ export declare class AdminController {
         message: string;
         publication: import("../researcher/entities/publication.entity").Publication;
     }>;
+    getMessages(): Promise<import("../contact/contact.entity").Contact[]>;
+    markRead(id: string): Promise<import("typeorm").UpdateResult>;
+    deleteMessage(id: string): Promise<import("typeorm").DeleteResult>;
+    replyMessage(id: string, reply: string): Promise<{
+        success: boolean;
+    }>;
     findAll(): Promise<Expert[]>;
     findOne(id: string): Promise<Expert>;
     create(dto: CreateExpertDto, req: any): Promise<Expert>;

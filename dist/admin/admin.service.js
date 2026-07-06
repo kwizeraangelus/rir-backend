@@ -21,18 +21,24 @@ const university_upload_entity_1 = require("../university/entities/university-up
 const event_entity_1 = require("../event/entities/event.entity");
 const publication_entity_1 = require("../researcher/entities/publication.entity");
 const innovation_entity_1 = require("../innovation/entities/innovation.entity");
+const contact_entity_1 = require("../contact/contact.entity");
+const mail_service_1 = require("../mail/mail.service");
 let AdminService = class AdminService {
     userRepo;
     uploadRepo;
     eventRepo;
     pubRepo;
     innovationRepo;
-    constructor(userRepo, uploadRepo, eventRepo, pubRepo, innovationRepo) {
+    contactRepo;
+    mailService;
+    constructor(userRepo, uploadRepo, eventRepo, pubRepo, innovationRepo, contactRepo, mailService) {
         this.userRepo = userRepo;
         this.uploadRepo = uploadRepo;
         this.eventRepo = eventRepo;
         this.pubRepo = pubRepo;
         this.innovationRepo = innovationRepo;
+        this.contactRepo = contactRepo;
+        this.mailService = mailService;
     }
     async getDashboardData() {
         const [pendingList, userCount, approvedBookCount, eventCount] = await Promise.all([
@@ -236,6 +242,22 @@ let AdminService = class AdminService {
             publication: savedPub,
         };
     }
+    async getMessages() {
+        return this.contactRepo.find({ order: { created_at: 'DESC' } });
+    }
+    async markMessageRead(id) {
+        return this.contactRepo.update(id, { is_read: true });
+    }
+    async deleteMessage(id) {
+        return this.contactRepo.delete(id);
+    }
+    async replyToMessage(id, reply) {
+        const contact = await this.contactRepo.findOne({ where: { id } });
+        if (!contact)
+            throw new common_1.NotFoundException('Message not found');
+        await this.mailService.sendReply(contact.email, contact.name, reply);
+        return { success: true };
+    }
 };
 exports.AdminService = AdminService;
 exports.AdminService = AdminService = __decorate([
@@ -245,10 +267,13 @@ exports.AdminService = AdminService = __decorate([
     __param(2, (0, typeorm_1.InjectRepository)(event_entity_1.Event)),
     __param(3, (0, typeorm_1.InjectRepository)(publication_entity_1.Publication)),
     __param(4, (0, typeorm_1.InjectRepository)(innovation_entity_1.Innovation)),
+    __param(5, (0, typeorm_1.InjectRepository)(contact_entity_1.Contact)),
     __metadata("design:paramtypes", [typeorm_2.Repository,
         typeorm_2.Repository,
         typeorm_2.Repository,
         typeorm_2.Repository,
-        typeorm_2.Repository])
+        typeorm_2.Repository,
+        typeorm_2.Repository,
+        mail_service_1.MailService])
 ], AdminService);
 //# sourceMappingURL=admin.service.js.map

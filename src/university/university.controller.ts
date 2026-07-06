@@ -8,6 +8,7 @@ import {
   UploadedFile,
   Req,
   UseGuards,
+  Delete,
   UnauthorizedException,
   Param,
   NotFoundException,
@@ -29,7 +30,7 @@ export class UniversityController {
   @Get('me')
   @UseGuards(JwtAuthGuard)
   async getMe(@Req() req) {
-    const userId = req.user.sub;
+    const userId = req.user.userId;
     const user = await this.universityService.getUserById(userId);
     if (!user) throw new UnauthorizedException();
     return user;
@@ -63,13 +64,13 @@ export class UniversityController {
   @UseInterceptors(FileInterceptor('file', { storage: memory }))
   async uploadResearch(@Req() req, @Body() body, @UploadedFile() file) {
     const fileUrl = await uploadFileToR2(file, 'research'); // ← R2 URL
-    return this.universityService.createUpload(req.user.sub, body, fileUrl);
+    return this.universityService.createUpload(req.user.userId, body, fileUrl);
   }
 
   @UseGuards(JwtAuthGuard)
   @Get('my-uploads')
   async getMyUploads(@Req() req) {
-    return this.universityService.getMyUploads(req.user.id);
+    return this.universityService.getMyUploads(req.user.userId);
   }
 
   @Get('book/:id')
@@ -91,6 +92,7 @@ export class UniversityController {
       status_display: book.status.toUpperCase(),
     };
   }
+
 
   @Get('innovations/public-list')
   async getPublicList(
@@ -138,6 +140,6 @@ export class UniversityController {
   @UseInterceptors(FileInterceptor('file', { storage: memory }))
   async updateUpload(@Req() req, @Param('id') id: string, @Body() body, @UploadedFile() file?) {
     const filePath = file ? await uploadFileToR2(file, 'research') : undefined; // ← R2 URL
-    return this.universityService.updateUpload(req.user.sub, id, body, filePath);
+    return this.universityService.updateUpload(req.user.userId, id, body, filePath);
   }
 }

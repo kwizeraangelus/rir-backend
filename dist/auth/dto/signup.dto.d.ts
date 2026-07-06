@@ -6,6 +6,7 @@ export declare class SignupDto {
     last_name?: string;
     phone_number?: string;
     user_category?: UserCategory;
+    university_name?: string;
     password?: string;
     confirmPassword?: string;
 }

@@ -110,6 +110,20 @@ let UniversityService = class UniversityService {
             return mapped;
         });
     }
+    async deleteUpload(userId, uploadId) {
+        const upload = await this.uploadRepo.findOne({
+            where: { id: uploadId },
+            relations: ['user'],
+        });
+        if (!upload) {
+            throw new common_1.NotFoundException('Upload not found');
+        }
+        if (!upload.user || upload.user.id !== userId) {
+            throw new common_1.ForbiddenException('You can only delete your own uploads');
+        }
+        await this.uploadRepo.remove(upload);
+        return { success: true };
+    }
     async getCounts(degreeType) {
         const query = this.uploadRepo
             .createQueryBuilder('p')

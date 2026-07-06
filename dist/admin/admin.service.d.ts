@@ -4,13 +4,17 @@ import { UniversityUpload } from '../university/entities/university-upload.entit
 import { Event } from '../event/entities/event.entity';
 import { Publication } from '../researcher/entities/publication.entity';
 import { Innovation } from "../innovation/entities/innovation.entity";
+import { Contact } from '../contact/contact.entity';
+import { MailService } from "../mail/mail.service";
 export declare class AdminService {
     private userRepo;
     private uploadRepo;
     private eventRepo;
     private pubRepo;
     private innovationRepo;
-    constructor(userRepo: Repository<User>, uploadRepo: Repository<UniversityUpload>, eventRepo: Repository<Event>, pubRepo: Repository<Publication>, innovationRepo: Repository<Innovation>);
+    private contactRepo;
+    private mailService;
+    constructor(userRepo: Repository<User>, uploadRepo: Repository<UniversityUpload>, eventRepo: Repository<Event>, pubRepo: Repository<Publication>, innovationRepo: Repository<Innovation>, contactRepo: Repository<Contact>, mailService: MailService);
     getDashboardData(): Promise<{
         kpis: {
             total_users: number;
@@ -93,5 +97,11 @@ export declare class AdminService {
     createResearch(adminId: string, data: any): Promise<{
         message: string;
         publication: Publication;
+    }>;
+    getMessages(): Promise<Contact[]>;
+    markMessageRead(id: string): Promise<import("typeorm").UpdateResult>;
+    deleteMessage(id: string): Promise<import("typeorm").DeleteResult>;
+    replyToMessage(id: string, reply: string): Promise<{
+        success: boolean;
     }>;
 }

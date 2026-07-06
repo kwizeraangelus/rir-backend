@@ -247,6 +247,25 @@ export class AdminController {
     const adminId = req.user.userId;
     return this.adminService.createResearch(adminId, body);
   }
+  @Get('messages')
+  async getMessages() {
+    return this.adminService.getMessages();
+  }
+
+  @Patch('messages/:id/read')
+  async markRead(@Param('id') id: string) {
+    return this.adminService.markMessageRead(id);
+  }
+
+  @Delete('messages/:id')
+  async deleteMessage(@Param('id') id: string) {
+    return this.adminService.deleteMessage(id);
+  }
+
+  @Post('messages/:id/reply')
+  async replyMessage(@Param('id') id: string, @Body('reply') reply: string) {
+    return this.adminService.replyToMessage(id, reply);
+  }
 
   @UseGuards(JwtAuthGuard, AdminGuard)
   @Get()
@@ -286,4 +305,5 @@ export class AdminController {
     console.log(`[Admin] ${req.user.username} deleted: ${id}`);
     await this.expertService.remove(id);
   }
+  
 }

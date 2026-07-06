@@ -11,6 +11,9 @@ export declare class UniversityService {
     getUserById(userId: string): Promise<User | null>;
     getUploadById(id: string): Promise<UniversityUpload | null>;
     findApproved(search?: string, degreeType?: string, fieldKeywords?: string): Promise<any[]>;
+    deleteUpload(userId: string, uploadId: string): Promise<{
+        success: boolean;
+    }>;
     getCounts(degreeType?: string): Promise<{
         thesis: number;
         dissertation: number;

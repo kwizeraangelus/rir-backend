@@ -19,6 +19,7 @@ class SignupDto {
     last_name;
     phone_number;
     user_category;
+    university_name;
     password;
     confirmPassword;
 }
@@ -53,6 +54,12 @@ __decorate([
     (0, class_validator_1.IsNotEmpty)(),
     __metadata("design:type", String)
 ], SignupDto.prototype, "user_category", void 0);
+__decorate([
+    (0, class_validator_1.ValidateIf)((o) => o.user_category === user_entity_1.UserCategory.UNIVERSITY),
+    (0, class_validator_1.IsString)(),
+    (0, class_validator_1.IsNotEmpty)({ message: 'University name required for university category' }),
+    __metadata("design:type", String)
+], SignupDto.prototype, "university_name", void 0);
 __decorate([
     (0, class_validator_1.IsString)(),
     (0, class_validator_1.MinLength)(8),

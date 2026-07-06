@@ -1,5 +1,5 @@
 // university/university.service.ts
-import { Injectable, NotFoundException, BadRequestException } from '@nestjs/common';
+import { Injectable, NotFoundException, BadRequestException , ForbiddenException} from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository, Brackets } from 'typeorm';
 import { User } from '../users/entities/user.entity';
@@ -118,6 +118,25 @@ export class UniversityService {
   delete mapped.university; // drop the old, unreliable free-typed field entirely
   return mapped;
 });
+}
+
+
+async deleteUpload(userId: string, uploadId: string) {
+  const upload = await this.uploadRepo.findOne({
+    where: { id: uploadId },
+    relations: ['user'],
+  });
+
+  if (!upload) {
+    throw new NotFoundException('Upload not found');
+  }
+
+  if (!upload.user || upload.user.id !== userId) {
+    throw new ForbiddenException('You can only delete your own uploads');
+  }
+
+  await this.uploadRepo.remove(upload);
+  return { success: true };
 }
 
   async getCounts(degreeType?: string) {

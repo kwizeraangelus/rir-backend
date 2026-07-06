@@ -11,6 +11,10 @@ import { UniversityUpload } from '../university/entities/university-upload.entit
 import { Event } from '../event/entities/event.entity';
 import { Publication } from '../researcher/entities/publication.entity';
 import { Innovation } from 'src/innovation/entities/innovation.entity';
+import { Contact } from '../contact/contact.entity';
+import { MailService } from 'src/mail/mail.service';
+// add to constructor
+
 
 @Injectable()
 export class AdminService {
@@ -20,8 +24,9 @@ export class AdminService {
     private uploadRepo: Repository<UniversityUpload>,
     @InjectRepository(Event) private eventRepo: Repository<Event>,
     @InjectRepository(Publication) private pubRepo: Repository<Publication>,
-    @InjectRepository(Innovation)
-    private innovationRepo: Repository<Innovation>,
+    @InjectRepository(Innovation) private innovationRepo: Repository<Innovation>,
+    @InjectRepository(Contact) private contactRepo: Repository<Contact>,
+    private mailService: MailService,
   ) {}
 
   async getDashboardData() {
@@ -308,5 +313,27 @@ export class AdminService {
     message: 'Research created successfully',
     publication: savedPub,
   };
+}
+
+// add Contact import at top
+
+
+async getMessages() {
+  return this.contactRepo.find({ order: { created_at: 'DESC' } });
+}
+
+async markMessageRead(id: string) {
+  return this.contactRepo.update(id, { is_read: true });
+}
+
+async deleteMessage(id: string) {
+  return this.contactRepo.delete(id);
+}
+
+async replyToMessage(id: string, reply: string) {
+  const contact = await this.contactRepo.findOne({ where: { id } });
+  if (!contact) throw new NotFoundException('Message not found');
+  await this.mailService.sendReply(contact.email, contact.name, reply);
+  return { success: true };
 }
 }

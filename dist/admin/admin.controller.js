@@ -110,6 +110,18 @@ let AdminController = class AdminController {
         const adminId = req.user.userId;
         return this.adminService.createResearch(adminId, body);
     }
+    async getMessages() {
+        return this.adminService.getMessages();
+    }
+    async markRead(id) {
+        return this.adminService.markMessageRead(id);
+    }
+    async deleteMessage(id) {
+        return this.adminService.deleteMessage(id);
+    }
+    async replyMessage(id, reply) {
+        return this.adminService.replyToMessage(id, reply);
+    }
     findAll() {
         return this.expertService.findAll();
     }
@@ -317,6 +329,34 @@ __decorate([
     __metadata("design:paramtypes", [Object, Object]),
     __metadata("design:returntype", Promise)
 ], AdminController.prototype, "createResearch", null);
+__decorate([
+    (0, common_1.Get)('messages'),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", []),
+    __metadata("design:returntype", Promise)
+], AdminController.prototype, "getMessages", null);
+__decorate([
+    (0, common_1.Patch)('messages/:id/read'),
+    __param(0, (0, common_1.Param)('id')),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", [String]),
+    __metadata("design:returntype", Promise)
+], AdminController.prototype, "markRead", null);
+__decorate([
+    (0, common_1.Delete)('messages/:id'),
+    __param(0, (0, common_1.Param)('id')),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", [String]),
+    __metadata("design:returntype", Promise)
+], AdminController.prototype, "deleteMessage", null);
+__decorate([
+    (0, common_1.Post)('messages/:id/reply'),
+    __param(0, (0, common_1.Param)('id')),
+    __param(1, (0, common_1.Body)('reply')),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", [String, String]),
+    __metadata("design:returntype", Promise)
+], AdminController.prototype, "replyMessage", null);
 __decorate([
     (0, common_1.UseGuards)(jwt_auth_guard_1.JwtAuthGuard, admin_guard_1.AdminGuard),
     (0, common_1.Get)(),

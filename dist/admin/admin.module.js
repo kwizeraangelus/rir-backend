@@ -20,6 +20,8 @@ const publication_entity_1 = require("../researcher/entities/publication.entity"
 const innovation_entity_1 = require("../innovation/entities/innovation.entity");
 const expert_entity_1 = require("../expert/entities/expert.entity");
 const expert_module_1 = require("../expert/expert.module");
+const contact_entity_1 = require("../contact/contact.entity");
+const mail_module_1 = require("../mail/mail.module");
 let AdminModule = class AdminModule {
 };
 exports.AdminModule = AdminModule;
@@ -33,10 +35,12 @@ exports.AdminModule = AdminModule = __decorate([
                 publication_entity_1.Publication,
                 innovation_entity_1.Innovation,
                 expert_entity_1.Expert,
+                contact_entity_1.Contact,
             ]),
             expert_module_1.ExpertModule,
             auth_module_1.AuthModule,
             event_module_1.EventModule,
+            mail_module_1.MailModule,
         ],
         controllers: [admin_controller_1.AdminController],
         providers: [admin_service_1.AdminService],

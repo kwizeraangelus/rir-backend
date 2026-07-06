@@ -26,7 +26,7 @@ let UniversityController = class UniversityController {
         this.universityService = universityService;
     }
     async getMe(req) {
-        const userId = req.user.sub;
+        const userId = req.user.userId;
         const user = await this.universityService.getUserById(userId);
         if (!user)
             throw new common_1.UnauthorizedException();
@@ -49,10 +49,10 @@ let UniversityController = class UniversityController {
     }
     async uploadResearch(req, body, file) {
         const fileUrl = await (0, r2_storage_1.uploadFileToR2)(file, 'research');
-        return this.universityService.createUpload(req.user.sub, body, fileUrl);
+        return this.universityService.createUpload(req.user.userId, body, fileUrl);
     }
     async getMyUploads(req) {
-        return this.universityService.getMyUploads(req.user.id);
+        return this.universityService.getMyUploads(req.user.userId);
     }
     async getBook(id) {
         const book = await this.universityService.getUploadById(id);
@@ -70,6 +70,9 @@ let UniversityController = class UniversityController {
                 })(),
             status_display: book.status.toUpperCase(),
         };
+    }
+    async deleteUpload(req, id) {
+        return this.universityService.deleteUpload(req.user.userId, id);
     }
     async getPublicList(search, degreeType, fieldKeywords) {
         return this.universityService.findApproved(search, degreeType, fieldKeywords);
@@ -97,7 +100,7 @@ let UniversityController = class UniversityController {
     }
     async updateUpload(req, id, body, file) {
         const filePath = file ? await (0, r2_storage_1.uploadFileToR2)(file, 'research') : undefined;
-        return this.universityService.updateUpload(req.user.sub, id, body, filePath);
+        return this.universityService.updateUpload(req.user.userId, id, body, filePath);
     }
 };
 exports.UniversityController = UniversityController;
@@ -147,6 +150,15 @@ __decorate([
     __metadata("design:paramtypes", [String]),
     __metadata("design:returntype", Promise)
 ], UniversityController.prototype, "getBook", null);
+__decorate([
+    (0, common_1.UseGuards)(jwt_auth_guard_1.JwtAuthGuard),
+    (0, common_1.Delete)('upload/:id'),
+    __param(0, (0, common_1.Req)()),
+    __param(1, (0, common_1.Param)('id')),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", [Object, String]),
+    __metadata("design:returntype", Promise)
+], UniversityController.prototype, "deleteUpload", null);
 __decorate([
     (0, common_1.Get)('innovations/public-list'),
     __param(0, (0, common_1.Query)('search')),

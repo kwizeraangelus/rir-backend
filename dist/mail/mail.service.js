@@ -97,6 +97,73 @@ let MailService = class MailService {
       `,
         });
     }
+    async sendContactNotification(data) {
+        const html = `
+    <div style="font-family: sans-serif; max-width: 600px; margin: 0 auto;">
+      <div style="background: #050A14; padding: 24px; text-align: center;">
+        <h1 style="color: #FFD700; margin: 0; font-size: 2rem; font-style: italic;">RIRI</h1>
+      </div>
+      <div style="padding: 32px; background: #f9fafb; border: 1px solid #e5e7eb;">
+        <h2 style="color: #050A14; margin-top: 0;">New Contact Message</h2>
+        <p style="color: #374151;"><strong>Name:</strong> ${data.name}</p>
+        <p style="color: #374151;"><strong>Email:</strong> ${data.email}</p>
+        <p style="color: #374151;"><strong>Subject:</strong> ${data.subject}</p>
+        <p style="color: #374151;"><strong>Message:</strong></p>
+        <p style="color: #374151; line-height: 1.6; white-space: pre-wrap;">${data.message}</p>
+      </div>
+      <div style="background: #050A14; padding: 16px; text-align: center;">
+        <p style="color: #9ca3af; font-size: 0.75rem; margin: 0;">
+          © 2025 RIRI • Rwanda Innovation & Research Institute
+        </p>
+      </div>
+    </div>
+  `;
+        await this.transporter.sendMail({
+            from: `"RIRI Website" <${process.env.MAIL_FROM}>`,
+            to: process.env.MAIL_USER,
+            replyTo: data.email,
+            subject: `[Contact Form] ${data.subject}`,
+            html,
+        });
+        const hostingerTransporter = nodemailer.createTransport({
+            host: 'smtp.hostinger.com',
+            port: 465,
+            secure: true,
+            auth: {
+                user: process.env.HOSTINGER_EMAIL,
+                pass: process.env.HOSTINGER_EMAIL_PASS,
+            },
+        });
+        await hostingerTransporter.sendMail({
+            from: `"RIRI Website" <${process.env.HOSTINGER_EMAIL}>`,
+            to: process.env.HOSTINGER_EMAIL,
+            replyTo: data.email,
+            subject: `[Contact Form] ${data.subject}`,
+            html,
+        });
+    }
+    async sendReply(to, name, reply) {
+        await this.transporter.sendMail({
+            from: `"RIRI Team" <${process.env.MAIL_FROM}>`,
+            to,
+            subject: `Re: Your message to RIRI`,
+            html: `
+      <div style="font-family: sans-serif; max-width: 600px; margin: 0 auto;">
+        <div style="background: #050A14; padding: 24px; text-align: center;">
+          <h1 style="color: #FFD700; margin: 0; font-size: 2rem;">RIRI</h1>
+        </div>
+        <div style="padding: 32px; background: #f9fafb; border: 1px solid #e5e7eb;">
+          <p style="color: #374151;">Dear ${name},</p>
+          <p style="color: #374151; line-height: 1.6; white-space: pre-wrap;">${reply}</p>
+          <p style="color: #374151; margin-top: 24px;">Best regards,<br/>RIRI Team</p>
+        </div>
+        <div style="background: #050A14; padding: 16px; text-align: center;">
+          <p style="color: #9ca3af; font-size: 0.75rem; margin: 0;">© 2025 RIRI • Rwanda Innovation & Research Institute</p>
+        </div>
+      </div>
+    `,
+        });
+    }
 };
 exports.MailService = MailService;
 exports.MailService = MailService = __decorate([
