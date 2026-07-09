@@ -14,6 +14,7 @@ export declare class Publication {
     status: boolean;
     assignedToExpertId?: string;
     pdf_path?: string;
+    orcid: string | null;
     assignedToExpert?: User;
     user?: User;
     userId?: string;

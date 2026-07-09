@@ -86,42 +86,46 @@ export class InnovationService {
   }
 
 
+async updateInnovation(
+  userId: string,
+  innovationId: string,
+  updateData: any,
+  photoPath?: string,
+) {
+  // Verify ownership
+  const innovation = await this.innovationRepo.findOne({
+    where: { id: innovationId, userId },
+  });
 
-   async updateInnovation(
-    userId: string,
-    innovationId: string,
-    updateData: any,
-    photoPath?: string,
-  ) {
-    // Verify ownership
-    const innovation = await this.innovationRepo.findOne({
-      where: { id: innovationId, userId },
-    });
- 
-    if (!innovation) {
-      throw new NotFoundException(
-        'Innovation not found or unauthorized',
-      );
-    }
- 
-    // Allowed fields to update
-    const allowedFields = ['name', 'description', 'sponsorship_needed'];
-    const dataToUpdate: any = {};
- 
-    allowedFields.forEach(field => {
-      if (updateData[field] !== undefined && updateData[field] !== null) {
-        dataToUpdate[field] = updateData[field];
-      }
-    });
- 
-    // Update photo if provided
-    if (photoPath) {
-      dataToUpdate.photo = photoPath;
-    }
- 
-    await this.innovationRepo.update(innovationId, dataToUpdate);
-    return this.innovationRepo.findOneBy({ id: innovationId });
+  if (!innovation) {
+    throw new NotFoundException('Innovation not found or unauthorized');
   }
+
+  // Allowed fields to update
+  const allowedFields = ['name', 'description', 'sponsorship_needed'];
+  const dataToUpdate: any = {};
+
+  allowedFields.forEach(field => {
+    if (updateData[field] !== undefined && updateData[field] !== null) {
+      dataToUpdate[field] = updateData[field];
+    }
+  });
+
+  // remove_photo arrives as a string via multipart/form-data, not a boolean
+  const shouldRemovePhoto =
+    updateData.remove_photo === 'true' || updateData.remove_photo === true;
+
+  if (photoPath) {
+    // TODO: delete innovation.photo from R2 before replacing, once deleteFileFromR2 exists
+    dataToUpdate.photo = photoPath;
+  } else if (shouldRemovePhoto) {
+    // TODO: delete innovation.photo from R2 once deleteFileFromR2 exists
+    dataToUpdate.photo = null;
+  }
+
+  await this.innovationRepo.update(innovationId, dataToUpdate);
+  return this.innovationRepo.findOneBy({ id: innovationId });
+}
  
   // ============= NEW: DELETE INNOVATION =============
   async deleteInnovation(userId: string, innovationId: string) {

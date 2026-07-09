@@ -49,6 +49,7 @@ export class ResearcherService {
     const updateData: any = {};
 
     if (body.bio !== undefined) updateData.bio = body.bio;
+    if (body.orcid !== undefined) updateData.orcid = body.orcid;
     if (body.platformId !== undefined) updateData.orcid = body.platformId;
     if (body.qualification !== undefined) updateData.qualification = body.qualification;
     if (body.Field !== undefined) updateData.Field = body.Field;
@@ -56,8 +57,10 @@ export class ResearcherService {
     if (body.ResearchArea !== undefined) updateData.ResearchArea = body.ResearchArea;
 
     if (file) {
-  updateData.profile_image = await uploadFileToR2(file, 'profiles');
-}
+  updateData.profile_image = await uploadFileToR2(file, 'profiles')
+} else if (body.remove_profile_image === 'true') {
+    updateData.profile_image = null;
+  }
 
     if (!userId) throw new BadRequestException('User ID is missing');
     if (Object.keys(updateData).length === 0) return this.getProfile(userId);
@@ -207,9 +210,15 @@ export class ResearcherService {
     } = data;
 
     Object.assign(pub, updatable);
+    const shouldRemovePdf = data.remove_pdf === 'true' || data.remove_pdf === true;
 
-    if (file) {
+    
+  if (file) {
+  // TODO: delete pub.pdf_path from R2 once deleteFileFromR2 is implemented
   pub.pdf_path = await uploadFileToR2(file, 'publications');
+} else if (shouldRemovePdf) {
+  // TODO: delete pub.pdf_path from R2 once deleteFileFromR2 is implemented
+  pub.pdf_path = undefined;
 }
 
     return this.pubRepo.save(pub);

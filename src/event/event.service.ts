@@ -59,43 +59,48 @@ export class EventsService {
 
   // ============= NEW: UPDATE EVENT =============
   async updateEvent(
-    userId: string,
-    eventId: string,
-    updateData: any,
-    photoPath?: string,
-  ) {
-    // Verify ownership
-    const event = await this.eventRepo.findOne({
-      where: { id: eventId, user: { id: userId } },
-    });
+  userId: string,
+  eventId: string,
+  updateData: any,
+  photoPath?: string,
+) {
+  // Verify ownership
+  const event = await this.eventRepo.findOne({
+    where: { id: eventId, user: { id: userId } },
+  });
 
-    if (!event) {
-      throw new NotFoundException(
-        'Event not found or unauthorized',
-      );
-    }
-
-    // Allowed fields to update
-    const allowedFields = ['title', 'description', 'date', 'location', 'link', 'icon'];
-    const dataToUpdate: any = {};
-
-    allowedFields.forEach(field => {
-      if (updateData[field] !== undefined && updateData[field] !== null) {
-        dataToUpdate[field] = updateData[field];
-      }
-    });
-
-    // Update photo if provided
-    if (photoPath) {
-      dataToUpdate.photo = photoPath;
-    }
-
-    await this.eventRepo.update(eventId, dataToUpdate);
-    return this.eventRepo.findOne({
-      where: { id: eventId },
-      relations: ['user'],
-    });
+  if (!event) {
+    throw new NotFoundException('Event not found or unauthorized');
   }
+
+  // Allowed fields to update
+  const allowedFields = ['title', 'description', 'date', 'location', 'link', 'icon'];
+  const dataToUpdate: any = {};
+
+  allowedFields.forEach(field => {
+    if (updateData[field] !== undefined && updateData[field] !== null) {
+      dataToUpdate[field] = updateData[field];
+    }
+  });
+
+  // remove_photo arrives as a string via multipart/form-data, not a boolean
+  const shouldRemovePhoto =
+    updateData.remove_photo === 'true' || updateData.remove_photo === true;
+
+  if (photoPath) {
+    // TODO: delete event.photo from R2 before replacing, once deleteFileFromR2 exists
+    dataToUpdate.photo = photoPath;
+  } else if (shouldRemovePhoto) {
+    // TODO: delete event.photo from R2 once deleteFileFromR2 exists
+    dataToUpdate.photo = null;
+  }
+
+  await this.eventRepo.update(eventId, dataToUpdate);
+  return this.eventRepo.findOne({
+    where: { id: eventId },
+    relations: ['user'],
+  });
+}
 
   // ============= NEW: DELETE EVENT =============
   async deleteEvent(userId: string, eventId: string) {

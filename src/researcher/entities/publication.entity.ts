@@ -53,6 +53,9 @@ export class Publication {
   @Column({ nullable: true })
   pdf_path?: string;
 
+  @Column({ type: 'varchar', nullable: true, default: null })
+  orcid: string | null;
+
   @ManyToOne(() => User, { nullable: true })
   @JoinColumn({ name: 'assignedToExpertId' })
   assignedToExpert?: User;

@@ -91,8 +91,12 @@ let InnovationService = class InnovationService {
                 dataToUpdate[field] = updateData[field];
             }
         });
+        const shouldRemovePhoto = updateData.remove_photo === 'true' || updateData.remove_photo === true;
         if (photoPath) {
             dataToUpdate.photo = photoPath;
+        }
+        else if (shouldRemovePhoto) {
+            dataToUpdate.photo = null;
         }
         await this.innovationRepo.update(innovationId, dataToUpdate);
         return this.innovationRepo.findOneBy({ id: innovationId });

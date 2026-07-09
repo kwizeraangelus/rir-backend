@@ -27,6 +27,7 @@ let Publication = class Publication {
     status = false;
     assignedToExpertId;
     pdf_path;
+    orcid;
     assignedToExpert;
     user;
     userId;
@@ -89,6 +90,10 @@ __decorate([
     (0, typeorm_1.Column)({ nullable: true }),
     __metadata("design:type", String)
 ], Publication.prototype, "pdf_path", void 0);
+__decorate([
+    (0, typeorm_1.Column)({ type: 'varchar', nullable: true, default: null }),
+    __metadata("design:type", Object)
+], Publication.prototype, "orcid", void 0);
 __decorate([
     (0, typeorm_1.ManyToOne)(() => user_entity_1.User, { nullable: true }),
     (0, typeorm_1.JoinColumn)({ name: 'assignedToExpertId' }),

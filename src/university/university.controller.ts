@@ -61,7 +61,9 @@ export class UniversityController {
 
   @UseGuards(JwtAuthGuard)
   @Post('upload')
-  @UseInterceptors(FileInterceptor('file', { storage: memory }))
+  @UseInterceptors(FileInterceptor('file', { storage: memory, limits: {
+      fileSize: 100 * 1024 * 1024,   // 100MB
+    } }))
   async uploadResearch(@Req() req, @Body() body, @UploadedFile() file) {
     const fileUrl = await uploadFileToR2(file, 'research'); // ← R2 URL
     return this.universityService.createUpload(req.user.userId, body, fileUrl);
@@ -137,7 +139,9 @@ export class UniversityController {
 
   @UseGuards(JwtAuthGuard)
   @Patch('upload/:id')
-  @UseInterceptors(FileInterceptor('file', { storage: memory }))
+  @UseInterceptors(FileInterceptor('file', { storage: memory, limits: {
+      fileSize: 100 * 1024 * 1024,   // 100MB
+    } }))
   async updateUpload(@Req() req, @Param('id') id: string, @Body() body, @UploadedFile() file?) {
     const filePath = file ? await uploadFileToR2(file, 'research') : undefined; // ← R2 URL
     return this.universityService.updateUpload(req.user.userId, id, body, filePath);

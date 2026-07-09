@@ -82,8 +82,12 @@ let EventsService = class EventsService {
                 dataToUpdate[field] = updateData[field];
             }
         });
+        const shouldRemovePhoto = updateData.remove_photo === 'true' || updateData.remove_photo === true;
         if (photoPath) {
             dataToUpdate.photo = photoPath;
+        }
+        else if (shouldRemovePhoto) {
+            dataToUpdate.photo = null;
         }
         await this.eventRepo.update(eventId, dataToUpdate);
         return this.eventRepo.findOne({

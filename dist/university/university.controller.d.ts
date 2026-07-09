@@ -32,9 +32,6 @@ export declare class UniversityController {
         average_rating?: number;
         updated_at: Date;
     }>;
-    deleteUpload(req: any, id: string): Promise<{
-        success: boolean;
-    }>;
     getPublicList(search?: string, degreeType?: string, fieldKeywords?: string): Promise<any[]>;
     getPublicCounts(degreeType?: string): Promise<{
         thesis: number;
