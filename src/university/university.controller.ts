@@ -12,7 +12,10 @@ import {
   UnauthorizedException,
   Param,
   NotFoundException,
-  Query,
+  Query,ParseFilePipe,
+  MaxFileSizeValidator,
+  FileTypeValidator,
+  BadRequestException,
 } from '@nestjs/common';
 import { FileInterceptor } from '@nestjs/platform-express';
 import { UniversityService } from './university.service';
@@ -22,6 +25,17 @@ import { uploadFileToR2 } from '../storage/r2.storage';
 
 
 const memory = memoryStorage();
+
+const researchUploadConfig = {
+  storage: memory,
+  limits: { fileSize: 16 * 1024 * 1024 }, // 16MB
+};
+
+const profileUploadConfig = {
+  storage: memory,
+  limits: { fileSize: 5 * 1024 * 1024 }, // 5MB for profile
+};
+
 
 @Controller('api')
 export class UniversityController {
@@ -38,8 +52,20 @@ export class UniversityController {
 
   @UseGuards(JwtAuthGuard)
   @Patch('update')
-  @UseInterceptors(FileInterceptor('profile_image', { storage: memory }))
-  async updateProfile(@Req() req, @Body() body, @UploadedFile() file) {
+  @UseInterceptors(FileInterceptor('profile_image', profileUploadConfig))
+  async updateProfile(
+  @Req() req, 
+  @Body() body, 
+  @UploadedFile(
+    new ParseFilePipe({
+      validators: [
+        new MaxFileSizeValidator({ maxSize: 5 * 1024 * 1024 }),
+      ],
+      fileIsRequired: false,
+      errorHttpStatusCode: 413,
+    })
+  ) file?: Express.Multer.File
+) {
     const userId = req.user.userId;
     const updateData = { ...body };
 
@@ -61,11 +87,25 @@ export class UniversityController {
 
   @UseGuards(JwtAuthGuard)
   @Post('upload')
-  @UseInterceptors(FileInterceptor('file', { storage: memory, limits: {
-      fileSize: 100 * 1024 * 1024,   // 100MB
-    } }))
-  async uploadResearch(@Req() req, @Body() body, @UploadedFile() file) {
-    const fileUrl = await uploadFileToR2(file, 'research'); // ← R2 URL
+  @UseInterceptors(FileInterceptor('file', researchUploadConfig))
+  async uploadResearch(
+    @Req() req, 
+    @Body() body, 
+    @UploadedFile(
+      new ParseFilePipe({
+        validators: [
+          new MaxFileSizeValidator({ maxSize: 16 * 1024 * 1024 }),
+          new FileTypeValidator({ fileType: /(pdf|doc|docx)$/i }),
+        ],
+        fileIsRequired: false,
+        errorHttpStatusCode: 413,
+      })
+    ) file?: Express.Multer.File
+  ) {
+    if (!file) {
+      throw new BadRequestException('File is required');
+    }
+    const fileUrl = await uploadFileToR2(file, 'research');
     return this.universityService.createUpload(req.user.userId, body, fileUrl);
   }
 
@@ -138,12 +178,24 @@ export class UniversityController {
   }
 
   @UseGuards(JwtAuthGuard)
-  @Patch('upload/:id')
-  @UseInterceptors(FileInterceptor('file', { storage: memory, limits: {
-      fileSize: 100 * 1024 * 1024,   // 100MB
-    } }))
-  async updateUpload(@Req() req, @Param('id') id: string, @Body() body, @UploadedFile() file?) {
-    const filePath = file ? await uploadFileToR2(file, 'research') : undefined; // ← R2 URL
-    return this.universityService.updateUpload(req.user.userId, id, body, filePath);
-  }
+@Patch('upload/:id')
+@UseInterceptors(FileInterceptor('file', researchUploadConfig))
+async updateUpload(
+  @Req() req, 
+  @Param('id') id: string, 
+  @Body() body, 
+  @UploadedFile(
+    new ParseFilePipe({
+      validators: [
+        new MaxFileSizeValidator({ maxSize: 16 * 1024 * 1024 }),
+        new FileTypeValidator({ fileType: /(pdf|doc|docx)$/i }),
+      ],
+      fileIsRequired: false,
+      errorHttpStatusCode: 413,
+    })
+  ) file?: Express.Multer.File
+) {
+  const filePath = file ? await uploadFileToR2(file, 'research') : undefined;
+  return this.universityService.updateUpload(req.user.userId, id, body, filePath);
+}
 }

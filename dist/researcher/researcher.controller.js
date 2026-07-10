@@ -88,7 +88,7 @@ __decorate([
     (0, common_1.UseGuards)(jwt_auth_guard_1.JwtAuthGuard),
     (0, common_1.Post)('researches'),
     (0, common_1.UseInterceptors)((0, platform_express_1.FileInterceptor)('pdf', { storage: memory, limits: {
-            fileSize: 100 * 1024 * 1024,
+            fileSize: 16 * 1024 * 1024,
         } })),
     __param(0, (0, common_1.Req)()),
     __param(1, (0, common_1.Body)()),
@@ -100,7 +100,9 @@ __decorate([
 __decorate([
     (0, common_1.Patch)('update-profile'),
     (0, common_1.UseGuards)(jwt_auth_guard_1.JwtAuthGuard),
-    (0, common_1.UseInterceptors)((0, platform_express_1.FileInterceptor)('profile_image', { storage: memory })),
+    (0, common_1.UseInterceptors)((0, platform_express_1.FileInterceptor)('profile_image', { storage: memory, limits: {
+            fileSize: 16 * 1024 * 1024,
+        }, })),
     __param(0, (0, common_1.Req)()),
     __param(1, (0, common_1.Body)()),
     __param(2, (0, common_1.UploadedFile)()),
@@ -139,7 +141,7 @@ __decorate([
     (0, common_1.UseGuards)(jwt_auth_guard_1.JwtAuthGuard),
     (0, common_1.Patch)('researches/:id'),
     (0, common_1.UseInterceptors)((0, platform_express_1.FileInterceptor)('pdf', { storage: memory, limits: {
-            fileSize: 100 * 1024 * 1024,
+            fileSize: 16 * 1024 * 1024,
         } })),
     __param(0, (0, common_1.Req)()),
     __param(1, (0, common_1.Param)('id')),

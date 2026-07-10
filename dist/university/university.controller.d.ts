@@ -3,8 +3,8 @@ export declare class UniversityController {
     private readonly universityService;
     constructor(universityService: UniversityService);
     getMe(req: any): Promise<import("../users/entities/user.entity").User>;
-    updateProfile(req: any, body: any, file: any): Promise<import("../users/entities/user.entity").User | null>;
-    uploadResearch(req: any, body: any, file: any): Promise<import("./entities/university-upload.entity").UniversityUpload[]>;
+    updateProfile(req: any, body: any, file?: Express.Multer.File): Promise<import("../users/entities/user.entity").User | null>;
+    uploadResearch(req: any, body: any, file?: Express.Multer.File): Promise<import("./entities/university-upload.entity").UniversityUpload[]>;
     getMyUploads(req: any): Promise<import("./entities/university-upload.entity").UniversityUpload[]>;
     getBook(id: string): Promise<{
         file_url: string;
@@ -57,5 +57,5 @@ export declare class UniversityController {
         success: boolean;
         average: number;
     }>;
-    updateUpload(req: any, id: string, body: any, file?: any): Promise<import("./entities/university-upload.entity").UniversityUpload | null>;
+    updateUpload(req: any, id: string, body: any, file?: Express.Multer.File): Promise<import("./entities/university-upload.entity").UniversityUpload | null>;
 }

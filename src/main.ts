@@ -17,6 +17,8 @@ async function bootstrap() {
         transform: true,
       }),
     );
+    app.useBodyParser('json', { limit: '100mb' });
+    app.useBodyParser('urlencoded', { limit: '100mb', extended: true });
 
     // CORS
     app.enableCors({

@@ -20,6 +20,14 @@ const multer_1 = require("multer");
 const jwt_auth_guard_1 = require("../auth/jwt-auth/jwt-auth.guard");
 const r2_storage_1 = require("../storage/r2.storage");
 const memory = (0, multer_1.memoryStorage)();
+const researchUploadConfig = {
+    storage: memory,
+    limits: { fileSize: 16 * 1024 * 1024 },
+};
+const profileUploadConfig = {
+    storage: memory,
+    limits: { fileSize: 5 * 1024 * 1024 },
+};
 let UniversityController = class UniversityController {
     universityService;
     constructor(universityService) {
@@ -48,6 +56,9 @@ let UniversityController = class UniversityController {
         return this.universityService.updateProfile(userId, updateData);
     }
     async uploadResearch(req, body, file) {
+        if (!file) {
+            throw new common_1.BadRequestException('File is required');
+        }
         const fileUrl = await (0, r2_storage_1.uploadFileToR2)(file, 'research');
         return this.universityService.createUpload(req.user.userId, body, fileUrl);
     }
@@ -112,10 +123,16 @@ __decorate([
 __decorate([
     (0, common_1.UseGuards)(jwt_auth_guard_1.JwtAuthGuard),
     (0, common_1.Patch)('update'),
-    (0, common_1.UseInterceptors)((0, platform_express_1.FileInterceptor)('profile_image', { storage: memory })),
+    (0, common_1.UseInterceptors)((0, platform_express_1.FileInterceptor)('profile_image', profileUploadConfig)),
     __param(0, (0, common_1.Req)()),
     __param(1, (0, common_1.Body)()),
-    __param(2, (0, common_1.UploadedFile)()),
+    __param(2, (0, common_1.UploadedFile)(new common_1.ParseFilePipe({
+        validators: [
+            new common_1.MaxFileSizeValidator({ maxSize: 5 * 1024 * 1024 }),
+        ],
+        fileIsRequired: false,
+        errorHttpStatusCode: 413,
+    }))),
     __metadata("design:type", Function),
     __metadata("design:paramtypes", [Object, Object, Object]),
     __metadata("design:returntype", Promise)
@@ -123,12 +140,17 @@ __decorate([
 __decorate([
     (0, common_1.UseGuards)(jwt_auth_guard_1.JwtAuthGuard),
     (0, common_1.Post)('upload'),
-    (0, common_1.UseInterceptors)((0, platform_express_1.FileInterceptor)('file', { storage: memory, limits: {
-            fileSize: 100 * 1024 * 1024,
-        } })),
+    (0, common_1.UseInterceptors)((0, platform_express_1.FileInterceptor)('file', researchUploadConfig)),
     __param(0, (0, common_1.Req)()),
     __param(1, (0, common_1.Body)()),
-    __param(2, (0, common_1.UploadedFile)()),
+    __param(2, (0, common_1.UploadedFile)(new common_1.ParseFilePipe({
+        validators: [
+            new common_1.MaxFileSizeValidator({ maxSize: 16 * 1024 * 1024 }),
+            new common_1.FileTypeValidator({ fileType: /(pdf|doc|docx)$/i }),
+        ],
+        fileIsRequired: false,
+        errorHttpStatusCode: 413,
+    }))),
     __metadata("design:type", Function),
     __metadata("design:paramtypes", [Object, Object, Object]),
     __metadata("design:returntype", Promise)
@@ -204,13 +226,18 @@ __decorate([
 __decorate([
     (0, common_1.UseGuards)(jwt_auth_guard_1.JwtAuthGuard),
     (0, common_1.Patch)('upload/:id'),
-    (0, common_1.UseInterceptors)((0, platform_express_1.FileInterceptor)('file', { storage: memory, limits: {
-            fileSize: 100 * 1024 * 1024,
-        } })),
+    (0, common_1.UseInterceptors)((0, platform_express_1.FileInterceptor)('file', researchUploadConfig)),
     __param(0, (0, common_1.Req)()),
     __param(1, (0, common_1.Param)('id')),
     __param(2, (0, common_1.Body)()),
-    __param(3, (0, common_1.UploadedFile)()),
+    __param(3, (0, common_1.UploadedFile)(new common_1.ParseFilePipe({
+        validators: [
+            new common_1.MaxFileSizeValidator({ maxSize: 16 * 1024 * 1024 }),
+            new common_1.FileTypeValidator({ fileType: /(pdf|doc|docx)$/i }),
+        ],
+        fileIsRequired: false,
+        errorHttpStatusCode: 413,
+    }))),
     __metadata("design:type", Function),
     __metadata("design:paramtypes", [Object, String, Object, Object]),
     __metadata("design:returntype", Promise)

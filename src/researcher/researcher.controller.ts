@@ -39,7 +39,7 @@ export class ResearcherController {
   @UseGuards(JwtAuthGuard)
 @Post('researches')
 @UseInterceptors(FileInterceptor('pdf', { storage: memory , limits: {
-      fileSize: 100 * 1024 * 1024,   // 50MB
+      fileSize: 16 * 1024 * 1024,   // 50MB
     }}))
 async addPublication(
   @Req() req,
@@ -56,7 +56,9 @@ async addPublication(
 
  @Patch('update-profile')
 @UseGuards(JwtAuthGuard)
-@UseInterceptors(FileInterceptor('profile_image', { storage: memory }))
+@UseInterceptors(FileInterceptor('profile_image', { storage: memory, limits: {
+    fileSize: 16 * 1024 * 1024, // 16MB
+  }, }))
 async updateProfile(
   @Req() req,
   @Body() body: any,
@@ -89,7 +91,7 @@ async updateProfile(
   @UseGuards(JwtAuthGuard)
 @Patch('researches/:id')
 @UseInterceptors(FileInterceptor('pdf', { storage: memory, limits: {
-      fileSize: 100 * 1024 * 1024,   // 50MB
+      fileSize: 16 * 1024 * 1024,   // 50MB
     } }))
 async updatePublication(
   @Req() req,

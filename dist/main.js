@@ -13,6 +13,8 @@ async function bootstrap() {
             forbidNonWhitelisted: true,
             transform: true,
         }));
+        app.useBodyParser('json', { limit: '100mb' });
+        app.useBodyParser('urlencoded', { limit: '100mb', extended: true });
         app.enableCors({
             origin: [
                 'http://localhost:3000',
