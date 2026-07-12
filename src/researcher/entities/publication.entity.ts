@@ -4,6 +4,8 @@ import {
   PrimaryGeneratedColumn,
   Column,
   ManyToOne,
+  ManyToMany,
+  JoinTable,
   CreateDateColumn,
   JoinColumn,
 } from 'typeorm';
@@ -54,7 +56,7 @@ export class Publication {
   pdf_path?: string;
 
   @Column({ type: 'varchar', nullable: true, default: null })
-  orcid: string | null;
+  orcid?: string | null;
 
   @ManyToOne(() => User, { nullable: true })
   @JoinColumn({ name: 'assignedToExpertId' })
@@ -66,6 +68,14 @@ export class Publication {
 
   @Column()
   userId?: string;
+
+  @ManyToMany(() => User)
+  @JoinTable({
+    name: 'publication_co_authors',
+    joinColumn: { name: 'publicationId', referencedColumnName: 'id' },
+    inverseJoinColumn: { name: 'userId', referencedColumnName: 'id' },
+  })
+  coAuthorUsers?: User[];
 
   @CreateDateColumn()
   created_at?: Date;

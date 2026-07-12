@@ -67,7 +67,13 @@ export class User {
   location?: string;
 
   @Column({ nullable: true })
-  details?: string; // bio / short description
+  details?: string; // bio / short description Institution
+
+  @Column({ nullable: true })
+  institution?: string;
+
+  @Column({ nullable: true })
+  graduation_university?: string;
 
   @Column({ nullable: true })
   profile_image?: string; // path like "/uploads/profiles/abc123.jpg"

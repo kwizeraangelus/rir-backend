@@ -8,6 +8,8 @@ export class UpdateProfileDto {
   @IsOptional() @Type(() => Number) @IsInt() @Min(1) age?: number;
   @IsOptional() @IsString() location?: string;
   @IsOptional() @IsString() details?: string;
+  @IsOptional() @IsString() institution?: string;
+  @IsOptional() @IsString() graduation_university?: string;
   @IsOptional() @IsString() bio?: string;
   @IsOptional() @IsString() orcid?: string;
   @IsOptional() @IsString() university_name?: string;
