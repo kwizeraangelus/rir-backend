@@ -12,9 +12,10 @@ export class UpdateProfileDto {
   @IsOptional() @IsString() graduation_university?: string;
   @IsOptional() @IsString() bio?: string;
   @IsOptional() @IsString() orcid?: string;
-  @IsOptional() @IsString() university_name?: string;
-}
 
+  @IsOptional() @IsString() university_name?: string;
+  @IsOptional() @IsString() email?: string;
+}
 export class ChangePasswordDto {
   @IsString() current_password: string = '';
   @IsString() @MinLength(6) new_password: string = '';

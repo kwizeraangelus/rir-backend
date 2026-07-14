@@ -58,6 +58,8 @@ export class ProfileService {
       'age',
       'location',
       'details',
+      'email',
+      'institution',
       'graduation_university',
       'bio',
       'orcid',
