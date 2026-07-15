@@ -30,4 +30,9 @@ export declare class AuthController {
     resetPassword(dto: ResetPasswordDto): Promise<{
         message: string;
     }>;
+    getServerTime(): {
+        nodeNow: string;
+        nodeNowLocal: string;
+        timezoneOffsetMinutes: number;
+    };
 }

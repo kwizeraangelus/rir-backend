@@ -222,6 +222,12 @@ export class AuthService {
       where: { resetPasswordToken: cleanToken },
     });
 
+     console.log('── verifyResetToken debug ──');
+  console.log('token from URL:', cleanToken);
+  console.log('user found:', !!user);
+  console.log('expiresAt:', user?.resetPasswordExpires, user?.resetPasswordExpires?.toISOString());
+  console.log('Node now:', new Date(), new Date().toISOString());
+
     if (!user || !user.resetPasswordExpires) return false;
     if (user.resetPasswordExpires < new Date()) return false;
 

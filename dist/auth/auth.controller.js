@@ -54,6 +54,13 @@ let AuthController = class AuthController {
         await this.authService.resetPassword(dto.token, dto.newPassword);
         return { message: 'Password has been reset successfully.' };
     }
+    getServerTime() {
+        return {
+            nodeNow: new Date().toISOString(),
+            nodeNowLocal: new Date().toString(),
+            timezoneOffsetMinutes: new Date().getTimezoneOffset(),
+        };
+    }
 };
 exports.AuthController = AuthController;
 __decorate([
@@ -111,6 +118,12 @@ __decorate([
     __metadata("design:paramtypes", [reset_password_dto_1.ResetPasswordDto]),
     __metadata("design:returntype", Promise)
 ], AuthController.prototype, "resetPassword", null);
+__decorate([
+    (0, common_1.Get)('/debug/server-time'),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", []),
+    __metadata("design:returntype", void 0)
+], AuthController.prototype, "getServerTime", null);
 exports.AuthController = AuthController = __decorate([
     (0, common_1.Controller)('api'),
     __metadata("design:paramtypes", [auth_service_1.AuthService])

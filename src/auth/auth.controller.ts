@@ -47,7 +47,6 @@ export class AuthController {
     return this.authService.login(loginDto);
   }
 
-
   @Post('/auth/forgot-password')
   @HttpCode(HttpStatus.OK)
   async forgotPassword(@Body() dto: ForgotPasswordDto) {
@@ -71,5 +70,13 @@ export class AuthController {
   async resetPassword(@Body() dto: ResetPasswordDto) {
     await this.authService.resetPassword(dto.token, dto.newPassword);
     return { message: 'Password has been reset successfully.' };
+  }
+  @Get('/debug/server-time')
+  getServerTime() {
+    return {
+      nodeNow: new Date().toISOString(),
+      nodeNowLocal: new Date().toString(),
+      timezoneOffsetMinutes: new Date().getTimezoneOffset(),
+    };
   }
 }
