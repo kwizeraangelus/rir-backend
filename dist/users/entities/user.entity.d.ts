@@ -38,4 +38,6 @@ export declare class User {
     hashPassword(): Promise<void>;
     resetPasswordToken: string | null;
     resetPasswordExpires: Date | null;
+    emailVerificationToken: string | null;
+    emailVerificationExpires: Date | null;
 }

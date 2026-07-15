@@ -61,6 +61,16 @@ let AuthController = class AuthController {
             timezoneOffsetMinutes: new Date().getTimezoneOffset(),
         };
     }
+    async verifyEmail(token) {
+        if (!token)
+            throw new common_1.BadRequestException('Token is required');
+        await this.authService.verifyEmail(token);
+        return { message: 'Email verified successfully' };
+    }
+    async resendVerification(email) {
+        await this.authService.resendVerification(email);
+        return { message: 'If that account exists and is unverified, a new link has been sent.' };
+    }
 };
 exports.AuthController = AuthController;
 __decorate([
@@ -124,6 +134,21 @@ __decorate([
     __metadata("design:paramtypes", []),
     __metadata("design:returntype", void 0)
 ], AuthController.prototype, "getServerTime", null);
+__decorate([
+    (0, common_1.Get)('/auth/verify-email'),
+    __param(0, (0, common_1.Query)('token')),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", [String]),
+    __metadata("design:returntype", Promise)
+], AuthController.prototype, "verifyEmail", null);
+__decorate([
+    (0, common_1.Post)('/auth/resend-verification'),
+    (0, common_1.HttpCode)(common_1.HttpStatus.OK),
+    __param(0, (0, common_1.Body)('email')),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", [String]),
+    __metadata("design:returntype", Promise)
+], AuthController.prototype, "resendVerification", null);
 exports.AuthController = AuthController = __decorate([
     (0, common_1.Controller)('api'),
     __metadata("design:paramtypes", [auth_service_1.AuthService])

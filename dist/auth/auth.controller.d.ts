@@ -35,4 +35,10 @@ export declare class AuthController {
         nodeNowLocal: string;
         timezoneOffsetMinutes: number;
     };
+    verifyEmail(token: string): Promise<{
+        message: string;
+    }>;
+    resendVerification(email: string): Promise<{
+        message: string;
+    }>;
 }

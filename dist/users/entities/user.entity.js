@@ -91,6 +91,8 @@ let User = class User {
     }
     resetPasswordToken = null;
     resetPasswordExpires = null;
+    emailVerificationToken = null;
+    emailVerificationExpires = null;
 };
 exports.User = User;
 __decorate([
@@ -149,7 +151,7 @@ __decorate([
     __metadata("design:type", String)
 ], User.prototype, "password", void 0);
 __decorate([
-    (0, typeorm_1.Column)({ default: true }),
+    (0, typeorm_1.Column)({ default: false }),
     __metadata("design:type", Boolean)
 ], User.prototype, "is_active", void 0);
 __decorate([
@@ -220,6 +222,14 @@ __decorate([
     (0, typeorm_1.Column)({ type: 'timestamp', nullable: true, default: null }),
     __metadata("design:type", Object)
 ], User.prototype, "resetPasswordExpires", void 0);
+__decorate([
+    (0, typeorm_1.Column)({ type: 'varchar', nullable: true, default: null }),
+    __metadata("design:type", Object)
+], User.prototype, "emailVerificationToken", void 0);
+__decorate([
+    (0, typeorm_1.Column)({ type: 'timestamp', nullable: true, default: null }),
+    __metadata("design:type", Object)
+], User.prototype, "emailVerificationExpires", void 0);
 exports.User = User = __decorate([
     (0, typeorm_1.Entity)('users')
 ], User);

@@ -57,7 +57,7 @@ export class User {
   @Column()
   password: string = '';
 
-  @Column({ default: true })
+  @Column({ default: false })
   is_active: boolean = true;
 
   @Column({ nullable: true })
@@ -113,4 +113,11 @@ export class User {
 
   @Column({ type: 'timestamp', nullable: true, default: null })
   resetPasswordExpires: Date | null = null;
+
+  // users/entities/user.entity.ts
+  @Column({ type: 'varchar', nullable: true, default: null })
+  emailVerificationToken: string | null = null;
+
+  @Column({ type: 'timestamp', nullable: true, default: null })
+  emailVerificationExpires: Date | null = null;
 }

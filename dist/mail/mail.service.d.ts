@@ -8,4 +8,5 @@ export declare class MailService {
         message: string;
     }): Promise<void>;
     sendReply(to: string, name: string, reply: string): Promise<void>;
+    sendVerificationEmail(to: string, name: string, verifyUrl: string): Promise<void>;
 }

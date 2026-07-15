@@ -27,34 +27,85 @@ export class AuthService {
   // src/auth/auth.service.ts
 
   async signup(dto: SignupDto) {
-    // 1. Password Confirmation Check
-    if (dto.password !== dto.confirmPassword) {
-      throw new BadRequestException('Passwords do not match');
-    }
-
-    // 2. Check if user exists
-    const existing = await this.userRepository.findOne({
-      where: [{ email: dto.email }, { username: dto.username }],
-    });
-    if (existing) {
-      throw new ConflictException('Email or Username already in use');
-    }
-
-    // 3. Map Frontend names to Database Entity names
-    const newUser = this.userRepository.create({
-      username: dto.username,
-      email: dto.email,
-      password: dto.password,
-      first_name: dto.first_name, // Mapping here
-      last_name: dto.last_name, // Mapping here
-      user_category: dto.user_category, // Mapping here
-    });
-
-    // 4. Save (ID and Hash are handled by @BeforeInsert in Entity)
-    await this.userRepository.save(newUser);
-
-    return { message: 'Signup successful' };
+  if (dto.password !== dto.confirmPassword) {
+    throw new BadRequestException('Passwords do not match');
   }
+
+  const existing = await this.userRepository.findOne({
+    where: [{ email: dto.email }, { username: dto.username }],
+  });
+  if (existing) {
+    throw new ConflictException('Email or Username already in use');
+  }
+
+  const token = uuidv4();
+
+  const newUser = this.userRepository.create({
+    username: dto.username,
+    email: dto.email,
+    password: dto.password,
+    first_name: dto.first_name,
+    last_name: dto.last_name,
+    user_category: dto.user_category,
+    is_active: false,
+    emailVerificationToken: token,
+    emailVerificationExpires: new Date(Date.now() + 1000 * 60 * 60 * 24), // 24h
+  });
+
+  await this.userRepository.save(newUser);
+
+  const verifyUrl = `${process.env.FRONTEND_URL}/verify-email?token=${token}`;
+
+  try {
+    await this.mailService.sendVerificationEmail(
+      newUser.email,
+      newUser.first_name || newUser.username,
+      verifyUrl,
+    );
+  } catch (error) {
+    console.error('EMAIL ERROR:', error);
+  }
+
+  return { message: 'Signup successful. Please check your email to verify your account.' };
+}
+
+// ─── VERIFY EMAIL ──────────────────────────────────────────────
+async verifyEmail(token: string): Promise<void> {
+  const cleanToken = token?.trim();
+  const user = await this.userRepository.findOne({
+    where: { emailVerificationToken: cleanToken },
+  });
+
+  if (!user) {
+    throw new BadRequestException('Invalid or expired verification link');
+  }
+  if (!user.emailVerificationExpires || user.emailVerificationExpires < new Date()) {
+    throw new BadRequestException('Verification link has expired. Please sign up again or request a new link.');
+  }
+
+  user.is_active = true;
+  user.emailVerificationToken = null;
+  user.emailVerificationExpires = null;
+  await this.userRepository.save(user);
+}
+
+// Optional: let a user request a fresh link if theirs expired
+async resendVerification(email: string): Promise<void> {
+  const user = await this.userRepository.findOne({ where: { email } });
+  if (!user || user.is_active) return; // stay silent either way
+
+  const token = uuidv4();
+  user.emailVerificationToken = token;
+  user.emailVerificationExpires = new Date(Date.now() + 1000 * 60 * 60 * 24);
+  await this.userRepository.save(user);
+
+  const verifyUrl = `${process.env.FRONTEND_URL}/verify-email?token=${token}`;
+  await this.mailService.sendVerificationEmail(
+    user.email,
+    user.first_name || user.username,
+    verifyUrl,
+  );
+}
 
   async register(dto: RegisterDto): Promise<{ message: string }> {
     if (dto.password !== dto.password_confirmation) {

@@ -13,6 +13,8 @@ export declare class AuthService {
     signup(dto: SignupDto): Promise<{
         message: string;
     }>;
+    verifyEmail(token: string): Promise<void>;
+    resendVerification(email: string): Promise<void>;
     register(dto: RegisterDto): Promise<{
         message: string;
     }>;

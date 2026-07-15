@@ -79,4 +79,18 @@ export class AuthController {
       timezoneOffsetMinutes: new Date().getTimezoneOffset(),
     };
   }
+
+  @Get('/auth/verify-email')
+  async verifyEmail(@Query('token') token: string) {
+    if (!token) throw new BadRequestException('Token is required');
+    await this.authService.verifyEmail(token);
+    return { message: 'Email verified successfully' };
+  }
+
+  @Post('/auth/resend-verification')
+  @HttpCode(HttpStatus.OK)
+  async resendVerification(@Body('email') email: string) {
+    await this.authService.resendVerification(email);
+    return { message: 'If that account exists and is unverified, a new link has been sent.' };
+  }
 }

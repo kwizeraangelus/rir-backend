@@ -56,7 +56,7 @@ export class MailService {
           </div>
           <div style="background: #050A14; padding: 16px; text-align: center;">
             <p style="color: #9ca3af; font-size: 0.75rem; margin: 0;">
-              © 2025 RIRI • Rwanda Innovation & Research Institute
+              © 2025 RIRI •  Discover · Innovate · Inspire
             </p>
           </div>
         </div>
@@ -86,7 +86,7 @@ export class MailService {
       </div>
       <div style="background: #050A14; padding: 16px; text-align: center;">
         <p style="color: #9ca3af; font-size: 0.75rem; margin: 0;">
-          © 2025 RIRI • Rwanda Innovation & Research Institute
+          © 2025 RIRI •  Discover · Innovate · Inspire
         </p>
       </div>
     </div>
@@ -137,7 +137,48 @@ async sendReply(to: string, name: string, reply: string): Promise<void> {
           <p style="color: #374151; margin-top: 24px;">Best regards,<br/>RIRI Team</p>
         </div>
         <div style="background: #050A14; padding: 16px; text-align: center;">
-          <p style="color: #9ca3af; font-size: 0.75rem; margin: 0;">© 2025 RIRI • Rwanda Innovation & Research Institute</p>
+          <p style="color: #9ca3af; font-size: 0.75rem; margin: 0;">© 2025 RIRI •  Discover · Innovate · Inspire</p>
+        </div>
+      </div>
+    `,
+    });
+  }
+
+  async sendVerificationEmail(to: string, name: string, verifyUrl: string): Promise<void> {
+  await this.transporter.sendMail({
+    from: `"RIRI Platform" <${process.env.MAIL_FROM}>`,
+    to,
+    subject: 'Verify your RIRI account',
+    html: `
+      <div style="font-family: sans-serif; max-width: 600px; margin: 0 auto;">
+        <div style="background: #050A14; padding: 24px; text-align: center;">
+          <h1 style="color: #FFD700; margin: 0; font-size: 2rem; font-style: italic;">RIRI</h1>
+        </div>
+        <div style="padding: 32px; background: #f9fafb; border: 1px solid #e5e7eb;">
+          <h2 style="color: #050A14;">Hello ${name},</h2>
+          <p style="color: #374151; line-height: 1.6;">
+            Thanks for signing up. Please confirm your email address to activate your account.
+            This link expires in <strong>24 hours</strong>.
+          </p>
+          <div style="text-align: center; margin: 32px 0;">
+            <a href="${verifyUrl}"
+               style="background: #FFD700; color: #050A14; padding: 14px 32px;
+                      border-radius: 9999px; text-decoration: none; font-weight: bold;
+                      font-size: 1rem; display: inline-block;">
+              Verify Email
+            </a>
+          </div>
+          <p style="color: #6b7280; font-size: 0.875rem;">
+            If you didn't create an account with RIRI, you can safely ignore this email.
+          </p>
+          <p style="color: #9ca3af; font-size: 0.75rem; word-break: break-all;">
+            Or copy this link: ${verifyUrl}
+          </p>
+        </div>
+        <div style="background: #050A14; padding: 16px; text-align: center;">
+          <p style="color: #9ca3af; font-size: 0.75rem; margin: 0;">
+            © 2025 RIRI •  Discover · Innovate · Inspire
+          </p>
         </div>
       </div>
     `,
