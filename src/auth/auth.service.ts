@@ -191,29 +191,38 @@ export class AuthService {
   }
 
   async forgotPassword(email: string): Promise<void> {
-    const user = await this.userRepository.findOne({ where: { email } });
+  const user = await this.userRepository.findOne({ where: { email } });
+  if (!user) return;
 
-    // Always return success even if email not found (security best practice)
-    if (!user) return;
+  // Reuse existing token if it's still valid — avoids invalidating
+  // an email link that's already been sent, if the user (or a double
+  // click) triggers this again before the first link is used.
+  const stillValid =
+    user.resetPasswordToken &&
+    user.resetPasswordExpires &&
+    user.resetPasswordExpires > new Date();
 
-    const token = uuidv4();
-    const expiresAt = new Date(Date.now() + 1000 * 60 * 60); // 1 hour from now
+  let token = user.resetPasswordToken;
 
+  if (!stillValid) {
+    token = uuidv4();
     user.resetPasswordToken = token;
-    user.resetPasswordExpires = expiresAt;
+    user.resetPasswordExpires = new Date(Date.now() + 1000 * 60 * 60);
     await this.userRepository.save(user);
-
-    const resetUrl = `${process.env.FRONTEND_URL}/reset-password?token=${token}`;
-
-    try {
-  await this.mailService.sendPasswordReset(
-    user.email,
-    user.first_name || user.username,
-    resetUrl,
-  );
-} catch (error) {
-  console.error('EMAIL ERROR:', error);}
   }
+
+  const resetUrl = `${process.env.FRONTEND_URL}/reset-password?token=${token}`;
+
+  try {
+    await this.mailService.sendPasswordReset(
+      user.email,
+      user.first_name || user.username,
+      resetUrl,
+    );
+  } catch (error) {
+    console.error('EMAIL ERROR:', error);
+  }
+}
 
   // ─── VERIFY RESET TOKEN ───────────────────────────────────────────────────
   async verifyResetToken(token: string): Promise<boolean> {

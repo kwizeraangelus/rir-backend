@@ -194,11 +194,16 @@ let AuthService = class AuthService {
         const user = await this.userRepository.findOne({ where: { email } });
         if (!user)
             return;
-        const token = (0, uuid_1.v4)();
-        const expiresAt = new Date(Date.now() + 1000 * 60 * 60);
-        user.resetPasswordToken = token;
-        user.resetPasswordExpires = expiresAt;
-        await this.userRepository.save(user);
+        const stillValid = user.resetPasswordToken &&
+            user.resetPasswordExpires &&
+            user.resetPasswordExpires > new Date();
+        let token = user.resetPasswordToken;
+        if (!stillValid) {
+            token = (0, uuid_1.v4)();
+            user.resetPasswordToken = token;
+            user.resetPasswordExpires = new Date(Date.now() + 1000 * 60 * 60);
+            await this.userRepository.save(user);
+        }
         const resetUrl = `${process.env.FRONTEND_URL}/reset-password?token=${token}`;
         try {
             await this.mailService.sendPasswordReset(user.email, user.first_name || user.username, resetUrl);
