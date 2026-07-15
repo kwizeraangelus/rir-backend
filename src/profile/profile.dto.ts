@@ -12,6 +12,10 @@ export class UpdateProfileDto {
   @IsOptional() @IsString() graduation_university?: string;
   @IsOptional() @IsString() bio?: string;
   @IsOptional() @IsString() orcid?: string;
+  @IsOptional() @IsString() qualification?: string;
+  @IsOptional() @IsString() ResearchArea?: string;
+  @IsOptional() @IsString() Position?: string;
+  @IsOptional() @IsString() Field?: string;
 
   @IsOptional() @IsString() university_name?: string;
   @IsOptional() @IsString() email?: string;

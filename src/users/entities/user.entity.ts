@@ -108,9 +108,9 @@ export class User {
   async hashPassword() {
     this.password = await bcrypt.hash(this.password, 10);
   }
-@Column({ type: 'varchar', nullable: true, default: null })
-resetPasswordToken: string | null;
+  @Column({ type: 'varchar', nullable: true, default: null })
+  resetPasswordToken: string | null = null;
 
-@Column({ type: 'timestamp', nullable: true, default: null })
-resetPasswordExpires: Date | null;
+  @Column({ type: 'timestamp', nullable: true, default: null })
+  resetPasswordExpires: Date | null = null;
 }

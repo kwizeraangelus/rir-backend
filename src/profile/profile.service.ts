@@ -64,6 +64,10 @@ export class ProfileService {
       'bio',
       'orcid',
       'university_name',
+      'qualification',
+      'ResearchArea',
+      'Position',
+      'Field',
     ];
     for (const key of fields) {
       if (dto[key] !== undefined) (user as unknown as Record<string, unknown>)[key] = dto[key];

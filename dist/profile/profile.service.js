@@ -92,6 +92,10 @@ let ProfileService = class ProfileService {
             'bio',
             'orcid',
             'university_name',
+            'qualification',
+            'ResearchArea',
+            'Position',
+            'Field',
         ];
         for (const key of fields) {
             if (dto[key] !== undefined)

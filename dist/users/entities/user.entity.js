@@ -89,8 +89,8 @@ let User = class User {
     async hashPassword() {
         this.password = await bcrypt.hash(this.password, 10);
     }
-    resetPasswordToken;
-    resetPasswordExpires;
+    resetPasswordToken = null;
+    resetPasswordExpires = null;
 };
 exports.User = User;
 __decorate([
