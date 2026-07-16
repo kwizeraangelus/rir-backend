@@ -66,8 +66,8 @@ let ResearcherService = class ResearcherService {
             updateData.orcid = body.platformId;
         if (body.qualification !== undefined)
             updateData.qualification = body.qualification;
-        if (body.Graduation_university !== undefined)
-            updateData.Graduation_university = body.Graduation_university;
+        if (body.graduation_university !== undefined)
+            updateData.graduation_university = body.graduation_university;
         if (body.Field !== undefined)
             updateData.Field = body.Field;
         if (body.Position !== undefined)

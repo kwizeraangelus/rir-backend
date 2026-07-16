@@ -52,7 +52,7 @@ export class ResearcherService {
     if (body.orcid !== undefined) updateData.orcid = body.orcid;
     if (body.platformId !== undefined) updateData.orcid = body.platformId;
     if (body.qualification !== undefined) updateData.qualification = body.qualification;
-    if (body.Graduation_university !== undefined) updateData.Graduation_university = body.Graduation_university;
+    if (body.graduation_university !== undefined) updateData.graduation_university = body.graduation_university;
     if (body.Field !== undefined) updateData.Field = body.Field;
     if (body.Position !== undefined) updateData.Position = body.Position;
     if(body.institution !== undefined) updateData.institution = body.institution;

@@ -56,7 +56,7 @@ export class MailService {
           </div>
           <div style="background: #050A14; padding: 16px; text-align: center;">
             <p style="color: #9ca3af; font-size: 0.75rem; margin: 0;">
-              © 2025 RIRI •  Discover · Innovate · Inspire
+              © 2025 RIRI •  Discover and Innovate for Inspire
             </p>
           </div>
         </div>
@@ -86,7 +86,7 @@ export class MailService {
       </div>
       <div style="background: #050A14; padding: 16px; text-align: center;">
         <p style="color: #9ca3af; font-size: 0.75rem; margin: 0;">
-          © 2025 RIRI •  Discover · Innovate · Inspire
+          © 2025 RIRI •  Discover and Innovate for Inspire
         </p>
       </div>
     </div>
@@ -137,7 +137,7 @@ async sendReply(to: string, name: string, reply: string): Promise<void> {
           <p style="color: #374151; margin-top: 24px;">Best regards,<br/>RIRI Team</p>
         </div>
         <div style="background: #050A14; padding: 16px; text-align: center;">
-          <p style="color: #9ca3af; font-size: 0.75rem; margin: 0;">© 2025 RIRI •  Discover · Innovate · Inspire</p>
+          <p style="color: #9ca3af; font-size: 0.75rem; margin: 0;">© 2025 RIRI •  Discover and Innovate for Inspire</p>
         </div>
       </div>
     `,
@@ -177,7 +177,7 @@ async sendReply(to: string, name: string, reply: string): Promise<void> {
         </div>
         <div style="background: #050A14; padding: 16px; text-align: center;">
           <p style="color: #9ca3af; font-size: 0.75rem; margin: 0;">
-            © 2025 RIRI •  Discover · Innovate · Inspire
+            © 2025 RIRI •  Discover and Innovate for Inspire
           </p>
         </div>
       </div>
