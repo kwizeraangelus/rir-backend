@@ -1,5 +1,6 @@
 export declare class MailService {
     private transporter;
+    constructor();
     sendPasswordReset(to: string, name: string, resetUrl: string): Promise<void>;
     sendContactNotification(data: {
         name: string;

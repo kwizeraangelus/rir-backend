@@ -4,6 +4,7 @@ import * as nodemailer from 'nodemailer';
 
 @Injectable()
 export class MailService {
+  
   private transporter = nodemailer.createTransport({
     host: process.env.MAIL_HOST,
     port: Number(process.env.MAIL_PORT) || 587,
@@ -18,6 +19,18 @@ export class MailService {
       rejectUnauthorized: false,
     },
   });
+
+  constructor() {
+    console.log('=== Mail Transporter Config ===');
+    console.log({
+      host: process.env.MAIL_HOST,
+      port: process.env.MAIL_PORT,
+      user: process.env.MAIL_USER,
+      passLength: process.env.MAIL_PASS?.length,
+      mailFrom: process.env.MAIL_FROM,
+    });
+    console.log('=============================');
+  }
 
   async sendPasswordReset(
     to: string,

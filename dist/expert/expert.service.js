@@ -18,6 +18,7 @@ const typeorm_1 = require("@nestjs/typeorm");
 const typeorm_2 = require("typeorm");
 const expert_entity_1 = require("./entities/expert.entity");
 const uuid_1 = require("uuid");
+const r2_storage_1 = require("../storage/r2.storage");
 let ExpertService = class ExpertService {
     expertRepository;
     constructor(expertRepository) {
@@ -84,9 +85,14 @@ let ExpertService = class ExpertService {
         expert.verified = false;
         return await this.expertRepository.save(expert);
     }
-    async uploadProfileImage(id, filePath) {
+    async uploadImage(file) {
+        const url = await (0, r2_storage_1.uploadFileToR2)(file, 'profiles');
+        return { url };
+    }
+    async uploadProfileImage(id, file) {
         const expert = await this.findOne(id);
-        expert.profileImage = filePath;
+        const url = await (0, r2_storage_1.uploadFileToR2)(file, 'profiles');
+        expert.profileImage = url;
         return await this.expertRepository.save(expert);
     }
 };

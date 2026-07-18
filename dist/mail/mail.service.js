@@ -38,6 +38,9 @@ var __importStar = (this && this.__importStar) || (function () {
         return result;
     };
 })();
+var __metadata = (this && this.__metadata) || function (k, v) {
+    if (typeof Reflect === "object" && typeof Reflect.metadata === "function") return Reflect.metadata(k, v);
+};
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.MailService = void 0;
 const common_1 = require("@nestjs/common");
@@ -57,6 +60,17 @@ let MailService = class MailService {
             rejectUnauthorized: false,
         },
     });
+    constructor() {
+        console.log('=== Mail Transporter Config ===');
+        console.log({
+            host: process.env.MAIL_HOST,
+            port: process.env.MAIL_PORT,
+            user: process.env.MAIL_USER,
+            passLength: process.env.MAIL_PASS?.length,
+            mailFrom: process.env.MAIL_FROM,
+        });
+        console.log('=============================');
+    }
     async sendPasswordReset(to, name, resetUrl) {
         await this.transporter.sendMail({
             from: `"RIRI Platform" <${process.env.MAIL_FROM}>`,
@@ -207,6 +221,7 @@ let MailService = class MailService {
 };
 exports.MailService = MailService;
 exports.MailService = MailService = __decorate([
-    (0, common_1.Injectable)()
+    (0, common_1.Injectable)(),
+    __metadata("design:paramtypes", [])
 ], MailService);
 //# sourceMappingURL=mail.service.js.map

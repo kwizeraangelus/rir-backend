@@ -15,5 +15,8 @@ export declare class ExpertService {
     }>;
     verify(id: string): Promise<Expert>;
     unverify(id: string): Promise<Expert>;
-    uploadProfileImage(id: string, filePath: string): Promise<Expert>;
+    uploadImage(file: Express.Multer.File): Promise<{
+        url: string;
+    }>;
+    uploadProfileImage(id: string, file: Express.Multer.File): Promise<Expert>;
 }

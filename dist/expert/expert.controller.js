@@ -19,7 +19,9 @@ const expert_service_1 = require("./expert.service");
 const create_expert_dto_1 = require("./dto/create-expert.dto");
 const update_expert_dto_1 = require("./dto/update-expert.dto");
 const admin_guard_1 = require("../auth/admin.guard");
+const multer_1 = require("multer");
 const jwt_auth_guard_1 = require("../auth/jwt-auth/jwt-auth.guard");
+const memory = (0, multer_1.memoryStorage)();
 let ExpertController = class ExpertController {
     expertService;
     constructor(expertService) {
@@ -46,12 +48,17 @@ let ExpertController = class ExpertController {
     async unverify(id) {
         return await this.expertService.unverify(id);
     }
+    async uploadStandaloneImage(file) {
+        if (!file) {
+            throw new Error('No file uploaded');
+        }
+        return await this.expertService.uploadImage(file);
+    }
     async uploadProfileImage(id, file) {
         if (!file) {
             throw new Error('No file uploaded');
         }
-        const filePath = `/uploads/profiles/${file.filename}`;
-        return await this.expertService.uploadProfileImage(id, filePath);
+        return await this.expertService.uploadProfileImage(id, file);
     }
 };
 exports.ExpertController = ExpertController;
@@ -111,8 +118,17 @@ __decorate([
 ], ExpertController.prototype, "unverify", null);
 __decorate([
     (0, common_1.UseGuards)(jwt_auth_guard_1.JwtAuthGuard, admin_guard_1.AdminGuard),
+    (0, common_1.Post)('upload-profile-image'),
+    (0, common_1.UseInterceptors)((0, platform_express_1.FileInterceptor)('file', { storage: memory })),
+    __param(0, (0, common_1.UploadedFile)()),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", [Object]),
+    __metadata("design:returntype", Promise)
+], ExpertController.prototype, "uploadStandaloneImage", null);
+__decorate([
+    (0, common_1.UseGuards)(jwt_auth_guard_1.JwtAuthGuard, admin_guard_1.AdminGuard),
     (0, common_1.Post)(':id/upload-profile-image'),
-    (0, common_1.UseInterceptors)((0, platform_express_1.FileInterceptor)('file')),
+    (0, common_1.UseInterceptors)((0, platform_express_1.FileInterceptor)('file', { storage: memory })),
     __param(0, (0, common_1.Param)('id')),
     __param(1, (0, common_1.UploadedFile)()),
     __metadata("design:type", Function),

@@ -15,8 +15,11 @@ import { ExpertService } from './expert.service';
 import { CreateExpertDto } from './dto/create-expert.dto';
 import { UpdateExpertDto } from './dto/update-expert.dto';
 import { AdminGuard } from '../auth/admin.guard';
+import { memoryStorage } from 'multer';
 import { JwtAuthGuard } from '../auth/jwt-auth/jwt-auth.guard';
 import { Expert } from './entities/expert.entity';
+
+const memory = memoryStorage();
 
 @Controller('experts')
 export class ExpertController {
@@ -67,17 +70,30 @@ export class ExpertController {
     return await this.expertService.unverify(id);
   }
 
-  @UseGuards(JwtAuthGuard, AdminGuard)
-  @Post(':id/upload-profile-image')
-  @UseInterceptors(FileInterceptor('file'))
-  async uploadProfileImage(
-    @Param('id') id: string,
-    @UploadedFile() file: Express.Multer.File,
-  ): Promise<Expert> {
-    if (!file) {
-      throw new Error('No file uploaded');
-    }
-    const filePath = `/uploads/profiles/${file.filename}`;
-    return await this.expertService.uploadProfileImage(id, filePath);
+// Standalone — used during CREATE, before an expert id exists
+@UseGuards(JwtAuthGuard, AdminGuard)
+@Post('upload-profile-image')
+@UseInterceptors(FileInterceptor('file', { storage: memory }))
+async uploadStandaloneImage(
+  @UploadedFile() file: Express.Multer.File,
+): Promise<{ url: string }> {
+  if (!file) {
+    throw new Error('No file uploaded');
   }
+  return await this.expertService.uploadImage(file);
+}
+
+// ID-scoped — used to replace an image on an EXISTING expert
+@UseGuards(JwtAuthGuard, AdminGuard)
+@Post(':id/upload-profile-image')
+@UseInterceptors(FileInterceptor('file', { storage: memory }))
+async uploadProfileImage(
+  @Param('id') id: string,
+  @UploadedFile() file: Express.Multer.File,
+): Promise<Expert> {
+  if (!file) {
+    throw new Error('No file uploaded');
+  }
+  return await this.expertService.uploadProfileImage(id, file);
+}
 }

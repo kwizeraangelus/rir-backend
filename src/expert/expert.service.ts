@@ -5,6 +5,7 @@ import { CreateExpertDto } from './dto/create-expert.dto';
 import { UpdateExpertDto } from './dto/update-expert.dto';
 import { Expert } from './entities/expert.entity';
 import { v4 as uuidv4 } from 'uuid';
+import { uploadFileToR2 } from 'src/storage/r2.storage';
 
 @Injectable()
 export class ExpertService {
@@ -91,9 +92,15 @@ export class ExpertService {
     return await this.expertRepository.save(expert);
   }
 
-  async uploadProfileImage(id: string, filePath: string): Promise<Expert> {
-    const expert = await this.findOne(id);
-    expert.profileImage = filePath;
-    return await this.expertRepository.save(expert);
-  }
+ async uploadImage(file: Express.Multer.File): Promise<{ url: string }> {
+  const url = await uploadFileToR2(file, 'profiles');
+  return { url };
+}
+
+async uploadProfileImage(id: string, file: Express.Multer.File): Promise<Expert> {
+  const expert = await this.findOne(id);
+  const url = await uploadFileToR2(file, 'profiles');
+  expert.profileImage = url;
+  return await this.expertRepository.save(expert);
+}
 }
