@@ -7,8 +7,8 @@ export class MailService {
   
   private transporter = nodemailer.createTransport({
     host: process.env.MAIL_HOST,
-    port: Number(process.env.MAIL_PORT) || 587,
-    secure: false,
+    port: Number(process.env.MAIL_PORT) || 465,
+    secure: true,
     requireTLS: true,
     family: 4,
     auth: {
