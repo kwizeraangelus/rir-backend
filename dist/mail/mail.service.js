@@ -48,8 +48,8 @@ const nodemailer = __importStar(require("nodemailer"));
 let MailService = class MailService {
     transporter = nodemailer.createTransport({
         host: process.env.MAIL_HOST,
-        port: Number(process.env.MAIL_PORT) || 465,
-        secure: true,
+        port: Number(process.env.MAIL_PORT) || 587,
+        secure: false,
         requireTLS: true,
         family: 4,
         auth: {
@@ -61,15 +61,14 @@ let MailService = class MailService {
         },
     });
     constructor() {
-        console.log('=== Mail Transporter Config ===');
-        console.log({
-            host: process.env.MAIL_HOST,
-            port: process.env.MAIL_PORT,
-            user: process.env.MAIL_USER,
-            passLength: process.env.MAIL_PASS?.length,
-            mailFrom: process.env.MAIL_FROM,
-        });
-        console.log('=============================');
+        console.log('🚨 MAIL SERVICE INITIALIZED - FULL DEBUG');
+        console.log('MAIL_HOST:', `'${process.env.MAIL_HOST}'`);
+        console.log('MAIL_PORT:', `'${process.env.MAIL_PORT}'`);
+        console.log('MAIL_USER:', `'${process.env.MAIL_USER}'`);
+        console.log('MAIL_PASS length:', process.env.MAIL_PASS?.length);
+        console.log('MAIL_FROM:', `'${process.env.MAIL_FROM}'`);
+        console.log('HOSTINGER_EMAIL:', `'${process.env.HOSTINGER_EMAIL}'`);
+        console.log('Process env keys containing email:', Object.keys(process.env).filter(k => k.includes('MAIL') || k.includes('EMAIL')));
     }
     async sendPasswordReset(to, name, resetUrl) {
         await this.transporter.sendMail({
