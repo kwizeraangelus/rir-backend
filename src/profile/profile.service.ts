@@ -7,8 +7,9 @@ import {
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import * as bcrypt from 'bcrypt';
-import { User } from '../users/entities/user.entity';
-import { UpdateProfileDto, ChangePasswordDto } from './profile.dto';
+import { User, UserCategory } from '../users/entities/user.entity';
+import { UpdateProfileDto, ChangePasswordDto, UpdateResearcherProfileDto } from './profile.dto';
+
 
 @Injectable()
 export class ProfileService {
@@ -128,4 +129,46 @@ export class ProfileService {
     await this.userRepo.save(user);
     return { message: 'Password changed successfully' };
   }
+
+
+  async completeResearcherProfile(targetId: string, dto: UpdateResearcherProfileDto) {
+  const user = await this.findOrFail(targetId);
+
+  if (user.user_category !== UserCategory.RESEARCHER) {
+    throw new ForbiddenException('Only researcher accounts have this profile step');
+  }
+
+  const tokenValid =
+    user.emailVerificationToken &&
+    user.emailVerificationToken === dto.token &&
+    user.emailVerificationExpires &&
+    user.emailVerificationExpires > new Date();
+
+  if (!tokenValid) {
+    throw new UnauthorizedException(
+      'This link has expired. Please sign up again or contact support.',
+    );
+  }
+
+  const fields: (keyof UpdateResearcherProfileDto)[] = [
+    'location',
+    'institution',
+    'graduation_university',
+    'graduation_country',
+    'bio',
+    'orcid',
+    'qualification',
+    'ResearchArea',
+    'Position',
+    'Field',
+  ];
+  for (const key of fields) {
+    if (dto[key] !== undefined) {
+      (user as unknown as Record<string, unknown>)[key] = dto[key];
+    }
+  }
+
+  await this.userRepo.save(user);
+  return { message: 'Profile saved' }; // no stripPassword(user) — unauthenticated caller
+}
 }

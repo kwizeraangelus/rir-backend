@@ -1,5 +1,6 @@
 import { IsOptional, IsString, IsInt, Min, MinLength } from 'class-validator';
 import { Type } from 'class-transformer';
+import { OmitType } from '@nestjs/mapped-types';
 
 export class UpdateProfileDto {
   @IsOptional() @IsString() first_name?: string;
@@ -23,4 +24,20 @@ export class UpdateProfileDto {
 export class ChangePasswordDto {
   @IsString() current_password: string = '';
   @IsString() @MinLength(6) new_password: string = '';
+}
+
+export class UpdateResearcherProfileDto extends OmitType(UpdateProfileDto, [
+  'email',
+  'university_name',
+  'first_name',
+  'last_name',
+  'phone_number',
+  'age',
+] as const) {
+  @IsString()
+  token: string;
+
+  @IsOptional()
+  @IsString()
+  graduation_country?: string;
 }

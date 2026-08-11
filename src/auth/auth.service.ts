@@ -27,7 +27,7 @@ export class AuthService {
   // src/auth/auth.service.ts
 
   async signup(dto: SignupDto) {
-  if (dto.password !== dto.confirmPassword) {
+   if (dto.password !== dto.confirmPassword) {
     throw new BadRequestException('Passwords do not match');
   }
 
@@ -39,7 +39,6 @@ export class AuthService {
   }
 
   const token = uuidv4();
-
   const newUser = this.userRepository.create({
     username: dto.username,
     email: dto.email,
@@ -55,7 +54,6 @@ export class AuthService {
   await this.userRepository.save(newUser);
 
   const verifyUrl = `${process.env.FRONTEND_URL}/verify-email?token=${token}`;
-
   try {
     await this.mailService.sendVerificationEmail(
       newUser.email,
@@ -66,7 +64,13 @@ export class AuthService {
     console.error('EMAIL ERROR:', error);
   }
 
-  return { message: 'Signup successful. Please check your email to verify your account.' };
+ const isResearcher = dto.user_category === UserCategory.RESEARCHER;
+
+return {
+  message: 'Signup successful. Please check your email to verify your account.',
+  userId: isResearcher ? newUser.id : undefined,
+  profileToken: isResearcher ? token : undefined,
+};
 }
 
 // ─── VERIFY EMAIL ──────────────────────────────────────────────
@@ -108,26 +112,45 @@ async resendVerification(email: string): Promise<void> {
 }
 
   async register(dto: RegisterDto): Promise<{ message: string }> {
-    if (dto.password !== dto.password_confirmation) {
-      throw new BadRequestException('Passwords do not match');
-    }
-
-    const existing = await this.userRepository.findOne({
-      where: [{ email: dto.email }, { username: dto.username }],
-    });
-    if (existing) {
-      throw new ConflictException(
-        existing.email === dto.email
-          ? 'Email already in use'
-          : 'Username already taken',
-      );
-    }
-
-    const user = this.userRepository.create(dto);
-    await this.userRepository.save(user);
-
-    return { message: 'User registered successfully' };
+  if (dto.password !== dto.password_confirmation) {
+    throw new BadRequestException('Passwords do not match');
   }
+
+  const existing = await this.userRepository.findOne({
+    where: [{ email: dto.email }, { username: dto.username }],
+  });
+  if (existing) {
+    throw new ConflictException(
+      existing.email === dto.email
+        ? 'Email already in use'
+        : 'Username already taken',
+    );
+  }
+
+  const isResearcher = dto.user_category === UserCategory.RESEARCHER;
+  const isUniversity = dto.user_category === UserCategory.UNIVERSITY;
+
+  const user = this.userRepository.create({
+    username: dto.username,
+    email: dto.email,
+    password: dto.password,
+    first_name: dto.first_name,
+    last_name: dto.last_name,
+    phone_number: dto.phone_number,
+    user_category: dto.user_category,
+    university_name: isUniversity ? dto.university_name : undefined,
+    Position: isResearcher ? dto.position : undefined,
+    institution: isResearcher ? dto.institution : undefined,
+    Field: isResearcher ? dto.field : undefined,
+    ResearchArea: isResearcher ? dto.research_area : undefined,
+    qualification: isResearcher ? dto.qualification : undefined,
+    location: isResearcher ? dto.location : undefined,
+  });
+
+  await this.userRepository.save(user);
+
+  return { message: 'User registered successfully' };
+}
 
   async login(
     loginDto: LoginDto,

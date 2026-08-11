@@ -40,6 +40,30 @@ export class RegisterDto {
   @IsNotEmpty({ message: 'University name required for university category' })
   university_name?: string;
 
+  @IsOptional()
+  @IsString()
+  position?: string;
+
+  @IsOptional()
+  @IsString()
+  institution?: string;
+
+  @IsOptional()
+  @IsString()
+  field?: string;
+
+  @IsOptional()
+  @IsString()
+  research_area?: string;
+
+  @IsOptional()
+  @IsString()
+  qualification?: string;
+
+  @IsOptional()
+  @IsString()
+  location?: string;
+
   @IsString()
   @IsNotEmpty()
   @MinLength(8, { message: 'Password must be at least 8 characters' })
