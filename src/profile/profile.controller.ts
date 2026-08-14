@@ -69,7 +69,6 @@ export class ProfileController {
     return this.profileService.changePassword(id, req.user.userId, req.user.is_staff, dto);
   }
 
-  
   @Patch(':id/complete-researcher')
   @UseGuards()
   async completeResearcherProfile(

@@ -7,6 +7,7 @@ import {
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import * as bcrypt from 'bcrypt';
+import { MailService } from '../mail/mail.service';
 import { User, UserCategory } from '../users/entities/user.entity';
 import { UpdateProfileDto, ChangePasswordDto, UpdateResearcherProfileDto } from './profile.dto';
 
@@ -16,6 +17,7 @@ export class ProfileService {
   constructor(
     @InjectRepository(User)
     private readonly userRepo: Repository<User>,
+    private readonly mailService: MailService,
   ) {}
 
   private stripPassword(user: User) {
@@ -151,16 +153,8 @@ export class ProfileService {
   }
 
   const fields: (keyof UpdateResearcherProfileDto)[] = [
-    'location',
-    'institution',
-    'graduation_university',
-    'graduation_country',
-    'bio',
-    'orcid',
-    'qualification',
-    'ResearchArea',
-    'Position',
-    'Field',
+    'location', 'institution', 'graduation_university', 'graduation_country',
+    'bio', 'orcid', 'qualification', 'ResearchArea', 'Position', 'Field',
   ];
   for (const key of fields) {
     if (dto[key] !== undefined) {
@@ -169,6 +163,19 @@ export class ProfileService {
   }
 
   await this.userRepo.save(user);
-  return { message: 'Profile saved' }; // no stripPassword(user) — unauthenticated caller
+
+  // Signup form + profile form are both saved now — send confirmation email.
+  const verifyUrl = `${process.env.FRONTEND_URL}/verify-email?token=${dto.token}`;
+  try {
+    await this.mailService.sendVerificationEmail(
+      user.email,
+      user.first_name || user.username,
+      verifyUrl,
+    );
+  } catch (error) {
+    console.error('EMAIL ERROR:', error);
+  }
+
+  return { message: 'Profile saved. Please check your email to verify your account.' };
 }
 }

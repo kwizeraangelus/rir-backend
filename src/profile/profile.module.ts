@@ -7,10 +7,12 @@ import * as fs from 'fs';
 import { ProfileController } from './profile.controller';
 import { ProfileService } from './profile.service';
 import { User } from '../users/entities/user.entity';
+import { MailModule } from '../mail/mail.module';
 
 @Module({
   imports: [
     TypeOrmModule.forFeature([User]),
+    MailModule,
     MulterModule.register({
       storage: diskStorage({
         destination: (_req, file, cb) => {

@@ -97,6 +97,9 @@ export class User {
   @Column({ default: false })
   isExpert: boolean = false;
 
+  @Column({ nullable: true })
+  graduation_country?: string;
+
   @BeforeInsert()
   generateId() {
     if (!this.id) {

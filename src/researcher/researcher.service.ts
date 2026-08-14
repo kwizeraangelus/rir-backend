@@ -53,6 +53,7 @@ export class ResearcherService {
     if (body.platformId !== undefined) updateData.orcid = body.platformId;
     if (body.qualification !== undefined) updateData.qualification = body.qualification;
     if (body.graduation_university !== undefined) updateData.graduation_university = body.graduation_university;
+    if (body.graduation_country !== undefined) updateData.graduation_country = body.graduation_country;
     if (body.Field !== undefined) updateData.Field = body.Field;
     if (body.Position !== undefined) updateData.Position = body.Position;
     if(body.institution !== undefined) updateData.institution = body.institution;
@@ -91,7 +92,7 @@ export class ResearcherService {
         .select([
           'user.id', 'user.first_name', 'user.last_name', 'user.email',
           'user.phone_number', 'user.qualification', 'user.Position', 'user.location','institution',
-          'user.Field', 'user.ResearchArea', 'user.bio', 'user.profile_image', 'user.orcid', 'user.graduation_university'
+          'user.Field', 'user.ResearchArea', 'user.bio', 'user.profile_image', 'user.orcid', 'user.graduation_university', 'user.graduation_country'
         ]);
 
       if (search) {
@@ -129,7 +130,7 @@ export class ResearcherService {
         select: [
           'id', 'first_name', 'last_name', 'email', 'phone_number',
           'qualification', 'Field', 'Position', 'ResearchArea', 'bio',
-          'profile_image', 'orcid', 'university_name', 'graduation_university', 'location','institution',
+          'profile_image', 'orcid', 'university_name', 'graduation_university', 'location','institution','graduation_country',
         ],
       });
 
@@ -156,6 +157,7 @@ export class ResearcherService {
         orcid: user.orcid,
         university: user.university_name,
         graduation_university: user.graduation_university,
+        graduation_country: user.graduation_country || 'Not Specified',
         location: user.location || 'Not Specified',
         publications: publications || [],
       };
@@ -176,7 +178,7 @@ export class ResearcherService {
         'user.id', 'user.first_name', 'user.last_name', 'user.email',
         'user.phone_number', 'user.qualification', 'user.ResearchArea',
         'user.Position', 'user.Field', 'user.bio', 'user.profile_image', 'user.orcid',
-        'user.graduation_university', 'user.location','user.institution',
+        'user.graduation_university', 'user.location','user.institution','user.graduation_country',
       ]);
 
     if (search) {

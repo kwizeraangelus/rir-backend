@@ -53,24 +53,30 @@ export class AuthService {
 
   await this.userRepository.save(newUser);
 
-  const verifyUrl = `${process.env.FRONTEND_URL}/verify-email?token=${token}`;
-  try {
-    await this.mailService.sendVerificationEmail(
-      newUser.email,
-      newUser.first_name || newUser.username,
-      verifyUrl,
-    );
-  } catch (error) {
-    console.error('EMAIL ERROR:', error);
+  const isResearcher = dto.user_category === UserCategory.RESEARCHER;
+
+  // Only send the verification email now if there's no extra profile step.
+  // Researchers get theirs sent after they finish their profile.
+  if (!isResearcher) {
+    const verifyUrl = `${process.env.FRONTEND_URL}/verify-email?token=${token}`;
+    try {
+      await this.mailService.sendVerificationEmail(
+        newUser.email,
+        newUser.first_name || newUser.username,
+        verifyUrl,
+      );
+    } catch (error) {
+      console.error('EMAIL ERROR:', error);
+    }
   }
 
- const isResearcher = dto.user_category === UserCategory.RESEARCHER;
-
-return {
-  message: 'Signup successful. Please check your email to verify your account.',
-  userId: isResearcher ? newUser.id : undefined,
-  profileToken: isResearcher ? token : undefined,
-};
+  return {
+    message: isResearcher
+      ? 'Almost done — complete your researcher profile next.'
+      : 'Signup successful. Please check your email to verify your account.',
+    userId: isResearcher ? newUser.id : undefined,
+    profileToken: isResearcher ? token : undefined,
+  };
 }
 
 // ─── VERIFY EMAIL ──────────────────────────────────────────────
