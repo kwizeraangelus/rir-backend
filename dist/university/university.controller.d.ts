@@ -35,7 +35,7 @@ export declare class UniversityController {
     getPublicList(search?: string, degreeType?: string, fieldKeywords?: string): Promise<any[]>;
     getPublicCounts(degreeType?: string): Promise<{
         thesis: number;
-        dissertation: number;
+        FYP: number;
         engineering: number;
         medicine_health_sciences: number;
         arts_humanities: number;
@@ -58,4 +58,7 @@ export declare class UniversityController {
         average: number;
     }>;
     updateUpload(req: any, id: string, body: any, file?: Express.Multer.File): Promise<import("./entities/university-upload.entity").UniversityUpload | null>;
+    deleteUpload(req: any, id: string): Promise<{
+        success: boolean;
+    }>;
 }

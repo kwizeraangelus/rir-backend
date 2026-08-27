@@ -89,8 +89,8 @@ export class UniversityController {
   @Post('upload')
   @UseInterceptors(FileInterceptor('file', researchUploadConfig))
   async uploadResearch(
-    @Req() req, 
-    @Body() body, 
+    @Req() req,
+    @Body() body,
     @UploadedFile(
       new ParseFilePipe({
         validators: [
@@ -197,5 +197,11 @@ async updateUpload(
 ) {
   const filePath = file ? await uploadFileToR2(file, 'research') : undefined;
   return this.universityService.updateUpload(req.user.userId, id, body, filePath);
+}
+
+@UseGuards(JwtAuthGuard)
+@Delete('upload/:id')
+async deleteUpload(@Req() req, @Param('id') id: string) {
+  return this.universityService.deleteUpload(req.user.userId, id);
 }
 }

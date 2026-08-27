@@ -110,6 +110,9 @@ let UniversityController = class UniversityController {
         const filePath = file ? await (0, r2_storage_1.uploadFileToR2)(file, 'research') : undefined;
         return this.universityService.updateUpload(req.user.userId, id, body, filePath);
     }
+    async deleteUpload(req, id) {
+        return this.universityService.deleteUpload(req.user.userId, id);
+    }
 };
 exports.UniversityController = UniversityController;
 __decorate([
@@ -242,6 +245,15 @@ __decorate([
     __metadata("design:paramtypes", [Object, String, Object, Object]),
     __metadata("design:returntype", Promise)
 ], UniversityController.prototype, "updateUpload", null);
+__decorate([
+    (0, common_1.UseGuards)(jwt_auth_guard_1.JwtAuthGuard),
+    (0, common_1.Delete)('upload/:id'),
+    __param(0, (0, common_1.Req)()),
+    __param(1, (0, common_1.Param)('id')),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", [Object, String]),
+    __metadata("design:returntype", Promise)
+], UniversityController.prototype, "deleteUpload", null);
 exports.UniversityController = UniversityController = __decorate([
     (0, common_1.Controller)('api'),
     __metadata("design:paramtypes", [university_service_1.UniversityService])

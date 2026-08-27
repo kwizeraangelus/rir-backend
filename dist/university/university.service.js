@@ -91,8 +91,8 @@ let UniversityService = class UniversityService {
         const inferDegree = (p) => {
             if (p.degree_type)
                 return p.degree_type;
-            if (p.submission_type?.toLowerCase().startsWith('dissertation'))
-                return 'dissertation';
+            if (p.submission_type?.toLowerCase().startsWith('fyp'))
+                return 'FYP';
             if (p.submission_type?.toLowerCase().startsWith('thesis'))
                 return 'thesis';
             return undefined;
@@ -143,15 +143,15 @@ let UniversityService = class UniversityService {
         const inferDegree = (i) => {
             if (i.degree_type)
                 return i.degree_type;
-            if (i.submission_type?.toLowerCase().startsWith('dissertation'))
-                return 'dissertation';
+            if (i.submission_type?.toLowerCase().startsWith('fyp'))
+                return 'FYP';
             if (i.submission_type?.toLowerCase().startsWith('thesis'))
                 return 'thesis';
             return undefined;
         };
         return {
             thesis: items.filter((i) => inferDegree(i) === 'thesis').length,
-            dissertation: items.filter((i) => inferDegree(i) === 'dissertation').length,
+            FYP: items.filter((i) => inferDegree(i) === 'FYP').length,
             engineering: items.filter((i) => i.submission_type.includes('engineering')).length,
             medicine_health_sciences: items.filter((i) => i.submission_type.match(/medicine|health|nursing/)).length,
             arts_humanities: items.filter((i) => i.submission_type.match(/law|arts|history/)).length,
