@@ -9,6 +9,23 @@ export declare class ResearcherService {
     getPublications(userId: string): Promise<Publication[]>;
     private getImageUrl;
     createPublication(userId: string, data: any, file?: Express.Multer.File): Promise<Publication[]>;
+    private cleanDoi;
+    private stripJatsTags;
+    private mapCrossrefType;
+    private fetchCrossrefMetadata;
+    previewPublicationFromDoi(doiInput: string): Promise<{
+        title: string;
+        authors: string[];
+        doi: string;
+        url: any;
+        publisher: any;
+        journal_name: string | undefined;
+        conference_info: string | undefined;
+        book_title: string | undefined;
+        publication_type: string;
+        abstract: string;
+    }>;
+    createPublicationFromDoi(userId: string, doiInput: string): Promise<Publication>;
     updateProfile(userId: string, body: any, file?: Express.Multer.File): Promise<User | null>;
     findAllApproved(): Promise<Publication[]>;
     getAllResearchers(search?: string): Promise<{

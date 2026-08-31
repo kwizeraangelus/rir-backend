@@ -5,6 +5,9 @@ export declare class ResearcherController {
     getMe(req: any): Promise<import("../users/entities/user.entity").User | null>;
     getMyResearches(req: any): Promise<import("./entities/publication.entity").Publication[]>;
     addPublication(req: any, body: any, file?: Express.Multer.File): Promise<import("./entities/publication.entity").Publication[]>;
+    importPublicationFromDoi(req: any, body: {
+        doi: string;
+    }): Promise<import("./entities/publication.entity").Publication>;
     updateProfile(req: any, body: any, file: Express.Multer.File): Promise<import("../users/entities/user.entity").User | null>;
     getPublicPublications(): Promise<import("./entities/publication.entity").Publication[]>;
     getAllResearchers(search?: string): Promise<{
@@ -56,5 +59,19 @@ export declare class ResearcherController {
     deletePublication(req: any, id: string): Promise<{
         success: boolean;
         id: string;
+    }>;
+    previewPublicationFromDoi(body: {
+        doi: string;
+    }): Promise<{
+        title: string;
+        authors: string[];
+        doi: string;
+        url: any;
+        publisher: any;
+        journal_name: string | undefined;
+        conference_info: string | undefined;
+        book_title: string | undefined;
+        publication_type: string;
+        abstract: string;
     }>;
 }

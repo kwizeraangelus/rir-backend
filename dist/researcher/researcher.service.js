@@ -56,6 +56,77 @@ let ResearcherService = class ResearcherService {
         const pub = this.pubRepo.create(pubData);
         return this.pubRepo.save(pub);
     }
+    cleanDoi(raw) {
+        return raw
+            .trim()
+            .replace(/^https?:\/\/(dx\.)?doi\.org\//i, '')
+            .replace(/^doi:/i, '');
+    }
+    stripJatsTags(html) {
+        if (!html)
+            return '';
+        return html.replace(/<\/?[^>]+>/g, ' ').replace(/\s+/g, ' ').trim();
+    }
+    mapCrossrefType(crossrefType) {
+        switch (crossrefType) {
+            case 'proceedings-article':
+                return 'conference';
+            case 'book-chapter':
+            case 'book':
+            case 'monograph':
+                return 'book';
+            case 'journal-article':
+            default:
+                return 'journal';
+        }
+    }
+    async fetchCrossrefMetadata(doiInput) {
+        if (!doiInput || !doiInput.trim()) {
+            throw new common_1.BadRequestException('DOI is required');
+        }
+        const doi = this.cleanDoi(doiInput);
+        const existing = await this.pubRepo.findOne({ where: { doi } });
+        if (existing) {
+            throw new common_1.BadRequestException('A publication with this DOI already exists');
+        }
+        const res = await fetch(`https://api.crossref.org/works/${encodeURIComponent(doi)}`);
+        if (!res.ok) {
+            throw new common_1.BadRequestException('Could not find a publication for that DOI');
+        }
+        const json = await res.json();
+        const work = json.message;
+        const title = Array.isArray(work.title) ? work.title[0] : work.title || '';
+        if (!title.trim()) {
+            throw new common_1.BadRequestException('Crossref returned no title for that DOI');
+        }
+        const authors = Array.isArray(work.author)
+            ? work.author.map((a) => `${a.given ?? ''} ${a.family ?? ''}`.trim()).filter((n) => n.length > 0)
+            : [];
+        const containerTitle = Array.isArray(work['container-title'])
+            ? work['container-title'][0]
+            : work['container-title'];
+        const publicationType = this.mapCrossrefType(work.type);
+        return {
+            title,
+            authors,
+            doi,
+            url: work.URL || undefined,
+            publisher: work.publisher || undefined,
+            journal_name: publicationType === 'journal' ? containerTitle : undefined,
+            conference_info: publicationType === 'conference' ? containerTitle : undefined,
+            book_title: publicationType === 'book' ? containerTitle : undefined,
+            publication_type: publicationType,
+            abstract: this.stripJatsTags(work.abstract) || '',
+        };
+    }
+    async previewPublicationFromDoi(doiInput) {
+        return this.fetchCrossrefMetadata(doiInput);
+    }
+    async createPublicationFromDoi(userId, doiInput) {
+        const pubData = await this.fetchCrossrefMetadata(doiInput);
+        const pub = this.pubRepo.create({ ...pubData, user: { id: userId }, status: false });
+        return this.pubRepo.save(pub);
+    }
     async updateProfile(userId, body, file) {
         const updateData = {};
         if (body.bio !== undefined)

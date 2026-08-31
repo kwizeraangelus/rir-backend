@@ -42,6 +42,7 @@ export class AdminService {
             file_path: true,
             cover_image: true,
             submission_type: true,
+            supervisor_name: true,
             authors: true,
             status: true,
             user: {
@@ -121,6 +122,8 @@ export class AdminService {
     const where: any = { status: 'approved' };
     if (filters.title) where.title = Like(`%${filters.title}%`);
     if (filters.university) where.university = Like(`%${filters.university}%`);
+    if (filters.submission_type) where.submission_type = Like(`%${filters.submission_type}%`);
+    if (filters. supervisor_name) where.supervisor_name = Like(`%${filters.supervisor_name}%`);
 
     const books = await this.uploadRepo.find({ where });
     return { books };

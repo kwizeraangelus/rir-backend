@@ -51,6 +51,7 @@ let AdminService = class AdminService {
                     file_path: true,
                     cover_image: true,
                     submission_type: true,
+                    supervisor_name: true,
                     authors: true,
                     status: true,
                     user: {
@@ -109,6 +110,10 @@ let AdminService = class AdminService {
             where.title = (0, typeorm_2.Like)(`%${filters.title}%`);
         if (filters.university)
             where.university = (0, typeorm_2.Like)(`%${filters.university}%`);
+        if (filters.submission_type)
+            where.submission_type = (0, typeorm_2.Like)(`%${filters.submission_type}%`);
+        if (filters.supervisor_name)
+            where.supervisor_name = (0, typeorm_2.Like)(`%${filters.supervisor_name}%`);
         const books = await this.uploadRepo.find({ where });
         return { books };
     }

@@ -54,6 +54,18 @@ async addPublication(
   return this.researcherService.createPublication(userId, body, file);
 }
 
+  // ── DOI import: POST { doi: "10.xxxx/xxxxx" } — fetches metadata from
+  // Crossref and saves it as a new pending publication for this researcher. ──
+  @UseGuards(JwtAuthGuard)
+  @Post('researches/import-doi')
+  async importPublicationFromDoi(@Req() req, @Body() body: { doi: string }) {
+    const userId = req.user?.userId;
+    if (!userId) {
+      throw new UnauthorizedException('User ID not found in token payload');
+    }
+    return this.researcherService.createPublicationFromDoi(userId, body.doi);
+  }
+
  @Patch('update-profile')
 @UseGuards(JwtAuthGuard)
 @UseInterceptors(FileInterceptor('profile_image', { storage: memory, limits: {
@@ -111,4 +123,10 @@ async updatePublication(
     if (!userId) throw new UnauthorizedException('User ID not found in token payload');
     return this.researcherService.deletePublication(userId, id);
   }
+
+  @UseGuards(JwtAuthGuard)
+@Post('researches/preview-doi')
+async previewPublicationFromDoi(@Body() body: { doi: string }) {
+  return this.researcherService.previewPublicationFromDoi(body.doi);
+}
 }

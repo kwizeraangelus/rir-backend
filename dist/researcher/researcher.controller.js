@@ -38,6 +38,13 @@ let ResearcherController = class ResearcherController {
         }
         return this.researcherService.createPublication(userId, body, file);
     }
+    async importPublicationFromDoi(req, body) {
+        const userId = req.user?.userId;
+        if (!userId) {
+            throw new common_1.UnauthorizedException('User ID not found in token payload');
+        }
+        return this.researcherService.createPublicationFromDoi(userId, body.doi);
+    }
     async updateProfile(req, body, file) {
         const userId = req.user.userId;
         return this.researcherService.updateProfile(userId, body, file);
@@ -65,6 +72,9 @@ let ResearcherController = class ResearcherController {
         if (!userId)
             throw new common_1.UnauthorizedException('User ID not found in token payload');
         return this.researcherService.deletePublication(userId, id);
+    }
+    async previewPublicationFromDoi(body) {
+        return this.researcherService.previewPublicationFromDoi(body.doi);
     }
 };
 exports.ResearcherController = ResearcherController;
@@ -97,6 +107,15 @@ __decorate([
     __metadata("design:paramtypes", [Object, Object, Object]),
     __metadata("design:returntype", Promise)
 ], ResearcherController.prototype, "addPublication", null);
+__decorate([
+    (0, common_1.UseGuards)(jwt_auth_guard_1.JwtAuthGuard),
+    (0, common_1.Post)('researches/import-doi'),
+    __param(0, (0, common_1.Req)()),
+    __param(1, (0, common_1.Body)()),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", [Object, Object]),
+    __metadata("design:returntype", Promise)
+], ResearcherController.prototype, "importPublicationFromDoi", null);
 __decorate([
     (0, common_1.Patch)('update-profile'),
     (0, common_1.UseGuards)(jwt_auth_guard_1.JwtAuthGuard),
@@ -160,6 +179,14 @@ __decorate([
     __metadata("design:paramtypes", [Object, String]),
     __metadata("design:returntype", Promise)
 ], ResearcherController.prototype, "deletePublication", null);
+__decorate([
+    (0, common_1.UseGuards)(jwt_auth_guard_1.JwtAuthGuard),
+    (0, common_1.Post)('researches/preview-doi'),
+    __param(0, (0, common_1.Body)()),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", [Object]),
+    __metadata("design:returntype", Promise)
+], ResearcherController.prototype, "previewPublicationFromDoi", null);
 exports.ResearcherController = ResearcherController = __decorate([
     (0, common_1.Controller)('api'),
     __metadata("design:paramtypes", [researcher_service_1.ResearcherService])

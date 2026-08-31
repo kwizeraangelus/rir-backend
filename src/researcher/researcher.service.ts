@@ -45,6 +45,96 @@ export class ResearcherService {
   return this.pubRepo.save(pub);
 }
 
+  // ── DOI import: fetch metadata from Crossref for a single DOI and save it
+  // as a new (pending) publication, mapped onto the real Publication columns. ──
+  private cleanDoi(raw: string): string {
+    return raw
+      .trim()
+      .replace(/^https?:\/\/(dx\.)?doi\.org\//i, '') // strip a full doi.org URL if pasted
+      .replace(/^doi:/i, ''); // strip a "doi:" prefix if pasted
+  }
+
+  // Crossref abstracts come back as JATS XML (e.g. "<jats:p>...</jats:p>") — strip tags.
+  private stripJatsTags(html?: string): string {
+    if (!html) return '';
+    return html.replace(/<\/?[^>]+>/g, ' ').replace(/\s+/g, ' ').trim();
+  }
+
+  // Crossref's "type" field doesn't match your publication_type values 1:1 —
+  // map the common ones, default to 'journal' for anything unrecognized.
+  private mapCrossrefType(crossrefType?: string): string {
+    switch (crossrefType) {
+      case 'proceedings-article':
+        return 'conference';
+      case 'book-chapter':
+      case 'book':
+      case 'monograph':
+        return 'book';
+      case 'journal-article':
+      default:
+        return 'journal';
+    }
+  }
+
+  private async fetchCrossrefMetadata(doiInput: string) {
+  if (!doiInput || !doiInput.trim()) {
+    throw new BadRequestException('DOI is required');
+  }
+  const doi = this.cleanDoi(doiInput);
+
+  const existing = await this.pubRepo.findOne({ where: { doi } });
+  if (existing) {
+    throw new BadRequestException('A publication with this DOI already exists');
+  }
+
+  const res = await fetch(`https://api.crossref.org/works/${encodeURIComponent(doi)}`);
+  if (!res.ok) {
+    throw new BadRequestException('Could not find a publication for that DOI');
+  }
+  const json: any = await res.json();
+  const work = json.message;
+
+  const title: string = Array.isArray(work.title) ? work.title[0] : work.title || '';
+  if (!title.trim()) {
+    throw new BadRequestException('Crossref returned no title for that DOI');
+  }
+
+  const authors: string[] = Array.isArray(work.author)
+    ? work.author.map((a: any) => `${a.given ?? ''} ${a.family ?? ''}`.trim()).filter((n: string) => n.length > 0)
+    : [];
+
+  const containerTitle: string | undefined = Array.isArray(work['container-title'])
+    ? work['container-title'][0]
+    : work['container-title'];
+
+  const publicationType = this.mapCrossrefType(work.type);
+
+  return {
+    title,
+    authors,
+    doi,
+    url: work.URL || undefined,
+    publisher: work.publisher || undefined,
+    journal_name: publicationType === 'journal' ? containerTitle : undefined,
+    conference_info: publicationType === 'conference' ? containerTitle : undefined,
+    book_title: publicationType === 'book' ? containerTitle : undefined,
+    publication_type: publicationType,
+    abstract: this.stripJatsTags(work.abstract) || '',
+  };
+}
+
+// Preview only — does NOT save
+async previewPublicationFromDoi(doiInput: string) {
+  return this.fetchCrossrefMetadata(doiInput);
+}
+
+// Confirmed save — re-fetches (DOI data is static) and persists
+async createPublicationFromDoi(userId: string, doiInput: string) {
+  const pubData = await this.fetchCrossrefMetadata(doiInput);
+  const pub = this.pubRepo.create({ ...pubData, user: { id: userId }, status: false });
+  return this.pubRepo.save(pub);
+}
+
   async updateProfile(userId: string, body: any, file?: Express.Multer.File) {
     const updateData: any = {};
 
