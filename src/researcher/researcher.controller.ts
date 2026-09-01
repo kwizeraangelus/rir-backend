@@ -57,28 +57,35 @@ async addPublication(
   // ── DOI import: POST { doi: "10.xxxx/xxxxx" } — fetches metadata from
   // Crossref and saves it as a new pending publication for this researcher. ──
   @UseGuards(JwtAuthGuard)
-  @Post('researches/import-doi')
-  async importPublicationFromDoi(@Req() req, @Body() body: { doi: string }) {
-    const userId = req.user?.userId;
-    if (!userId) {
-      throw new UnauthorizedException('User ID not found in token payload');
-    }
-    return this.researcherService.createPublicationFromDoi(userId, body.doi);
-  }
-
- @Patch('update-profile')
-@UseGuards(JwtAuthGuard)
-@UseInterceptors(FileInterceptor('profile_image', { storage: memory, limits: {
-    fileSize: 16 * 1024 * 1024, // 16MB
-  }, }))
-async updateProfile(
+@Post('researches/import-doi')
+@UseInterceptors(FileInterceptor('pdf', { storage: memory, limits: {
+  fileSize: 16 * 1024 * 1024,
+} }))
+async importPublicationFromDoi(
   @Req() req,
-  @Body() body: any,
-  @UploadedFile() file: Express.Multer.File,
+  @Body() body: { doi: string },
+  @UploadedFile() file?: Express.Multer.File,
 ) {
-  const userId = req.user.userId;
-  return this.researcherService.updateProfile(userId, body, file);
+  const userId = req.user?.userId;
+  if (!userId) {
+    throw new UnauthorizedException('User ID not found in token payload');
+  }
+  return this.researcherService.createPublicationFromDoi(userId, body.doi, file);
 }
+
+  @Patch('update-profile')
+  @UseGuards(JwtAuthGuard)
+  @UseInterceptors(FileInterceptor('profile_image', { storage: memory, limits: {
+      fileSize: 16 * 1024 * 1024, // 16MB
+    }, }))
+  async updateProfile(
+    @Req() req,
+    @Body() body: any,
+    @UploadedFile() file: Express.Multer.File,
+  ) {
+    const userId = req.user.userId;
+    return this.researcherService.updateProfile(userId, body, file);
+  }
 
   @Get('publications/public')
   async getPublicPublications() {
@@ -128,5 +135,21 @@ async updatePublication(
 @Post('researches/preview-doi')
 async previewPublicationFromDoi(@Body() body: { doi: string }) {
   return this.researcherService.previewPublicationFromDoi(body.doi);
+}
+
+
+
+@UseGuards(JwtAuthGuard)
+@Post('researches/preview-orcid')
+async previewOrcidWorks(@Body() body: { orcid: string }) {
+  return this.researcherService.previewOrcidWorks(body.orcid);
+}
+
+@UseGuards(JwtAuthGuard)
+@Post('researches/import-orcid')
+async importFromOrcid(@Req() req, @Body() body: { orcid: string; putCodes: string[] }) {
+  const userId = req.user?.userId;
+  if (!userId) throw new UnauthorizedException('User ID not found in token payload');
+  return this.researcherService.createPublicationsFromOrcid(userId, body.orcid, body.putCodes);
 }
 }

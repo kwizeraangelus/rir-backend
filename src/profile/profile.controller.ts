@@ -16,6 +16,8 @@ import { FileInterceptor } from '@nestjs/platform-express';
 import { JwtAuthGuard } from '../auth/jwt-auth/jwt-auth.guard';
 import { ProfileService } from './profile.service';
 import { UpdateProfileDto, ChangePasswordDto, UpdateResearcherProfileDto } from './profile.dto';
+import path from 'path/win32';
+import { memoryStorage } from 'multer';
 
 interface JwtUser {
   userId: string;
@@ -41,25 +43,28 @@ export class ProfileController {
   updateProfile(@Param('id') id: string, @Body() dto: UpdateProfileDto, @Req() req: { user: JwtUser }) {
     return this.profileService.updateProfile(id, req.user.userId, req.user.is_staff, dto);
   }
+  
   @UseGuards(JwtAuthGuard)
   @Patch(':id/photo')
-  @UseInterceptors(FileInterceptor('profile_image'))
-  updatePhoto(@Param('id') id: string, @UploadedFile() file: Express.Multer.File, @Req() req: { user: JwtUser }) {
-    return this.profileService.updatePhoto(id, req.user.userId, req.user.is_staff, file.path);
-  }
-   
-  @UseGuards(JwtAuthGuard)
-  @Patch(':id/cv')
-  @UseInterceptors(FileInterceptor('cv'))
-  updateCv(@Param('id') id: string, @UploadedFile() file: Express.Multer.File, @Req() req: { user: JwtUser }) {
-    return this.profileService.updateCv(id, req.user.userId, req.user.is_staff, file.path);
-  }
-
-  @UseGuards(JwtAuthGuard)
-  @Patch(':id/resume')
-  @UseInterceptors(FileInterceptor('resume'))
-  updateResume(@Param('id') id: string, @UploadedFile() file: Express.Multer.File, @Req() req: { user: JwtUser }) {
-    return this.profileService.updateResume(id, req.user.userId, req.user.is_staff, file.path);
+  @UseInterceptors(
+    FileInterceptor('profile_image', {
+      storage: memoryStorage(),
+      limits: {
+        fileSize: 16 * 1024 * 1024,
+      },
+    }),
+  )
+  async updatePhoto(
+    @Param('id') id: string,
+    @UploadedFile() file: Express.Multer.File,
+    @Req() req: { user: JwtUser },
+  ) {
+    return this.profileService.updatePhoto(
+      id,
+      req.user.userId,
+      req.user.is_staff,
+      file,
+    );
   }
 
   @UseGuards(JwtAuthGuard)

@@ -52,6 +52,8 @@ const typeorm_2 = require("typeorm");
 const bcrypt = __importStar(require("bcrypt"));
 const mail_service_1 = require("../mail/mail.service");
 const user_entity_1 = require("../users/entities/user.entity");
+const common_2 = require("@nestjs/common");
+const r2_storage_1 = require("../storage/r2.storage");
 let ProfileService = class ProfileService {
     userRepo;
     mailService;
@@ -106,10 +108,14 @@ let ProfileService = class ProfileService {
         }
         return this.stripPassword(await this.userRepo.save(user));
     }
-    async updatePhoto(targetId, requesterId, isStaff, filePath) {
+    async updatePhoto(targetId, requesterId, isStaff, file) {
         this.guard(requesterId, targetId, isStaff);
         const user = await this.findOrFail(targetId);
-        user.profile_image = filePath;
+        if (!file) {
+            throw new common_2.BadRequestException('Profile image is required');
+        }
+        const imageUrl = await (0, r2_storage_1.uploadFileToR2)(file, 'profiles');
+        user.profile_image = imageUrl;
         return this.stripPassword(await this.userRepo.save(user));
     }
     async updateCv(targetId, requesterId, isStaff, filePath) {

@@ -10,6 +10,9 @@ import * as bcrypt from 'bcrypt';
 import { MailService } from '../mail/mail.service';
 import { User, UserCategory } from '../users/entities/user.entity';
 import { UpdateProfileDto, ChangePasswordDto, UpdateResearcherProfileDto } from './profile.dto';
+import { BadRequestException } from '@nestjs/common';
+import { uploadFileToR2 } from '../storage/r2.storage';
+
 
 
 @Injectable()
@@ -81,15 +84,27 @@ export class ProfileService {
 
   // PATCH /profile/:id/photo
   async updatePhoto(
-    targetId: string,
-    requesterId: string,
-    isStaff: boolean,
-    filePath: string) {
-    this.guard(requesterId, targetId, isStaff);
-    const user = await this.findOrFail(targetId);
-    user.profile_image = filePath;
-    return this.stripPassword(await this.userRepo.save(user));
+  targetId: string,
+  requesterId: string,
+  isStaff: boolean,
+  file: Express.Multer.File,
+) {
+  this.guard(requesterId, targetId, isStaff);
+
+  const user = await this.findOrFail(targetId);
+
+  if (!file) {
+    throw new BadRequestException('Profile image is required');
   }
+
+  // Upload image to Cloudflare R2
+  const imageUrl = await uploadFileToR2(file, 'profiles');
+
+  // Save permanent R2 URL in database
+  user.profile_image = imageUrl;
+
+  return this.stripPassword(await this.userRepo.save(user));
+}
 
   // PATCH /profile/:id/cv
   async updateCv(

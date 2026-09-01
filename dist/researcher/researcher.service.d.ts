@@ -25,7 +25,12 @@ export declare class ResearcherService {
         publication_type: string;
         abstract: string;
     }>;
-    createPublicationFromDoi(userId: string, doiInput: string): Promise<Publication>;
+    createPublicationFromDoi(userId: string, doiInput: string, file?: Express.Multer.File): Promise<Publication>;
+    private fetchWithTimeout;
+    private fetchOrcidWorksList;
+    private fetchOrcidWorkDetail;
+    previewOrcidWorks(orcidInput: string): Promise<any>;
+    createPublicationsFromOrcid(userId: string, orcidInput: string, putCodes: string[]): Promise<any[]>;
     updateProfile(userId: string, body: any, file?: Express.Multer.File): Promise<User | null>;
     findAllApproved(): Promise<Publication[]>;
     getAllResearchers(search?: string): Promise<{

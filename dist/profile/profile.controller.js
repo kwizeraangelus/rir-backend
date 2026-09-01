@@ -18,6 +18,7 @@ const platform_express_1 = require("@nestjs/platform-express");
 const jwt_auth_guard_1 = require("../auth/jwt-auth/jwt-auth.guard");
 const profile_service_1 = require("./profile.service");
 const profile_dto_1 = require("./profile.dto");
+const multer_1 = require("multer");
 let ProfileController = class ProfileController {
     profileService;
     constructor(profileService) {
@@ -29,14 +30,8 @@ let ProfileController = class ProfileController {
     updateProfile(id, dto, req) {
         return this.profileService.updateProfile(id, req.user.userId, req.user.is_staff, dto);
     }
-    updatePhoto(id, file, req) {
-        return this.profileService.updatePhoto(id, req.user.userId, req.user.is_staff, file.path);
-    }
-    updateCv(id, file, req) {
-        return this.profileService.updateCv(id, req.user.userId, req.user.is_staff, file.path);
-    }
-    updateResume(id, file, req) {
-        return this.profileService.updateResume(id, req.user.userId, req.user.is_staff, file.path);
+    async updatePhoto(id, file, req) {
+        return this.profileService.updatePhoto(id, req.user.userId, req.user.is_staff, file);
     }
     changePassword(id, dto, req) {
         return this.profileService.changePassword(id, req.user.userId, req.user.is_staff, dto);
@@ -68,36 +63,19 @@ __decorate([
 __decorate([
     (0, common_1.UseGuards)(jwt_auth_guard_1.JwtAuthGuard),
     (0, common_1.Patch)(':id/photo'),
-    (0, common_1.UseInterceptors)((0, platform_express_1.FileInterceptor)('profile_image')),
+    (0, common_1.UseInterceptors)((0, platform_express_1.FileInterceptor)('profile_image', {
+        storage: (0, multer_1.memoryStorage)(),
+        limits: {
+            fileSize: 16 * 1024 * 1024,
+        },
+    })),
     __param(0, (0, common_1.Param)('id')),
     __param(1, (0, common_1.UploadedFile)()),
     __param(2, (0, common_1.Req)()),
     __metadata("design:type", Function),
     __metadata("design:paramtypes", [String, Object, Object]),
-    __metadata("design:returntype", void 0)
+    __metadata("design:returntype", Promise)
 ], ProfileController.prototype, "updatePhoto", null);
-__decorate([
-    (0, common_1.UseGuards)(jwt_auth_guard_1.JwtAuthGuard),
-    (0, common_1.Patch)(':id/cv'),
-    (0, common_1.UseInterceptors)((0, platform_express_1.FileInterceptor)('cv')),
-    __param(0, (0, common_1.Param)('id')),
-    __param(1, (0, common_1.UploadedFile)()),
-    __param(2, (0, common_1.Req)()),
-    __metadata("design:type", Function),
-    __metadata("design:paramtypes", [String, Object, Object]),
-    __metadata("design:returntype", void 0)
-], ProfileController.prototype, "updateCv", null);
-__decorate([
-    (0, common_1.UseGuards)(jwt_auth_guard_1.JwtAuthGuard),
-    (0, common_1.Patch)(':id/resume'),
-    (0, common_1.UseInterceptors)((0, platform_express_1.FileInterceptor)('resume')),
-    __param(0, (0, common_1.Param)('id')),
-    __param(1, (0, common_1.UploadedFile)()),
-    __param(2, (0, common_1.Req)()),
-    __metadata("design:type", Function),
-    __metadata("design:paramtypes", [String, Object, Object]),
-    __metadata("design:returntype", void 0)
-], ProfileController.prototype, "updateResume", null);
 __decorate([
     (0, common_1.UseGuards)(jwt_auth_guard_1.JwtAuthGuard),
     (0, common_1.Post)(':id/change-password'),

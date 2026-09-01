@@ -73,7 +73,7 @@ export declare class ProfileService {
         emailVerificationToken: string | null;
         emailVerificationExpires: Date | null;
     }>;
-    updatePhoto(targetId: string, requesterId: string, isStaff: boolean, filePath: string): Promise<{
+    updatePhoto(targetId: string, requesterId: string, isStaff: boolean, file: Express.Multer.File): Promise<{
         id: string;
         username: string;
         email: string;

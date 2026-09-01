@@ -4,6 +4,8 @@ import { AppModule } from './app.module';
 import { ValidationPipe } from '@nestjs/common';
 import { join } from 'path';
 import { NestExpressApplication } from '@nestjs/platform-express';
+import dns from 'dns';
+dns.setDefaultResultOrder('ipv4first');
 
 async function bootstrap() {
   try {

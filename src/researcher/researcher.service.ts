@@ -125,14 +125,132 @@ export class ResearcherService {
 
 // Preview only — does NOT save
 async previewPublicationFromDoi(doiInput: string) {
-  return this.fetchCrossrefMetadata(doiInput);
+  try {
+    return await this.fetchCrossrefMetadata(doiInput);
+  } catch (err: any) {
+    if (err.name === 'AbortError' || err.message === 'unreachable') {
+      throw new BadRequestException('Crossref is not responding right now — please try again in a moment.');
+    }
+    throw err;
+  }
 }
 
 // Confirmed save — re-fetches (DOI data is static) and persists
-async createPublicationFromDoi(userId: string, doiInput: string) {
+async createPublicationFromDoi(userId: string, doiInput: string, file?: Express.Multer.File) {
   const pubData = await this.fetchCrossrefMetadata(doiInput);
   const pub = this.pubRepo.create({ ...pubData, user: { id: userId }, status: false });
+  if (file) {
+    pub.pdf_path = await uploadFileToR2(file, 'publications');
+  }
   return this.pubRepo.save(pub);
+}
+
+
+
+private async fetchWithTimeout(url: string, options: RequestInit = {}, timeoutMs = 8000) {
+  for (let attempt = 0; attempt < 2; attempt++) {
+    const controller = new AbortController();
+    const timer = setTimeout(() => controller.abort(), timeoutMs);
+    try {
+      const res = await fetch(url, { ...options, signal: controller.signal });
+      clearTimeout(timer);
+      return res;
+    } catch (err) {
+      clearTimeout(timer);
+      if (attempt === 1) throw err; // last attempt failed, give up
+      // otherwise loop and retry once
+    }
+  }
+  throw new Error('unreachable');
+}
+
+private async fetchOrcidWorksList(orcidInput: string) {
+  const orcid = orcidInput.trim().replace(/^https?:\/\/(www\.)?orcid\.org\//i, '');
+  const res = await this.fetchWithTimeout(`https://pub.orcid.org/v3.0/${orcid}/works`, {
+    headers: { Accept: 'application/json' },
+  });
+  if (!res.ok) {
+    throw new BadRequestException('Could not find an ORCID record for that ID');
+  }
+  const json: any = await res.json();
+  const groups = json.group || [];
+
+  return groups
+    .map((g: any) => {
+      const summary = g['work-summary']?.[0];
+      if (!summary) return null;
+      const externalIds = summary['external-ids']?.['external-id'] || [];
+      const doiEntry = externalIds.find((e: any) => e['external-id-type'] === 'doi');
+      return {
+        putCode: String(summary['put-code']),
+        title: summary.title?.title?.value || '(untitled)',
+        journal: summary['journal-title']?.value || undefined,
+        year: summary['publication-date']?.year?.value || undefined,
+        doi: doiEntry?.['external-id-value'] || undefined,
+        url: summary.url?.value || undefined,
+      };
+    })
+    .filter(Boolean);
+}
+
+private async fetchOrcidWorkDetail(orcid: string, putCode: string) {
+  const res = await fetch(`https://pub.orcid.org/v3.0/${orcid}/work/${putCode}`, {
+    headers: { Accept: 'application/json' },
+  });
+  if (!res.ok) return null;
+  const work: any = await res.json();
+  const authors: string[] = (work.contributors?.contributor || [])
+    .map((c: any) => c['credit-name']?.value)
+    .filter(Boolean);
+  return {
+    title: work.title?.title?.value || '',
+    authors,
+    journal_name: work['journal-title']?.value || undefined,
+    url: work.url?.value || undefined,
+  };
+}
+
+async previewOrcidWorks(orcidInput: string) {
+  return this.fetchOrcidWorksList(orcidInput);
+}
+
+async createPublicationsFromOrcid(userId: string, orcidInput: string, putCodes: string[]) {
+  const orcid = orcidInput.trim().replace(/^https?:\/\/(www\.)?orcid\.org\//i, '');
+  const list = await this.fetchOrcidWorksList(orcid);
+  const selected = list.filter((w: any) => putCodes.includes(w.putCode));
+
+  const saved: any[] = [];
+  for (const item of selected) {
+    if (item.doi) {
+      const existing = await this.pubRepo.findOne({ where: { doi: this.cleanDoi(item.doi) } });
+      if (existing) continue; // skip ones already imported
+    }
+
+    let pubData: any = null;
+    if (item.doi) {
+      try {
+        pubData = await this.fetchCrossrefMetadata(item.doi); // richer: abstract, structured authors
+      } catch {
+        pubData = null;
+      }
+    }
+    if (!pubData) {
+      const detail = await this.fetchOrcidWorkDetail(orcid, item.putCode);
+      pubData = {
+        title: detail?.title || item.title,
+        authors: detail?.authors || [],
+        doi: item.doi,
+        url: detail?.url || item.url,
+        journal_name: detail?.journal_name || item.journal,
+        publication_type: 'journal',
+        abstract: '',
+      };
+    }
+
+    const pub = this.pubRepo.create({ ...pubData, user: { id: userId }, status: false });
+    saved.push(await this.pubRepo.save(pub));
+  }
+  return saved;
 }
 
   async updateProfile(userId: string, body: any, file?: Express.Multer.File) {

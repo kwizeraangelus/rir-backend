@@ -38,12 +38,12 @@ let ResearcherController = class ResearcherController {
         }
         return this.researcherService.createPublication(userId, body, file);
     }
-    async importPublicationFromDoi(req, body) {
+    async importPublicationFromDoi(req, body, file) {
         const userId = req.user?.userId;
         if (!userId) {
             throw new common_1.UnauthorizedException('User ID not found in token payload');
         }
-        return this.researcherService.createPublicationFromDoi(userId, body.doi);
+        return this.researcherService.createPublicationFromDoi(userId, body.doi, file);
     }
     async updateProfile(req, body, file) {
         const userId = req.user.userId;
@@ -75,6 +75,15 @@ let ResearcherController = class ResearcherController {
     }
     async previewPublicationFromDoi(body) {
         return this.researcherService.previewPublicationFromDoi(body.doi);
+    }
+    async previewOrcidWorks(body) {
+        return this.researcherService.previewOrcidWorks(body.orcid);
+    }
+    async importFromOrcid(req, body) {
+        const userId = req.user?.userId;
+        if (!userId)
+            throw new common_1.UnauthorizedException('User ID not found in token payload');
+        return this.researcherService.createPublicationsFromOrcid(userId, body.orcid, body.putCodes);
     }
 };
 exports.ResearcherController = ResearcherController;
@@ -110,10 +119,14 @@ __decorate([
 __decorate([
     (0, common_1.UseGuards)(jwt_auth_guard_1.JwtAuthGuard),
     (0, common_1.Post)('researches/import-doi'),
+    (0, common_1.UseInterceptors)((0, platform_express_1.FileInterceptor)('pdf', { storage: memory, limits: {
+            fileSize: 16 * 1024 * 1024,
+        } })),
     __param(0, (0, common_1.Req)()),
     __param(1, (0, common_1.Body)()),
+    __param(2, (0, common_1.UploadedFile)()),
     __metadata("design:type", Function),
-    __metadata("design:paramtypes", [Object, Object]),
+    __metadata("design:paramtypes", [Object, Object, Object]),
     __metadata("design:returntype", Promise)
 ], ResearcherController.prototype, "importPublicationFromDoi", null);
 __decorate([
@@ -187,6 +200,23 @@ __decorate([
     __metadata("design:paramtypes", [Object]),
     __metadata("design:returntype", Promise)
 ], ResearcherController.prototype, "previewPublicationFromDoi", null);
+__decorate([
+    (0, common_1.UseGuards)(jwt_auth_guard_1.JwtAuthGuard),
+    (0, common_1.Post)('researches/preview-orcid'),
+    __param(0, (0, common_1.Body)()),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", [Object]),
+    __metadata("design:returntype", Promise)
+], ResearcherController.prototype, "previewOrcidWorks", null);
+__decorate([
+    (0, common_1.UseGuards)(jwt_auth_guard_1.JwtAuthGuard),
+    (0, common_1.Post)('researches/import-orcid'),
+    __param(0, (0, common_1.Req)()),
+    __param(1, (0, common_1.Body)()),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", [Object, Object]),
+    __metadata("design:returntype", Promise)
+], ResearcherController.prototype, "importFromOrcid", null);
 exports.ResearcherController = ResearcherController = __decorate([
     (0, common_1.Controller)('api'),
     __metadata("design:paramtypes", [researcher_service_1.ResearcherService])

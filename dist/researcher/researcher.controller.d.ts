@@ -7,7 +7,7 @@ export declare class ResearcherController {
     addPublication(req: any, body: any, file?: Express.Multer.File): Promise<import("./entities/publication.entity").Publication[]>;
     importPublicationFromDoi(req: any, body: {
         doi: string;
-    }): Promise<import("./entities/publication.entity").Publication>;
+    }, file?: Express.Multer.File): Promise<import("./entities/publication.entity").Publication>;
     updateProfile(req: any, body: any, file: Express.Multer.File): Promise<import("../users/entities/user.entity").User | null>;
     getPublicPublications(): Promise<import("./entities/publication.entity").Publication[]>;
     getAllResearchers(search?: string): Promise<{
@@ -74,4 +74,11 @@ export declare class ResearcherController {
         publication_type: string;
         abstract: string;
     }>;
+    previewOrcidWorks(body: {
+        orcid: string;
+    }): Promise<any>;
+    importFromOrcid(req: any, body: {
+        orcid: string;
+        putCodes: string[];
+    }): Promise<any[]>;
 }

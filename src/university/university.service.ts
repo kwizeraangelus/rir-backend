@@ -175,7 +175,7 @@ async deleteUpload(userId: string, uploadId: string) {
     engineering: items.filter((i) => i.submission_type.includes('engineering')).length,
     medicine_health_sciences: items.filter((i) => i.submission_type.match(/medicine|health|nursing/)).length,
     arts_humanities: items.filter((i) => i.submission_type.match(/law|arts|history/)).length,
-    natural_sciences: items.filter((i) => i.submission_type.match(/biology|physics|chemistry/)).length,
+    natural_sciences: items.filter((i) => i.submission_type.match(/biology|physics|chemistry|natural/)).length,
     social_sciences: items.filter((i) => i.submission_type.match(/sociology|psychology|social/)).length,
     business_economics: items.filter((i) => i.submission_type.match(/business|economics|finance/)).length,
     computer_science_it: items.filter((i) => i.submission_type.match(/computer|it|software/)).length,
