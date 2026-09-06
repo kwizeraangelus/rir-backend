@@ -16,7 +16,7 @@ export declare class UniversityService {
     }>;
     getCounts(degreeType?: string): Promise<{
         thesis: number;
-        FYP: number;
+        dissertation: number;
         engineering: number;
         medicine_health_sciences: number;
         arts_humanities: number;

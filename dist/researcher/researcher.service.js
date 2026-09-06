@@ -116,6 +116,7 @@ let ResearcherService = class ResearcherService {
             conference_info: publicationType === 'conference' ? containerTitle : undefined,
             book_title: publicationType === 'book' ? containerTitle : undefined,
             publication_type: publicationType,
+            year: work['published-print']?.['date-parts']?.[0]?.[0] || work['published-online']?.['date-parts']?.[0]?.[0] || undefined,
             abstract: this.stripJatsTags(work.abstract) || '',
         };
     }
@@ -198,6 +199,7 @@ let ResearcherService = class ResearcherService {
             authors,
             journal_name: work['journal-title']?.value || undefined,
             url: work.url?.value || undefined,
+            year: work['publication-date']?.value?.year || undefined,
         };
     }
     async previewOrcidWorks(orcidInput) {
@@ -229,8 +231,9 @@ let ResearcherService = class ResearcherService {
                     title: detail?.title || item.title,
                     authors: detail?.authors || [],
                     doi: item.doi,
-                    url: detail?.url || item.url,
+                    year: detail?.year || item.year,
                     journal_name: detail?.journal_name || item.journal,
+                    url: detail?.url || item.url,
                     publication_type: 'journal',
                     abstract: '',
                 };

@@ -23,6 +23,7 @@ export declare class ResearcherService {
         conference_info: string | undefined;
         book_title: string | undefined;
         publication_type: string;
+        year: any;
         abstract: string;
     }>;
     createPublicationFromDoi(userId: string, doiInput: string, file?: Express.Multer.File): Promise<Publication>;

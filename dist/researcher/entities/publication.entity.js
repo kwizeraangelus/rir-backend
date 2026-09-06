@@ -21,6 +21,7 @@ let Publication = class Publication {
     doi;
     abstract;
     url;
+    year;
     publisher;
     book_title;
     publication_type = 'journal';
@@ -67,6 +68,10 @@ __decorate([
     (0, typeorm_1.Column)({ nullable: true }),
     __metadata("design:type", String)
 ], Publication.prototype, "url", void 0);
+__decorate([
+    (0, typeorm_1.Column)({ nullable: true }),
+    __metadata("design:type", Number)
+], Publication.prototype, "year", void 0);
 __decorate([
     (0, typeorm_1.Column)({ nullable: true }),
     __metadata("design:type", String)

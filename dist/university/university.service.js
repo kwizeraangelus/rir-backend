@@ -151,7 +151,7 @@ let UniversityService = class UniversityService {
         };
         return {
             thesis: items.filter((i) => inferDegree(i) === 'thesis').length,
-            FYP: items.filter((i) => inferDegree(i) === 'FYP').length,
+            dissertation: items.filter((i) => inferDegree(i) === 'FYP').length,
             engineering: items.filter((i) => i.submission_type.includes('engineering')).length,
             medicine_health_sciences: items.filter((i) => i.submission_type.match(/medicine|health|nursing/)).length,
             arts_humanities: items.filter((i) => i.submission_type.match(/law|arts|history/)).length,

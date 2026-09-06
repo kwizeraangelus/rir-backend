@@ -38,6 +38,9 @@ export class Publication {
   url?: string;
 
   @Column({ nullable: true })
+  year?: number;
+
+  @Column({ nullable: true })
   publisher?: string;
 
   @Column({ nullable: true })

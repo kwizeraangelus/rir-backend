@@ -8,6 +8,7 @@ export declare class Publication {
     doi?: string;
     abstract: string;
     url?: string;
+    year?: number;
     publisher?: string;
     book_title?: string;
     publication_type: string;

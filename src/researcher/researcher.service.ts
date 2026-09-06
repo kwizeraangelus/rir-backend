@@ -119,6 +119,7 @@ export class ResearcherService {
     conference_info: publicationType === 'conference' ? containerTitle : undefined,
     book_title: publicationType === 'book' ? containerTitle : undefined,
     publication_type: publicationType,
+    year: work['published-print']?.['date-parts']?.[0]?.[0] || work['published-online']?.['date-parts']?.[0]?.[0] || undefined,
     abstract: this.stripJatsTags(work.abstract) || '',
   };
 }
@@ -207,6 +208,7 @@ private async fetchOrcidWorkDetail(orcid: string, putCode: string) {
     authors,
     journal_name: work['journal-title']?.value || undefined,
     url: work.url?.value || undefined,
+    year: work['publication-date']?.value?.year || undefined,
   };
 }
 
@@ -240,8 +242,9 @@ async createPublicationsFromOrcid(userId: string, orcidInput: string, putCodes: 
         title: detail?.title || item.title,
         authors: detail?.authors || [],
         doi: item.doi,
-        url: detail?.url || item.url,
+        year: detail?.year || item.year,
         journal_name: detail?.journal_name || item.journal,
+        url: detail?.url || item.url,
         publication_type: 'journal',
         abstract: '',
       };
@@ -413,7 +416,12 @@ async createPublicationsFromOrcid(userId: string, orcidInput: string, putCodes: 
     }));
   }
 
-  async updatePublication(userId: string, pubId: string, data: any, file?: Express.Multer.File) {
+  async updatePublication(
+    userId: string,
+    pubId: string,
+    data: any,
+    file?: Express.Multer.File,
+  ) {
     const pub = await this.pubRepo.findOne({
       where: { id: pubId },
       relations: ['user'],

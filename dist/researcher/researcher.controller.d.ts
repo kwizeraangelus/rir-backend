@@ -72,6 +72,7 @@ export declare class ResearcherController {
         conference_info: string | undefined;
         book_title: string | undefined;
         publication_type: string;
+        year: any;
         abstract: string;
     }>;
     previewOrcidWorks(body: {

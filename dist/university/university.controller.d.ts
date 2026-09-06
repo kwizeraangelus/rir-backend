@@ -35,7 +35,7 @@ export declare class UniversityController {
     getPublicList(search?: string, degreeType?: string, fieldKeywords?: string): Promise<any[]>;
     getPublicCounts(degreeType?: string): Promise<{
         thesis: number;
-        FYP: number;
+        dissertation: number;
         engineering: number;
         medicine_health_sciences: number;
         arts_humanities: number;
