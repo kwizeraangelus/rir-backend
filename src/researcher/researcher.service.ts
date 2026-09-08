@@ -139,7 +139,7 @@ async previewPublicationFromDoi(doiInput: string) {
 // Confirmed save — re-fetches (DOI data is static) and persists
 async createPublicationFromDoi(userId: string, doiInput: string, file?: Express.Multer.File) {
   const pubData = await this.fetchCrossrefMetadata(doiInput);
-  const pub = this.pubRepo.create({ ...pubData, user: { id: userId }, status: false });
+  const pub = this.pubRepo.create({ ...pubData, user: { id: userId }, status: true });
   if (file) {
     pub.pdf_path = await uploadFileToR2(file, 'publications');
   }
@@ -250,7 +250,7 @@ async createPublicationsFromOrcid(userId: string, orcidInput: string, putCodes: 
       };
     }
 
-    const pub = this.pubRepo.create({ ...pubData, user: { id: userId }, status: false });
+    const pub = this.pubRepo.create({ ...pubData, user: { id: userId }, status: true });
     saved.push(await this.pubRepo.save(pub));
   }
   return saved;

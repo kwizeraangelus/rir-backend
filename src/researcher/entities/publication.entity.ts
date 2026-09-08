@@ -49,8 +49,8 @@ export class Publication {
   @Column({ default: 'journal' })
   publication_type: string = 'journal';
 
-  @Column({ default: false })
-  status: boolean = false;
+  @Column({ default: true })
+  status: boolean = true;
 
   @Column({ nullable: true })
   assignedToExpertId?: string;

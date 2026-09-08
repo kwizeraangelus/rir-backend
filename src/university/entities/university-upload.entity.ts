@@ -45,8 +45,8 @@ export class UniversityUpload {
   @Column()
   file_path: string = '';
 
-  @Column({ default: 'pending' })
-  status: 'pending' | 'approved' | 'rejected' = 'pending';
+  @Column({ default: 'approved' })
+  status: 'pending' | 'approved' | 'rejected' = 'approved';
 
   @Column({ nullable: true })
   userId?: string;
