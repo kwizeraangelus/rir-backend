@@ -164,7 +164,6 @@ private async fetchWithTimeout(url: string, options: RequestInit = {}, timeoutMs
   }
   throw new Error('unreachable');
 }
-
 private async fetchOrcidWorksList(orcidInput: string) {
   const orcid = orcidInput.trim().replace(/^https?:\/\/(www\.)?orcid\.org\//i, '');
   const res = await this.fetchWithTimeout(`https://pub.orcid.org/v3.0/${orcid}/works`, {
@@ -176,7 +175,7 @@ private async fetchOrcidWorksList(orcidInput: string) {
   const json: any = await res.json();
   const groups = json.group || [];
 
-  return groups
+  const summaries = groups
     .map((g: any) => {
       const summary = g['work-summary']?.[0];
       if (!summary) return null;
@@ -192,8 +191,23 @@ private async fetchOrcidWorksList(orcidInput: string) {
       };
     })
     .filter(Boolean);
-}
 
+  // Fetch authors per work, in small batches to avoid rate-limiting ORCID
+  const batchSize = 5;
+  const results: any[] = [];
+  for (let i = 0; i < summaries.length; i += batchSize) {
+    const batch = summaries.slice(i, i + batchSize);
+    const detailed = await Promise.all(
+      batch.map(async (s) => {
+        const detail = await this.fetchOrcidWorkDetail(orcid, s.putCode);
+        return { ...s, authors: detail?.authors || [] };
+      }),
+    );
+    results.push(...detailed);
+  }
+
+  return results;
+}
 private async fetchOrcidWorkDetail(orcid: string, putCode: string) {
   const res = await fetch(`https://pub.orcid.org/v3.0/${orcid}/work/${putCode}`, {
     headers: { Accept: 'application/json' },
