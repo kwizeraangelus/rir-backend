@@ -346,7 +346,6 @@ let ResearcherService = class ResearcherService {
             const publications = await this.pubRepo.find({
                 where: { user: { id }, status: true },
                 order: { created_at: 'DESC' },
-                take: 10,
             });
             return {
                 id: user.id,

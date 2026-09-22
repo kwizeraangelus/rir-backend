@@ -364,7 +364,6 @@ async createPublicationsFromOrcid(userId: string, orcidInput: string, putCodes: 
       const publications = await this.pubRepo.find({
         where: { user: { id }, status: true },
         order: { created_at: 'DESC' },
-        take: 10,
       });
 
       return {
