@@ -47,7 +47,7 @@ let AdminController = class AdminController {
     async deleteUser(id) {
         return this.adminService.deleteUser(id);
     }
-    async getApproved(filters) {
+    getApprovedBooks(filters) {
         return this.adminService.getApprovedBooks(filters);
     }
     async createUser(body) {
@@ -56,6 +56,12 @@ let AdminController = class AdminController {
     async createAdminEvent(req, body, file) {
         const photoPath = file ? await (0, r2_storage_1.uploadFileToR2)(file, 'events') : null;
         return this.adminService.createEvent(req.user.userId, body, photoPath);
+    }
+    getAllPublications(search, page, limit) {
+        return this.adminService.getAllPublications(search ?? '', Number(page) || 1, Number(limit) || 10);
+    }
+    deletePublication(id) {
+        return this.adminService.deletePublicationById(id);
     }
     async getAllEvents() {
         return this.adminService.getAllEvents();
@@ -182,8 +188,8 @@ __decorate([
     __param(0, (0, common_1.Query)()),
     __metadata("design:type", Function),
     __metadata("design:paramtypes", [Object]),
-    __metadata("design:returntype", Promise)
-], AdminController.prototype, "getApproved", null);
+    __metadata("design:returntype", void 0)
+], AdminController.prototype, "getApprovedBooks", null);
 __decorate([
     (0, common_1.Post)('users/create'),
     (0, common_1.UseGuards)(jwt_auth_guard_1.JwtAuthGuard, admin_guard_1.AdminGuard),
@@ -202,6 +208,24 @@ __decorate([
     __metadata("design:paramtypes", [Object, Object, Object]),
     __metadata("design:returntype", Promise)
 ], AdminController.prototype, "createAdminEvent", null);
+__decorate([
+    (0, common_1.Get)('publications'),
+    (0, common_1.UseGuards)(jwt_auth_guard_1.JwtAuthGuard, admin_guard_1.AdminGuard),
+    __param(0, (0, common_1.Query)('search')),
+    __param(1, (0, common_1.Query)('page')),
+    __param(2, (0, common_1.Query)('limit')),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", [String, String, String]),
+    __metadata("design:returntype", void 0)
+], AdminController.prototype, "getAllPublications", null);
+__decorate([
+    (0, common_1.UseGuards)(jwt_auth_guard_1.JwtAuthGuard, admin_guard_1.AdminGuard),
+    (0, common_1.Delete)('publications/:id/delete'),
+    __param(0, (0, common_1.Param)('id')),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", [String]),
+    __metadata("design:returntype", void 0)
+], AdminController.prototype, "deletePublication", null);
 __decorate([
     (0, common_1.Get)('events'),
     (0, common_1.UseGuards)(jwt_auth_guard_1.JwtAuthGuard, admin_guard_1.AdminGuard),

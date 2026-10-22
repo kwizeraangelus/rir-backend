@@ -61,9 +61,23 @@ export declare class AdminController {
     getDashboard(): Promise<{
         kpis: {
             total_users: number;
+            users_by_role: {
+                researcher: number;
+                university: number;
+            };
             total_books: number;
+            books_by_degree: {
+                fyp: number;
+                theses: number;
+            };
+            total_publications: number;
+            publications_by_type: {
+                journal: number;
+                conference: number;
+            };
             total_events: number;
             pending_count: number;
+            pending_innovations_count: number;
         };
         pending: {
             author_name: string;
@@ -96,7 +110,7 @@ export declare class AdminController {
         feedback?: string;
     }): Promise<{
         message: string;
-        status: "approved" | "pending" | "rejected" | undefined;
+        status: "pending" | "approved" | "rejected" | undefined;
     }>;
     getAllUsers(): Promise<import("../users/entities/user.entity").User[]>;
     updateUser(id: string, body: UpdateUserDto): Promise<{
@@ -105,13 +119,45 @@ export declare class AdminController {
     deleteUser(id: string): Promise<{
         message: string;
     }>;
-    getApproved(filters: AdminFilters): Promise<{
-        books: import("../university/entities/university-upload.entity").UniversityUpload[];
+    getApprovedBooks(filters: Record<string, string>): Promise<{
+        books: {
+            university: string;
+            id: string;
+            submission_type: string;
+            title: string;
+            authors: string;
+            cover_image?: string;
+            year: number;
+            description: string;
+            supervisor_name: string;
+            degree_type?: string;
+            file_path: string;
+            status: "pending" | "approved" | "rejected";
+            userId?: string;
+            created_at: Date;
+            views_count: number;
+            likes_count?: number;
+            feedback?: string;
+            rating_sum?: number;
+            rating_count?: number;
+            average_rating?: number;
+            updated_at: Date;
+        }[];
     }>;
     createUser(body: CreateUserDto): Promise<{
         message: string;
     }>;
     createAdminEvent(req: RequestWithUser, body: CreateEventDto, file: Express.Multer.File): Promise<{
+        message: string;
+    }>;
+    getAllPublications(search?: string, page?: string, limit?: string): Promise<{
+        items: import("../researcher/entities/publication.entity").Publication[];
+        total: number;
+        page: number;
+        limit: number;
+        totalPages: number;
+    }>;
+    deletePublication(id: string): Promise<{
         message: string;
     }>;
     getAllEvents(): Promise<import("../event/entities/event.entity").Event[]>;

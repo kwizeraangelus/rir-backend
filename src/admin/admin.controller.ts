@@ -125,9 +125,9 @@ export class AdminController {
   }
 
   @Get('approved-books')
-  async getApproved(@Query() filters: AdminFilters) {
-    return this.adminService.getApprovedBooks(filters);
-  }
+getApprovedBooks(@Query() filters: Record<string, string>) {
+  return this.adminService.getApprovedBooks(filters);
+}
 
   @Post('users/create')
   @UseGuards(JwtAuthGuard, AdminGuard)
@@ -146,6 +146,27 @@ export class AdminController {
     const photoPath = file ? await uploadFileToR2(file, 'events') : null;
     return this.adminService.createEvent(req.user.userId, body, photoPath);
   }
+
+
+  @Get('publications')
+  @UseGuards(JwtAuthGuard, AdminGuard)
+  getAllPublications(
+  @Query('search') search?: string,
+  @Query('page') page?: string,
+  @Query('limit') limit?: string,
+) {
+  return this.adminService.getAllPublications(
+    search ?? '',
+    Number(page) || 1,
+    Number(limit) || 10,
+  );
+}
+
+@UseGuards(JwtAuthGuard, AdminGuard)
+@Delete('publications/:id/delete')
+deletePublication(@Param('id') id: string) {
+  return this.adminService.deletePublicationById(id);
+}
 
   @Get('events')
   @UseGuards(JwtAuthGuard, AdminGuard)
@@ -305,5 +326,9 @@ export class AdminController {
     console.log(`[Admin] ${req.user.username} deleted: ${id}`);
     await this.expertService.remove(id);
   }
+
+
+
+
   
 }

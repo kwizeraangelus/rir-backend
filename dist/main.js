@@ -34,7 +34,7 @@ async function bootstrap() {
         app.useStaticAssets((0, path_1.join)(__dirname, '..', 'uploads'), {
             prefix: '/uploads/',
         });
-        const port = Number(process.env.PORT) || 3000;
+        const port = Number(process.env.PORT) || 3001;
         await app.listen(port);
         console.log(`🚀 Server running on port ${port}`);
         console.log(`🌍 NODE_ENV: ${process.env.NODE_ENV}`);

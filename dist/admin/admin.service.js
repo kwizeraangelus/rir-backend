@@ -40,8 +40,14 @@ let AdminService = class AdminService {
         this.contactRepo = contactRepo;
         this.mailService = mailService;
     }
+    toCountMap(rows) {
+        return rows.reduce((acc, row) => {
+            acc[(row.key ?? 'unknown').toLowerCase()] = Number(row.count);
+            return acc;
+        }, {});
+    }
     async getDashboardData() {
-        const [pendingList, userCount, approvedBookCount, eventCount] = await Promise.all([
+        const [pendingList, userCount, usersByRoleRows, approvedBookCount, approvedTypeRows, publicationCount, publicationsByTypeRows, pendingInnovationCount, eventCount,] = await Promise.all([
             this.uploadRepo.find({
                 where: { status: 'pending' },
                 relations: ['user'],
@@ -53,26 +59,71 @@ let AdminService = class AdminService {
                     submission_type: true,
                     supervisor_name: true,
                     authors: true,
+                    university: true,
                     status: true,
-                    user: {
-                        id: true,
-                        first_name: true,
-                    },
+                    user: { id: true, first_name: true },
                 },
             }),
             this.userRepo.count(),
-            this.uploadRepo.count({
-                where: { status: 'approved' },
-                relations: ['user'],
-            }),
+            this.userRepo
+                .createQueryBuilder('u')
+                .select('u.user_category', 'key')
+                .addSelect('COUNT(*)', 'count')
+                .where('u.user_category IN (:...roles)', {
+                roles: [user_entity_1.UserCategory.RESEARCHER, user_entity_1.UserCategory.UNIVERSITY],
+            })
+                .groupBy('u.user_category')
+                .getRawMany(),
+            this.uploadRepo.count({ where: { status: 'approved' } }),
+            this.uploadRepo
+                .createQueryBuilder('b')
+                .select(['b.id', 'b.degree_type', 'b.submission_type'])
+                .where('b.status = :status', { status: 'approved' })
+                .getMany(),
+            this.pubRepo.count(),
+            this.pubRepo
+                .createQueryBuilder('p')
+                .select('p.publication_type', 'key')
+                .addSelect('COUNT(*)', 'count')
+                .groupBy('p.publication_type')
+                .getRawMany(),
+            this.innovationRepo.count({ where: { status: false } }),
             this.eventRepo.count(),
         ]);
+        const usersByRole = this.toCountMap(usersByRoleRows);
+        const publicationsByType = this.toCountMap(publicationsByTypeRows);
+        const classify = (b) => {
+            const raw = (b.degree_type || b.submission_type || '').toLowerCase();
+            if (raw.includes('fyp') || raw.includes('final'))
+                return 'fyp';
+            if (raw.includes('thes') || raw.includes('dissert'))
+                return 'theses';
+            return 'other';
+        };
+        const booksByDegree = { fyp: 0, theses: 0, other: 0 };
+        for (const b of approvedTypeRows) {
+            booksByDegree[classify(b)]++;
+        }
         return {
             kpis: {
                 total_users: userCount,
+                users_by_role: {
+                    researcher: usersByRole['researcher'] ?? 0,
+                    university: usersByRole['university'] ?? 0,
+                },
                 total_books: approvedBookCount,
+                books_by_degree: {
+                    fyp: booksByDegree.fyp,
+                    theses: booksByDegree.theses,
+                },
+                total_publications: publicationCount,
+                publications_by_type: {
+                    journal: publicationsByType['journal'] ?? 0,
+                    conference: publicationsByType['conference'] ?? 0,
+                },
                 total_events: eventCount,
                 pending_count: pendingList.length,
+                pending_innovations_count: pendingInnovationCount,
             },
             pending: pendingList.map((item) => ({
                 ...item,
@@ -105,16 +156,37 @@ let AdminService = class AdminService {
         return { message: 'User and all their data deleted successfully' };
     }
     async getApprovedBooks(filters) {
-        const where = { status: 'approved' };
-        if (filters.title)
-            where.title = (0, typeorm_2.Like)(`%${filters.title}%`);
-        if (filters.university)
-            where.university = (0, typeorm_2.Like)(`%${filters.university}%`);
-        if (filters.submission_type)
-            where.submission_type = (0, typeorm_2.Like)(`%${filters.submission_type}%`);
-        if (filters.supervisor_name)
-            where.supervisor_name = (0, typeorm_2.Like)(`%${filters.supervisor_name}%`);
-        const books = await this.uploadRepo.find({ where });
+        const qb = this.uploadRepo
+            .createQueryBuilder('b')
+            .leftJoinAndSelect('b.user', 'u')
+            .where('b.status = :status', { status: 'approved' });
+        if (filters.title) {
+            qb.andWhere('b.title LIKE :title', { title: `%${filters.title}%` });
+        }
+        if (filters.author) {
+            qb.andWhere('b.authors LIKE :author', { author: `%${filters.author}%` });
+        }
+        if (filters.university) {
+            qb.andWhere('(b.university LIKE :uni OR u.university_name LIKE :uni)', {
+                uni: `%${filters.university}%`,
+            });
+        }
+        const category = filters.category ?? filters.submission_type;
+        if (category) {
+            qb.andWhere('(b.submission_type LIKE :cat OR b.degree_type LIKE :cat)', {
+                cat: `%${category}%`,
+            });
+        }
+        if (filters.supervisor_name) {
+            qb.andWhere('b.supervisor_name LIKE :sup', {
+                sup: `%${filters.supervisor_name}%`,
+            });
+        }
+        const rows = await qb.orderBy('b.created_at', 'DESC').getMany();
+        const books = rows.map(({ user, ...book }) => ({
+            ...book,
+            university: book.university?.trim() || user?.university_name || '',
+        }));
         return { books };
     }
     async createUser(data) {
@@ -262,6 +334,43 @@ let AdminService = class AdminService {
             throw new common_1.NotFoundException('Message not found');
         await this.mailService.sendReply(contact.email, contact.name, reply);
         return { success: true };
+    }
+    async getAllPublications(search = '', page = 1, limit = 10) {
+        const safePage = Math.max(Number(page) || 1, 1);
+        const safeLimit = Math.min(Math.max(Number(limit) || 10, 1), 100);
+        const qb = this.pubRepo
+            .createQueryBuilder('p')
+            .leftJoin('p.user', 'u')
+            .addSelect(['u.id', 'u.first_name', 'u.last_name', 'u.email']);
+        if (search.trim()) {
+            qb.where(`(p.title LIKE :s
+        OR p.authors LIKE :s
+        OR p.journal_name LIKE :s
+        OR p.conference_info LIKE :s
+        OR p.doi LIKE :s
+        OR p.publisher LIKE :s
+        OR u.first_name LIKE :s
+        OR u.last_name LIKE :s)`, { s: `%${search.trim()}%` });
+        }
+        const [items, total] = await qb
+            .orderBy('p.created_at', 'DESC')
+            .skip((safePage - 1) * safeLimit)
+            .take(safeLimit)
+            .getManyAndCount();
+        return {
+            items,
+            total,
+            page: safePage,
+            limit: safeLimit,
+            totalPages: Math.max(Math.ceil(total / safeLimit), 1),
+        };
+    }
+    async deletePublicationById(id) {
+        const pub = await this.pubRepo.findOneBy({ id });
+        if (!pub)
+            throw new common_1.NotFoundException(`Publication with ID ${id} not found`);
+        await this.pubRepo.remove(pub);
+        return { message: 'Publication deleted successfully' };
     }
 };
 exports.AdminService = AdminService;

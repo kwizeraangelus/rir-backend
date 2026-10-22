@@ -15,12 +15,27 @@ export declare class AdminService {
     private contactRepo;
     private mailService;
     constructor(userRepo: Repository<User>, uploadRepo: Repository<UniversityUpload>, eventRepo: Repository<Event>, pubRepo: Repository<Publication>, innovationRepo: Repository<Innovation>, contactRepo: Repository<Contact>, mailService: MailService);
+    private toCountMap;
     getDashboardData(): Promise<{
         kpis: {
             total_users: number;
+            users_by_role: {
+                researcher: number;
+                university: number;
+            };
             total_books: number;
+            books_by_degree: {
+                fyp: number;
+                theses: number;
+            };
+            total_publications: number;
+            publications_by_type: {
+                journal: number;
+                conference: number;
+            };
             total_events: number;
             pending_count: number;
+            pending_innovations_count: number;
         };
         pending: {
             author_name: string;
@@ -50,7 +65,7 @@ export declare class AdminService {
     }>;
     processUpload(id: string, action: string, feedback?: string): Promise<{
         message: string;
-        status: "approved" | "pending" | "rejected" | undefined;
+        status: "pending" | "approved" | "rejected" | undefined;
     }>;
     getUsers(): Promise<User[]>;
     updateUser(id: string, data: any): Promise<{
@@ -60,7 +75,29 @@ export declare class AdminService {
         message: string;
     }>;
     getApprovedBooks(filters: any): Promise<{
-        books: UniversityUpload[];
+        books: {
+            university: string;
+            id: string;
+            submission_type: string;
+            title: string;
+            authors: string;
+            cover_image?: string;
+            year: number;
+            description: string;
+            supervisor_name: string;
+            degree_type?: string;
+            file_path: string;
+            status: "pending" | "approved" | "rejected";
+            userId?: string;
+            created_at: Date;
+            views_count: number;
+            likes_count?: number;
+            feedback?: string;
+            rating_sum?: number;
+            rating_count?: number;
+            average_rating?: number;
+            updated_at: Date;
+        }[];
     }>;
     createUser(data: any): Promise<{
         message: string;
@@ -103,5 +140,15 @@ export declare class AdminService {
     deleteMessage(id: string): Promise<import("typeorm").DeleteResult>;
     replyToMessage(id: string, reply: string): Promise<{
         success: boolean;
+    }>;
+    getAllPublications(search?: string, page?: number, limit?: number): Promise<{
+        items: Publication[];
+        total: number;
+        page: number;
+        limit: number;
+        totalPages: number;
+    }>;
+    deletePublicationById(id: string): Promise<{
+        message: string;
     }>;
 }
