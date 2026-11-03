@@ -503,4 +503,43 @@ async deletePublicationById(id: string) {
   await this.pubRepo.remove(pub);
   return { message: 'Publication deleted successfully' };
 }
+
+
+async getReportStats() {
+  // approved books per uploader, split into FYP / theses (same rule as the dashboard)
+  const uploads = await this.uploadRepo
+    .createQueryBuilder('b')
+    .select(['b.id', 'b.userId', 'b.degree_type', 'b.submission_type'])
+    .where('b.status = :status', { status: 'approved' })
+    .getMany();
+
+  const uploadStats: Record<string, { fyp: number; theses: number; other: number }> = {};
+  for (const b of uploads) {
+    if (!b.userId) continue;
+    const raw = (b.degree_type || b.submission_type || '').toLowerCase();
+    const kind =
+      raw.includes('fyp') || raw.includes('final')
+        ? 'fyp'
+        : raw.includes('thes') || raw.includes('dissert')
+        ? 'theses'
+        : 'other';
+    (uploadStats[b.userId] ??= { fyp: 0, theses: 0, other: 0 })[kind]++;
+  }
+
+  // publications per researcher: count and DOIs
+  const pubs = await this.pubRepo
+    .createQueryBuilder('p')
+    .select(['p.id', 'p.userId', 'p.doi'])
+    .getMany();
+
+  const pubStats: Record<string, { count: number; dois: string[] }> = {};
+  for (const p of pubs) {
+    if (!p.userId) continue;
+    const entry = (pubStats[p.userId] ??= { count: 0, dois: [] });
+    entry.count++;
+    if (p.doi?.trim()) entry.dois.push(p.doi.trim());
+  }
+
+  return { uploads: uploadStats, publications: pubStats };
+}
 }

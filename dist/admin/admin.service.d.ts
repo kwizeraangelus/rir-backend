@@ -65,7 +65,7 @@ export declare class AdminService {
     }>;
     processUpload(id: string, action: string, feedback?: string): Promise<{
         message: string;
-        status: "pending" | "approved" | "rejected" | undefined;
+        status: "approved" | "pending" | "rejected" | undefined;
     }>;
     getUsers(): Promise<User[]>;
     updateUser(id: string, data: any): Promise<{
@@ -150,5 +150,16 @@ export declare class AdminService {
     }>;
     deletePublicationById(id: string): Promise<{
         message: string;
+    }>;
+    getReportStats(): Promise<{
+        uploads: Record<string, {
+            fyp: number;
+            theses: number;
+            other: number;
+        }>;
+        publications: Record<string, {
+            count: number;
+            dois: string[];
+        }>;
     }>;
 }

@@ -110,7 +110,7 @@ export declare class AdminController {
         feedback?: string;
     }): Promise<{
         message: string;
-        status: "pending" | "approved" | "rejected" | undefined;
+        status: "approved" | "pending" | "rejected" | undefined;
     }>;
     getAllUsers(): Promise<import("../users/entities/user.entity").User[]>;
     updateUser(id: string, body: UpdateUserDto): Promise<{
@@ -201,4 +201,15 @@ export declare class AdminController {
     create(dto: CreateExpertDto, req: any): Promise<Expert>;
     update(id: string, dto: UpdateExpertDto, req: any): Promise<Expert>;
     remove(id: string, req: any): Promise<void>;
+    getReportStats(): Promise<{
+        uploads: Record<string, {
+            fyp: number;
+            theses: number;
+            other: number;
+        }>;
+        publications: Record<string, {
+            count: number;
+            dois: string[];
+        }>;
+    }>;
 }

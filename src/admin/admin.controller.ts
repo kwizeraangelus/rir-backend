@@ -328,7 +328,10 @@ deletePublication(@Param('id') id: string) {
   }
 
 
-
+@Get('reports/stats')
+getReportStats() {
+  return this.adminService.getReportStats();
+}
 
   
 }

@@ -1,4 +1,4 @@
-import { Entity, PrimaryColumn, Column, BeforeInsert } from 'typeorm';
+import { Entity, PrimaryColumn, Column, BeforeInsert, CreateDateColumn } from 'typeorm';
 import * as bcrypt from 'bcrypt';
 import { v4 as uuidv4 } from 'uuid';
 
@@ -123,4 +123,7 @@ export class User {
 
   @Column({ type: 'timestamp', nullable: true, default: null })
   emailVerificationExpires: Date | null = null;
+
+  @CreateDateColumn()
+  created_at!: Date;
 }

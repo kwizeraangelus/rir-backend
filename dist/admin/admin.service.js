@@ -372,6 +372,39 @@ let AdminService = class AdminService {
         await this.pubRepo.remove(pub);
         return { message: 'Publication deleted successfully' };
     }
+    async getReportStats() {
+        const uploads = await this.uploadRepo
+            .createQueryBuilder('b')
+            .select(['b.id', 'b.userId', 'b.degree_type', 'b.submission_type'])
+            .where('b.status = :status', { status: 'approved' })
+            .getMany();
+        const uploadStats = {};
+        for (const b of uploads) {
+            if (!b.userId)
+                continue;
+            const raw = (b.degree_type || b.submission_type || '').toLowerCase();
+            const kind = raw.includes('fyp') || raw.includes('final')
+                ? 'fyp'
+                : raw.includes('thes') || raw.includes('dissert')
+                    ? 'theses'
+                    : 'other';
+            (uploadStats[b.userId] ??= { fyp: 0, theses: 0, other: 0 })[kind]++;
+        }
+        const pubs = await this.pubRepo
+            .createQueryBuilder('p')
+            .select(['p.id', 'p.userId', 'p.doi'])
+            .getMany();
+        const pubStats = {};
+        for (const p of pubs) {
+            if (!p.userId)
+                continue;
+            const entry = (pubStats[p.userId] ??= { count: 0, dois: [] });
+            entry.count++;
+            if (p.doi?.trim())
+                entry.dois.push(p.doi.trim());
+        }
+        return { uploads: uploadStats, publications: pubStats };
+    }
 };
 exports.AdminService = AdminService;
 exports.AdminService = AdminService = __decorate([

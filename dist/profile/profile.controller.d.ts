@@ -42,6 +42,7 @@ export declare class ProfileController {
         resetPasswordExpires: Date | null;
         emailVerificationToken: string | null;
         emailVerificationExpires: Date | null;
+        created_at: Date;
     }>;
     updateProfile(id: string, dto: UpdateProfileDto, req: {
         user: JwtUser;
@@ -76,6 +77,7 @@ export declare class ProfileController {
         resetPasswordExpires: Date | null;
         emailVerificationToken: string | null;
         emailVerificationExpires: Date | null;
+        created_at: Date;
     }>;
     updatePhoto(id: string, file: Express.Multer.File, req: {
         user: JwtUser;
@@ -110,6 +112,7 @@ export declare class ProfileController {
         resetPasswordExpires: Date | null;
         emailVerificationToken: string | null;
         emailVerificationExpires: Date | null;
+        created_at: Date;
     }>;
     changePassword(id: string, dto: ChangePasswordDto, req: {
         user: JwtUser;

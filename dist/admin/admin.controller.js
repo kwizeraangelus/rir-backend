@@ -146,6 +146,9 @@ let AdminController = class AdminController {
         console.log(`[Admin] ${req.user.username} deleted: ${id}`);
         await this.expertService.remove(id);
     }
+    getReportStats() {
+        return this.adminService.getReportStats();
+    }
 };
 exports.AdminController = AdminController;
 __decorate([
@@ -430,6 +433,12 @@ __decorate([
     __metadata("design:paramtypes", [String, Object]),
     __metadata("design:returntype", Promise)
 ], AdminController.prototype, "remove", null);
+__decorate([
+    (0, common_1.Get)('reports/stats'),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", []),
+    __metadata("design:returntype", void 0)
+], AdminController.prototype, "getReportStats", null);
 exports.AdminController = AdminController = __decorate([
     (0, common_1.Controller)('api/admin'),
     (0, common_1.UseGuards)(jwt_auth_guard_1.JwtAuthGuard, admin_guard_1.AdminGuard),

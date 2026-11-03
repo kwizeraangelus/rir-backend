@@ -94,6 +94,7 @@ let User = class User {
     resetPasswordExpires = null;
     emailVerificationToken = null;
     emailVerificationExpires = null;
+    created_at;
 };
 exports.User = User;
 __decorate([
@@ -235,6 +236,10 @@ __decorate([
     (0, typeorm_1.Column)({ type: 'timestamp', nullable: true, default: null }),
     __metadata("design:type", Object)
 ], User.prototype, "emailVerificationExpires", void 0);
+__decorate([
+    (0, typeorm_1.CreateDateColumn)(),
+    __metadata("design:type", Date)
+], User.prototype, "created_at", void 0);
 exports.User = User = __decorate([
     (0, typeorm_1.Entity)('users')
 ], User);

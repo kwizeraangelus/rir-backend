@@ -41,4 +41,5 @@ export declare class User {
     resetPasswordExpires: Date | null;
     emailVerificationToken: string | null;
     emailVerificationExpires: Date | null;
+    created_at: Date;
 }

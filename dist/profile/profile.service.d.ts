@@ -40,6 +40,7 @@ export declare class ProfileService {
         resetPasswordExpires: Date | null;
         emailVerificationToken: string | null;
         emailVerificationExpires: Date | null;
+        created_at: Date;
     }>;
     updateProfile(targetId: string, requesterId: string, isStaff: boolean, dto: UpdateProfileDto): Promise<{
         id: string;
@@ -72,6 +73,7 @@ export declare class ProfileService {
         resetPasswordExpires: Date | null;
         emailVerificationToken: string | null;
         emailVerificationExpires: Date | null;
+        created_at: Date;
     }>;
     updatePhoto(targetId: string, requesterId: string, isStaff: boolean, file: Express.Multer.File): Promise<{
         id: string;
@@ -104,6 +106,7 @@ export declare class ProfileService {
         resetPasswordExpires: Date | null;
         emailVerificationToken: string | null;
         emailVerificationExpires: Date | null;
+        created_at: Date;
     }>;
     updateCv(targetId: string, requesterId: string, isStaff: boolean, filePath: string): Promise<{
         id: string;
@@ -136,6 +139,7 @@ export declare class ProfileService {
         resetPasswordExpires: Date | null;
         emailVerificationToken: string | null;
         emailVerificationExpires: Date | null;
+        created_at: Date;
     }>;
     updateResume(targetId: string, requesterId: string, isStaff: boolean, filePath: string): Promise<{
         id: string;
@@ -168,6 +172,7 @@ export declare class ProfileService {
         resetPasswordExpires: Date | null;
         emailVerificationToken: string | null;
         emailVerificationExpires: Date | null;
+        created_at: Date;
     }>;
     changePassword(targetId: string, requesterId: string, isStaff: boolean, dto: ChangePasswordDto): Promise<{
         message: string;
