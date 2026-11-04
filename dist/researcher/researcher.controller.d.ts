@@ -81,5 +81,9 @@ export declare class ResearcherController {
     importFromOrcid(req: any, body: {
         orcid: string;
         putCodes: string[];
-    }): Promise<any[]>;
+    }): Promise<{
+        saved: any[];
+        skipped_no_doi: any[];
+        skipped_duplicates: string[];
+    }>;
 }

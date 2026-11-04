@@ -31,7 +31,11 @@ export declare class ResearcherService {
     private fetchOrcidWorksList;
     private fetchOrcidWorkDetail;
     previewOrcidWorks(orcidInput: string): Promise<any[]>;
-    createPublicationsFromOrcid(userId: string, orcidInput: string, putCodes: string[]): Promise<any[]>;
+    createPublicationsFromOrcid(userId: string, orcidInput: string, putCodes: string[]): Promise<{
+        saved: any[];
+        skipped_no_doi: any[];
+        skipped_duplicates: string[];
+    }>;
     updateProfile(userId: string, body: any, file?: Express.Multer.File): Promise<User | null>;
     findAllApproved(): Promise<Publication[]>;
     getAllResearchers(search?: string): Promise<{

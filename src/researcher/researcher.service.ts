@@ -235,27 +235,40 @@ async createPublicationsFromOrcid(userId: string, orcidInput: string, putCodes: 
   const list = await this.fetchOrcidWorksList(orcid);
   const selected = list.filter((w: any) => putCodes.includes(w.putCode));
 
+  // a publication must have a DOI
+  const withDoi = selected.filter((w: any) => w.doi && this.cleanDoi(w.doi));
+  const noDoi = selected.filter((w: any) => !w.doi || !this.cleanDoi(w.doi));
+
+  if (withDoi.length === 0) {
+    throw new BadRequestException(
+      'None of the selected works has a DOI. A publication must have a DOI to be added.',
+    );
+  }
+
   const saved: any[] = [];
-  for (const item of selected) {
-    if (item.doi) {
-      const existing = await this.pubRepo.findOne({ where: { doi: this.cleanDoi(item.doi) } });
-      if (existing) continue; // skip ones already imported
+  const duplicates: string[] = [];
+
+  for (const item of withDoi) {
+    const doi = this.cleanDoi(item.doi);
+
+    const existing = await this.pubRepo.findOne({ where: { doi } });
+    if (existing) {
+      duplicates.push(item.title);
+      continue;
     }
 
     let pubData: any = null;
-    if (item.doi) {
-      try {
-        pubData = await this.fetchCrossrefMetadata(item.doi); // richer: abstract, structured authors
-      } catch {
-        pubData = null;
-      }
+    try {
+      pubData = await this.fetchCrossrefMetadata(doi);
+    } catch {
+      pubData = null;
     }
+
     if (!pubData) {
       const detail = await this.fetchOrcidWorkDetail(orcid, item.putCode);
       pubData = {
         title: detail?.title || item.title,
         authors: detail?.authors || [],
-        doi: item.doi,
         year: detail?.year || item.year,
         journal_name: detail?.journal_name || item.journal,
         url: detail?.url || item.url,
@@ -264,12 +277,22 @@ async createPublicationsFromOrcid(userId: string, orcidInput: string, putCodes: 
       };
     }
 
-    const pub = this.pubRepo.create({ ...pubData, user: { id: userId }, status: true });
+    // always store the cleaned DOI, whichever source the data came from
+    const pub = this.pubRepo.create({
+      ...pubData,
+      doi,
+      user: { id: userId },
+      status: true,
+    });
     saved.push(await this.pubRepo.save(pub));
   }
-  return saved;
-}
 
+  return {
+    saved,
+    skipped_no_doi: noDoi.map((w: any) => w.title),
+    skipped_duplicates: duplicates,
+  };
+}
   async updateProfile(userId: string, body: any, file?: Express.Multer.File) {
     const updateData: any = {};
 
