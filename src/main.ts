@@ -29,6 +29,7 @@ async function bootstrap() {
         'https://riri.rw',
         'https://www.riri.rw',
         'https://api.riri.rw',
+        'https://forestgreen-walrus-194611.hostingersite.com',
       ],
       methods: 'GET,POST,PATCH,DELETE,PUT',
       allowedHeaders: ['Content-Type', 'Authorization'],
