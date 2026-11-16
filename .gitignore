@@ -1,7 +1,13 @@
-# Ignore dependency and build folders everywhere
+# Dependencies
 node_modules/
-.next/
-#dist/
-.env
-*.log
 
+# Build output
+dist/
+.next/
+
+# Environment variables
+.env
+.env.*
+
+# Logs
+*.log
